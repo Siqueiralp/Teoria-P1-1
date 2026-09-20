@@ -228,7 +228,7 @@ function runConverterCalculations() {
       IL_avg = Io;
       IL_max = deltaIL;
       IL_min = 0;
-      deltaVo = (Io * (1 - D - D2)) / (C * fs);
+      deltaVo = (Io / (C * fs)) * Math.pow(1 - (D + D2) / 2, 2);
     }
   } else if (topology === 'boost') {
     // Topologia Boost (Elevador)
@@ -254,10 +254,10 @@ function runConverterCalculations() {
       D = Math.sqrt(Math.max(0, K * M * (M - 1)));
       D2 = D / Math.max(0.001, M - 1);
       deltaIL = (Vin * D) / (L * fs);
-      IL_avg = (Vin / (Vo - Vin)) * (deltaIL * D2 / 2);
+      IL_avg = (deltaIL * (D + D2)) / 2;
       IL_max = deltaIL;
       IL_min = 0;
-      deltaVo = (Io * D) / (C * fs);
+      deltaVo = (Io / (C * fs)) * Math.pow(1 - D2 / 2, 2);
     }
   } else if (topology === 'buck-boost') {
     // Topologia Buck-Boost (Inversor)
@@ -285,7 +285,7 @@ function runConverterCalculations() {
       IL_avg = (deltaIL * (D + D2)) / 2;
       IL_max = deltaIL;
       IL_min = 0;
-      deltaVo = (Io * D) / (C * fs);
+      deltaVo = (Io / (C * fs)) * Math.pow(1 - D2 / 2, 2);
     }
   }
 
@@ -314,8 +314,8 @@ function runConverterCalculations() {
   drawWaveformsSVG({
     mode,
     topology,
-    D: Math.min(0.95, Math.max(0.05, D)),
-    D2: Math.min(0.95, Math.max(0.05, D2)),
+    D: Math.min(0.999, Math.max(0.001, D)),
+    D2: Math.min(0.999, Math.max(0.001, D2)),
     IL_min: Math.max(0, IL_min),
     IL_max: Math.max(0.01, IL_max),
     Vin,

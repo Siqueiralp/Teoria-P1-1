@@ -219,7 +219,7 @@
             Para projetar componentes e dissipadores térmicos, precisamos responder a duas perguntas distintas:
           </p>
           <ul>
-            <li><strong>Qual a quantidade líquida de carga transportada por segundo?</strong> Respondida pelo <strong>Valor Médio</strong>. É ele quem produz torque em motores CC, carrega baterias e define a queda na barreira de potencial de semicondutores.</li>
+            <li><strong>Qual é a componente contínua da grandeza?</strong> Respondida pelo <strong>Valor Médio</strong>. Para corrente, ele representa a carga líquida transferida por unidade de tempo e é fundamental em fenômenos como corrente de carga de baterias e torque médio em máquinas CC.</li>
             <li><strong>Quanto calor essa forma de onda dissipa em uma resistência?</strong> Respondida pelo <strong>Valor Eficaz (RMS - Root Mean Square)</strong>. É ele quem dita o aquecimento por Efeito Joule (\(P = R I_{ef}^2\)) em condutores, bobinas e no canal \(R_{DS(on)}\) de MOSFETs.</li>
           </ul>
 
@@ -260,7 +260,7 @@
                   <td>$$\frac{2}{\sqrt{3}} \approx 1{,}155$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Triangular Simétrica</strong></td>
+                  <td><strong>Triangular Unipolar (0 → A → 0)</strong></td>
                   <td>Sobe a \(A\) em \(T/2\) e desce a \(0\) em \(T\)</td>
                   <td>$$\frac{A}{2}$$</td>
                   <td>$$\frac{A}{\sqrt{3}}$$</td>
@@ -290,6 +290,22 @@
               </tbody>
             </table>
           </div>
+
+          <h3>1.3 Conceito de Potência Elétrica</h3>
+          <p>
+            Em formas de onda arbitrárias, a potência instantânea é o produto entre tensão e corrente no mesmo instante:
+            \(p(t) = v(t)i(t)\). A potência ativa média em um período é:
+          </p>
+          $P = \frac{1}{T}\int_0^T v(t)i(t)\,dt$
+          <p>
+            Para uma carga puramente resistiva, tensão e corrente são proporcionais e a expressão se reduz a:
+          </p>
+          $P = R I_{rms}^2 = \frac{V_{rms}^2}{R}$
+          <p>
+            Para senoides de mesma frequência, com defasagem \(\varphi\), vale \(P = V_{rms} I_{rms}\cos\varphi\).
+            Para formas de onda chaveadas ou não senoidais, porém, <strong>não se deve assumir que \(V_{rms}I_{rms}\) é a potência ativa</strong>;
+            a definição geral continua sendo a média de \(v(t)i(t)\).
+          </p>
 
           <div class="callout callout-exam">
             <div class="callout-title">⚠️ Pegadinha Clássica de Prova da UTFPR</div>
@@ -338,7 +354,7 @@
             <ul class="checklist-items">
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod1-item1">
-                <span>Compreendo a diferença física entre valor médio (transferência DC de carga) e valor eficaz (efeito térmico Joule).</span>
+                <span>Compreendo a diferença física entre valor médio (componente contínua; para corrente, transferência líquida de carga) e valor eficaz (efeito térmico em elementos resistivos).</span>
               </li>
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod1-item2">
@@ -431,10 +447,10 @@
           <div class="callout callout-concept">
             <div class="callout-title">⚡ A Hipótese de Pequenas Oscilações (Small-Ripple Approximation)</div>
             <p>
-              Ao projetar fontes chaveadas, escolhemos capacitores tais que a constante de tempo do filtro de saída seja muito maior que o período de chaveamento (\(R \cdot C \gg T_s\)).
-              Isso garante que a ondulação de tensão de saída \(\Delta v_C(t)\) seja insignificante em comparação ao nível médio \(V_o\) (geralmente \(\Delta V_o / V_o < 1\%\)).
-              Portanto, nas análises das etapas de chaveamento, podemos adotar com excelente precisão:
-              $$v_C(t) \approx V_o = \text{constante}$$
+              A aproximação de pequenas oscilações assume que a ondulação é pequena em relação ao valor médio
+              (\(\Delta V_o \ll V_o\)). Essa hipótese não decorre apenas de \(R C \gg T_s\): ela deve ser verificada a partir
+              da topologia, de \(L\), \(C\), da carga e da frequência de chaveamento. Quando satisfeita, podemos adotar:
+              $v_C(t) \approx V_o = \text{constante}$
             </p>
           </div>
 
@@ -456,7 +472,7 @@
               </li>
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod2-item4">
-                <span>Sei aplicar a aproximação de pequenas oscilações (\(v_C(t) \approx V_o\)) para simplificar a análise de circuitos chaveados.</span>
+                <span>Sei aplicar e verificar a aproximação de pequenas oscilações (\(v_C(t) \approx V_o\)) a partir do ripple previsto para a topologia.</span>
               </li>
             </ul>
           </div>
@@ -485,17 +501,17 @@
           <h3>3.1 O Diodo Real vs. Modelo Linearizado por Trechos (PWL)</h3>
           <p>
             O diodo ideal conduz corrente no sentido ânodo-cátodo com queda de tensão zero e bloqueia qualquer tensão reversa com corrente nula. 
-            No entanto, diodos de potência reais possuem quedas de tensão não desprezíveis decorrentes da barreira de potencial da junção PN (\(V_F\)) 
+            No entanto, diodos de potência reais possuem quedas de tensão não desprezíveis decorrentes da barreira de potencial da junção PN (\(V_{T0}\)) 
             e da resistência ôhmica das camadas semicondutoras de deriva (\(r_D\)).
           </p>
 
           <div class="callout callout-math">
             <div class="callout-title">⚡ Equação do Modelo Linear por Trechos</div>
             <p>Quando o diodo está em condução (\(i_D(t) > 0\)), sua tensão é modelada pela equação da reta:</p>
-            $$v_D(t) = V_F + r_D \cdot i_D(t)$$
+            $$v_D(t) = V_{T0} + r_D \cdot i_D(t)$$
             <p>Onde:</p>
             <ul>
-              <li>\(V_F\) (ou \(V_\gamma\)): Tensão limiar de condução (aprox. \(0{,}7\text{ V}\) a \(1{,}1\text{ V}\) para silício; \(0{,}3\text{ V}\) a \(0{,}5\text{ V}\) para Schottky).</li>
+              <li>\(V_{T0}\) (ou \(V_\gamma\)): Tensão limiar de condução (aprox. \(0{,}7\text{ V}\) a \(1{,}1\text{ V}\) para silício; \(0{,}3\text{ V}\) a \(0{,}5\text{ V}\) para Schottky).</li>
               <li>\(r_D\): Resistência dinâmica de condução (inclinação da curva \(I-V\) na região de trabalho).</li>
             </ul>
           </div>
@@ -505,23 +521,23 @@
             A potência instantânea dissipada pelo diodo em condução é dada pelo produto da sua tensão instantânea pela corrente instantânea: 
             \(p_D(t) = v_D(t) \cdot i_D(t)\). Para calcular a potência média dissipada no ciclo de comutação \(T\):
           </p>
-          $$P_{cond} = \frac{1}{T} \int_0^T v_D(t) \cdot i_D(t) \, dt = \frac{1}{T} \int_0^T [V_F + r_D \cdot i_D(t)] \cdot i_D(t) \, dt$$
-          $$P_{cond} = \frac{1}{T} \int_0^T V_F \cdot i_D(t) \, dt + \frac{1}{T} \int_0^T r_D \cdot i_D^2(t) \, dt$$
-          <p>Colocando as constantes \(V_F\) e \(r_D\) para fora das integrais:</p>
-          $$P_{cond} = V_F \cdot \underbrace{\left( \frac{1}{T} \int_0^T i_D(t) \, dt \right)}_{I_{D,med}} + r_D \cdot \underbrace{\left( \frac{1}{T} \int_0^T i_D^2(t) \, dt \right)}_{I_{D,ef}^2}$$
+          $$P_{cond} = \frac{1}{T} \int_0^T v_D(t) \cdot i_D(t) \, dt = \frac{1}{T} \int_0^T [V_{T0} + r_D \cdot i_D(t)] \cdot i_D(t) \, dt$$
+          $$P_{cond} = \frac{1}{T} \int_0^T V_{T0} \cdot i_D(t) \, dt + \frac{1}{T} \int_0^T r_D \cdot i_D^2(t) \, dt$$
+          <p>Colocando as constantes \(V_{T0}\) e \(r_D\) para fora das integrais:</p>
+          $$P_{cond} = V_{T0} \cdot \underbrace{\left( \frac{1}{T} \int_0^T i_D(t) \, dt \right)}_{I_{D,med}} + r_D \cdot \underbrace{\left( \frac{1}{T} \int_0^T i_D^2(t) \, dt \right)}_{I_{D,ef}^2}$$
 
           <div class="formula-block">
             <span class="formula-tag">Fórmula Fundamental das Perdas por Condução</span>
-            $$P_{cond} = V_F \cdot I_{D,med} + r_D \cdot I_{D,ef}^2$$
+            $$P_{cond} = V_{T0} \cdot I_{D,med} + r_D \cdot I_{D,ef}^2$$
           </div>
 
           <div class="callout callout-exam">
-            <div class="callout-title">⚠️ Questão Conceitual Garantida em Provas</div>
+            <div class="callout-title">⚠️ Questão Conceitual Importante</div>
             <p>
               <strong>Por que a primeira parcela utiliza o valor médio e a segunda utiliza o valor eficaz ao quadrado?</strong><br>
-              <em>Resposta Didática:</em> A fonte ideal de tensão \(V_F\) consome uma energia fixa por Coulomb de carga que atravessa o diodo (\(W = V_F \cdot Q\)). 
-              Como a corrente média é exatamente a taxa de transferência líquida de carga (\(Q = I_{med} \cdot T\)), a potência média na barreira de potencial é \(V_F \cdot I_{med}\). 
-              Já a resistência \(r_D\) dissipa calor por Efeito Joule clássico (\(p(t) = r_D \cdot i^2(t)\)), cuja média temporal temporal decorre diretamente da integral do quadrado da corrente, que define o valor eficaz: \(\langle i^2 \rangle = I_{ef}^2\).
+              <em>Resposta Didática:</em> A fonte ideal de tensão \(V_{T0}\) consome uma energia fixa por Coulomb de carga que atravessa o diodo (\(W = V_{T0} \cdot Q\)). 
+              Como a corrente média é exatamente a taxa de transferência líquida de carga (\(Q = I_{med} \cdot T\)), a potência média na barreira de potencial é \(V_{T0} \cdot I_{med}\). 
+              Já a resistência \(r_D\) dissipa calor por Efeito Joule clássico (\(p(t) = r_D \cdot i^2(t)\)), cuja média temporal decorre diretamente da integral do quadrado da corrente, que define o valor eficaz: \(\langle i^2 \rangle = I_{ef}^2\).
             </p>
           </div>
 
@@ -533,21 +549,23 @@
           </p>
           $$P_{com} \approx Q_{rr} \cdot V_R \cdot f_s$$
           <p>
-            Em altas frequências de chaveamento, as perdas de comutação do diodo de roda-livre podem superar as perdas de condução, 
-            exigindo diodos do tipo <em>Ultra-Fast Recovery</em>, <em>Schottky</em> ou semicondutores de banda larga (SiC - Carbeto de Silício).
+            A expressão \(P_{com} \approx Q_{rr}V_Rf_s\) é uma <strong>estimativa de primeira ordem</strong>. O valor de \(Q_{rr}\)
+            depende das condições de operação, como corrente direta, \(di/dt\), tensão reversa e temperatura. Além disso, parte da energia
+            associada à recuperação reversa pode aparecer como perda adicional na chave que força a comutação. Em altas frequências,
+            esse efeito favorece o uso de diodos <em>Ultra-Fast Recovery</em>, Schottky ou dispositivos SiC, conforme a aplicação.
           </p>
 
           <!-- Exercício Resolvido Módulo 3 -->
           <div class="exercise-box">
             <div class="exercise-header">
-              <span>Exercício de Fixação 3.1 — Dimensionamento Térmico de Diodo</span>
+              <span>Exercício de Fixação 3.1 — Cálculo de Perdas no Diodo</span>
               <span>Nível: Exame UTFPR</span>
             </div>
             <div class="exercise-body">
               <p>
                 Um diodo de roda-livre opera em um conversor com corrente na forma de pulso retangular com amplitude \(I_p = 20\text{ A}\) 
                 e razão de condução \(D_d = 0{,}4\) (isto é, conduz durante \(40\%\) do período). 
-                Os parâmetros do modelo linearizado obtidos do datasheet são: \(V_F = 0{,}85\text{ V}\) e \(r_D = 18\text{ m}\Omega\). 
+                Os parâmetros do modelo linearizado obtidos do datasheet são: \(V_{T0} = 0{,}85\text{ V}\) e \(r_D = 18\text{ m}\Omega\). 
                 (a) Calcule a corrente média e eficaz no diodo; 
                 (b) Calcule a potência de condução total dissipada; 
                 (c) Se o conversor operar a \(f_s = 100\text{ kHz}\) com tensão reversa \(V_R = 150\text{ V}\) e \(Q_{rr} = 60\text{ nC}\), calcule as perdas por comutação.
@@ -559,7 +577,7 @@
                 $$I_{D,ef} = \sqrt{D_d} \cdot I_p = \sqrt{0{,}4} \cdot 20\text{ A} \approx 0{,}6325 \cdot 20\text{ A} = 12{,}65\text{ A}$$
 
                 <p><strong>(b) Perdas por Condução:</strong></p>
-                $$P_{cond} = V_F \cdot I_{D,med} + r_D \cdot I_{D,ef}^2$$
+                $$P_{cond} = V_{T0} \cdot I_{D,med} + r_D \cdot I_{D,ef}^2$$
                 $$P_{cond} = 0{,}85 \cdot 8{,}0 + 0{,}018 \cdot (12{,}65)^2 = 6{,}80\text{ W} + 0{,}018 \cdot 160{,}0\text{ W} = 6{,}80\text{ W} + 2{,}88\text{ W} = 9{,}68\text{ W}$$
 
                 <p><strong>(c) Perdas por Comutação:</strong></p>
@@ -575,11 +593,11 @@
             <ul class="checklist-items">
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod3-item1">
-                <span>Compreendo o modelo por trechos linearizados (PWL) do diodo: \(v_D = V_F + r_D \cdot i_D\).</span>
+                <span>Compreendo o modelo por trechos linearizados (PWL) do diodo: \(v_D = V_{T0} + r_D \cdot i_D\).</span>
               </li>
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod3-item2">
-                <span>Sei deduzir formalmente por que \(P_{cond} = V_F \cdot I_{D,med} + r_D \cdot I_{D,ef}^2\).</span>
+                <span>Sei deduzir formalmente por que \(P_{cond} = V_{T0} \cdot I_{D,med} + r_D \cdot I_{D,ef}^2\).</span>
               </li>
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod3-item3">
@@ -587,7 +605,7 @@
               </li>
               <li class="checklist-item">
                 <input type="checkbox" data-check-id="mod3-item4">
-                <span>Consigo dimensionar dissipadores térmicos somando perdas por condução e comutação do semicondutor.</span>
+                <span>Consigo estimar as perdas elétricas por condução e recuperação reversa antes de partir para o dimensionamento térmico completo.</span>
               </li>
             </ul>
           </div>
@@ -719,6 +737,37 @@
           <div class="formula-block">
             <span class="formula-tag">Ondulação de Tensão no Buck (Filtro LC de 2ª Ordem)</span>
             $$\Delta V_o = \frac{\Delta I_L}{8 C f_s} = \frac{V_o (1 - D)}{8 L C f_s^2}$$
+          </div>
+
+          <p class="muted">
+            A expressão acima considera capacitor ideal, ESR/ESL desprezíveis e pequena ondulação. Em componentes reais,
+            a ESR acrescenta uma parcela adicional ao ripple de tensão.
+          </p>
+
+          <div class="exercise-box">
+            <div class="exercise-header">
+              <span>Exemplo de Aula — Buck 12 V → 5 V, 50 W</span>
+              <span>Tema: Buck CCM • Dimensionamento de L e C</span>
+            </div>
+            <div class="exercise-body">
+              <p>
+                Para \(P_o=50\text{ W}\), \(V_{in}=12\text{ V}\), \(V_o=5\text{ V}\), \(f_s=100\text{ kHz}\),
+                ripple de corrente \(\Delta I_L=10\%\,\overline I_L\) e ripple de tensão \(\Delta V_o=1\%\,V_o\):
+              </p>
+              $R=\frac{V_o^2}{P_o}=\frac{5^2}{50}=0{,}5\,\Omega$
+              $\overline I_L=I_o=\frac{V_o}{R}=10\text{ A}$
+              $D=\frac{V_o}{V_{in}}=\frac{5}{12}\approx0{,}417$
+              $\Delta I_L=0{,}10\cdot10=1\text{ A}$
+              $L=\frac{(V_{in}-V_o)D}{\Delta I_L f_s}
+              =\frac{(12-5)\cdot0{,}417}{1\cdot100\times10^3}
+              \approx29{,}2\,\mu\text{H}$
+              $\Delta V_o=0{,}01\cdot5=0{,}05\text{ V}$
+              $C=\frac{\Delta I_L}{8f_s\Delta V_o}
+              =\frac{1}{8\cdot100\times10^3\cdot0{,}05}
+              \approx25\,\mu\text{F}$
+              <p><strong>Resultado:</strong> \(R=0{,}5\,\Omega\), \(I_o=10\text{ A}\), \(D\approx0{,}417\),
+              \(L\approx29{,}2\,\mu\text{H}\) e \(C\approx25\,\mu\text{F}\), desprezando ESR/ESL.</p>
+            </div>
           </div>
 
           <h3>4.6 Esforços Máximos nos Semicondutores</h3>
@@ -879,9 +928,12 @@
           <div class="callout callout-warning">
             <div class="callout-title">⚠️ Comparação Crítica de Projeto: Buck vs Boost</div>
             <p>
-              Observe a diferença crucial: No Buck, o filtro de saída é de segunda ordem (LC) e \(\Delta V_o\) cai com \(f_s^2\) e traz o fator 8 no denominador (\(\Delta V_o \propto \frac{1}{8 L C f_s^2}\)). 
-              No Boost, o filtro é de primeira ordem e \(\Delta V_o\) cai apenas com \(f_s\) (\(\Delta V_o \propto \frac{1}{R C f_s}\)). 
-              Por isso, para a mesma potência e frequência, o capacitor do Boost necessita de uma capacitância ordens de grandeza maior que a do Buck!
+              A diferença entre as expressões de ripple do Buck e do Boost vem do <strong>caminho da corrente do capacitor</strong>.
+              No Buck, a corrente do capacitor é a componente alternada da corrente do indutor. No Boost, durante \(D T_s\),
+              o diodo está bloqueado e o capacitor alimenta sozinho a carga, perdendo aproximadamente \(I_o D T_s\) de carga.
+              Isso conduz a \(\Delta V_o \approx I_oD/(Cf_s)\) sob pequena ondulação e ESR desprezível. Não se deve concluir,
+              a partir dessa expressão, que o conversor Boost seja um sistema de primeira ordem nem que sua capacitância precise ser
+              necessariamente ordens de grandeza maior que a do Buck.
             </p>
           </div>
 
@@ -937,8 +989,9 @@
         <div class="module-body">
           <h3>6.1 Topologia e Inversão de Polaridade</h3>
           <p>
-            O conversor Buck-Boost combina as características dos dois conversores anteriores: ele pode tanto rebaixar (\(V_o < V_{in}\)) 
-            quanto elevar (\(V_o > V_{in}\)) a amplitude da tensão, operando com <strong>inversão intrínseca de polaridade</strong> (o terminal positivo da saída está conectado à referência de terra).
+            O conversor Buck-Boost combina as características dos dois conversores anteriores: ele pode tanto rebaixar (\(V_o < V_{in}\))
+            quanto elevar (\(V_o > V_{in}\)) a <strong>magnitude</strong> da tensão. Neste material, \(V_o>0\) representa a magnitude
+            da saída e a tensão elétrica no terminal de saída é \(v_{out}=-V_o\), pois a topologia é inversora.
           </p>
 
           <!-- Diagrama SVG do Conversor Buck-Boost -->
@@ -996,7 +1049,7 @@
 
           <div class="formula-block">
             <span class="formula-tag">Ganho Estático do Buck-Boost em CCM</span>
-            $$M(D) = \frac{V_o}{V_{in}} = \frac{D}{1 - D}$$
+            $\frac{v_{out}}{V_{in}} = -\frac{D}{1-D}, \qquad M \equiv \frac{V_o}{V_{in}} = \frac{D}{1-D}$
           </div>
 
           <p>
@@ -1008,7 +1061,15 @@
             <li>Se \(D > 0{,}5 \implies V_o > V_{in}\) (Modo Elevador).</li>
           </ul>
 
-          <h3>6.3 Corrente no Indutor e Esforço de Tensão nos Semicondutores</h3>
+          <h3>6.3 Ondulações de Corrente e Tensão</h3>
+          <p>Durante a condução da chave, \(v_L=V_{in}\). Assim, a ondulação pico a pico da corrente é:</p>
+          $\Delta I_L = \frac{V_{in}D}{Lf_s}$
+          <p>
+            Nesse mesmo intervalo o diodo está bloqueado e o capacitor alimenta a carga. Sob pequena ondulação e ESR desprezível:
+          </p>
+          $\Delta V_o \approx \frac{I_oD}{Cf_s}$
+
+          <h3>6.4 Corrente no Indutor e Esforço de Tensão nos Semicondutores</h3>
           <p>A corrente média no indutor do Buck-Boost é a soma das correntes médias de entrada e saída:</p>
           $$I_L = I_{in} + I_o = \frac{I_o}{1 - D}$$
           <p>
@@ -1182,7 +1243,8 @@
             No conversor Boost, a corrente no indutor tem valor médio \(I_L = \frac{I_o}{1 - D}\) e ondulação \(\Delta I_L = \frac{V_{in} D}{L f_s}\). 
             A condução torna-se descontínua quando a corrente de carga cai abaixo da corrente crítica:
           </p>
-          $$I_{o,crit} = \frac{V_{in} \cdot D (1 - D)^2}{2 L f_s}$$
+          $I_{o,crit} = \frac{V_{in} \cdot D (1 - D)}{2 L f_s}
+          = \frac{V_o \cdot D (1 - D)^2}{2 L f_s}$
           <p>Expressando em termos do parâmetro normalizado \(K = \frac{2 L f_s}{R}\):</p>
 
           <div class="formula-block">
@@ -1208,11 +1270,11 @@
           </div>
 
           <div class="callout callout-exam">
-            <div class="callout-title">⚠️ O Fenômeno Perigoso de Corrida Térmica / Sobretensão no Boost</div>
+            <div class="callout-title">⚠️ Elevação Descontrolada da Tensão em Vazio no Boost</div>
             <p>
               Observe a equação acima quando a carga é desconectada (\(R \to \infty \implies K \to 0\)):
               $$\lim_{K \to 0} M(D, K) = \lim_{K \to 0} \frac{1 + \sqrt{1 + 4D^2/K}}{2} = +\infty$$
-              <strong>Atenção Vital de Engenharia:</strong> Se um conversor Boost em malha aberta operar em vazio (sem carga), a cada período a fonte continuará bombeando um pacote de energia magnética \(\frac{1}{2} L I_{pk}^2\) para o capacitor de saída. Como não há carga para drenar essa energia, a tensão \(V_o\) crescerá teoricamente até o infinito, explodindo o capacitor eletrolítico e destruindo o MOSFET por avalanche! Em projetos práticos de Boost, <em>sempre</em> deve haver um resistor de carga mínima (bleeder) ou proteção por sobretensão (OVP).
+              <strong>Atenção de Engenharia:</strong> No modelo ideal em malha aberta, a operação em vazio não possui um ponto de equilíbrio finito para a tensão de saída: a energia transferida a cada ciclo se acumula no capacitor. Em um circuito real, perdas, controle, limitações dos componentes e proteções impedem o crescimento matematicamente ilimitado, mas a sobretensão continua sendo um risco real. Por isso, projetos práticos empregam controle adequado, carga mínima quando aplicável e/ou proteção por sobretensão (OVP).
             </p>
           </div>
 
@@ -1286,7 +1348,7 @@
 
           <div class="formula-block">
             <span class="formula-tag">Ganho do Buck-Boost em DCM</span>
-            $$M(D, K) = \frac{V_o}{V_{in}} = \frac{D}{\sqrt{K}}$$
+            $\frac{v_{out}}{V_{in}} = -\frac{D}{\sqrt{K}}, \qquad M \equiv \frac{V_o}{V_{in}} = \frac{D}{\sqrt{K}}$
           </div>
 
           <div class="callout callout-concept">
@@ -1296,7 +1358,8 @@
               A tensão de saída é <strong>diretamente proporcional à razão cíclica \(D\)</strong> e inversamente proporcional a \(\sqrt{K}\). 
               Além disso:
               $$D_2 = \frac{D}{M} = \frac{D}{D / \sqrt{K}} = \sqrt{K}$$
-              O tempo de descarga do indutor (\(D_2\)) independe da razão cíclica \(D\) e é determinado exclusivamente pelos parâmetros de carga e indutância (\(\sqrt{K}\))!
+              O intervalo normalizado de descarga do indutor (\(D_2\)) independe diretamente da razão cíclica \(D\) e vale
+          \(D_2=\sqrt{K}=\sqrt{2Lf_s/R}\); portanto, depende de indutância, frequência de chaveamento e carga.
             </p>
           </div>
 
@@ -1455,65 +1518,84 @@
                 </tr>
               </thead>
               <tbody>
+                <tr><td colspan="4"><strong>CCM — relações válidas em condução contínua</strong></td></tr>
                 <tr>
-                  <td><strong>Ganho em CCM (\(M\))</strong></td>
-                  <td>$$D$$</td>
-                  <td>$$\frac{1}{1 - D}$$</td>
-                  <td>$$\frac{D}{1 - D}$$</td>
+                  <td><strong>Ganho em CCM</strong></td>
+                  <td>$$M=\frac{V_o}{V_{in}}=D$$</td>
+                  <td>$$M=\frac{V_o}{V_{in}}=\frac{1}{1-D}$$</td>
+                  <td>$$\frac{v_{out}}{V_{in}}=-\frac{D}{1-D} \quad (M=\frac{V_o}{V_{in}}=\frac{D}{1-D})$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Ganho em DCM (\(M\))</strong></td>
-                  <td>$$\frac{2}{1 + \sqrt{1 + 4K/D^2}}$$</td>
-                  <td>$$\frac{1 + \sqrt{1 + 4D^2/K}}{2}$$</td>
-                  <td>$$\frac{D}{\sqrt{K}}$$</td>
+                  <td><strong>Corrente média no indutor — CCM</strong></td>
+                  <td>$$\overline I_L=I_o$$</td>
+                  <td>$$\overline I_L=\frac{I_o}{1-D}$$</td>
+                  <td>$$\overline I_L=\frac{I_o}{1-D}$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Parâmetro \(K_{crit}\)</strong></td>
-                  <td>$$1 - D$$</td>
-                  <td>$$D (1 - D)^2$$</td>
-                  <td>$$(1 - D)^2$$</td>
+                  <td><strong>Ondulação de corrente — CCM</strong></td>
+                  <td>$$\Delta I_L=\frac{V_o(1-D)}{Lf_s}$$</td>
+                  <td>$$\Delta I_L=\frac{V_{in}D}{Lf_s}$$</td>
+                  <td>$$\Delta I_L=\frac{V_{in}D}{Lf_s}$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Indutância Crítica (\(L_{crit}\))</strong></td>
-                  <td>$$\frac{(1 - D) R}{2 f_s}$$</td>
-                  <td>$$\frac{D (1 - D)^2 R}{2 f_s}$$</td>
-                  <td>$$\frac{(1 - D)^2 R}{2 f_s}$$</td>
+                  <td><strong>Ondulação de tensão — CCM</strong><br><small>capacitor ideal, ESR desprezível</small></td>
+                  <td>$$\Delta V_o\approx\frac{\Delta I_L}{8Cf_s}$$</td>
+                  <td>$$\Delta V_o\approx\frac{I_oD}{Cf_s}$$</td>
+                  <td>$$\Delta V_o\approx\frac{I_oD}{Cf_s}$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Corrente Média no Indutor (\(I_L\))</strong></td>
-                  <td>$$I_o$$</td>
-                  <td>$$\frac{I_o}{1 - D}$$</td>
-                  <td>$$\frac{I_o}{1 - D}$$</td>
+                  <td><strong>Indutância crítica</strong></td>
+                  <td>$$L_{crit}=\frac{(1-D)R}{2f_s}$$</td>
+                  <td>$$L_{crit}=\frac{D(1-D)^2R}{2f_s}$$</td>
+                  <td>$$L_{crit}=\frac{(1-D)^2R}{2f_s}$$</td>
+                </tr>
+                <tr><td colspan="4"><strong>DCM — usar os três intervalos \(D\), \(D_2\) e \(D_3\)</strong></td></tr>
+                <tr>
+                  <td><strong>Parâmetro normalizado</strong></td>
+                  <td colspan="3">$$K=\frac{2Lf_s}{R}$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Ondulação de Corrente (\(\Delta I_L\))</strong></td>
-                  <td>$$\frac{V_o (1 - D)}{L f_s}$$</td>
-                  <td>$$\frac{V_{in} D}{L f_s}$$</td>
-                  <td>$$\frac{V_{in} D}{L f_s}$$</td>
+                  <td><strong>Fronteira \(K_{crit}\)</strong></td>
+                  <td>$$1-D$$</td>
+                  <td>$$D(1-D)^2$$</td>
+                  <td>$$(1-D)^2$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Ondulação de Tensão (\(\Delta V_o\))</strong></td>
-                  <td>$$\frac{\Delta I_L}{8 C f_s}$$</td>
-                  <td>$$\frac{I_o D}{C f_s}$$</td>
-                  <td>$$\frac{I_o D}{C f_s}$$</td>
+                  <td><strong>Ganho em DCM</strong></td>
+                  <td>$$M=\frac{2}{1+\sqrt{1+4K/D^2}}$$</td>
+                  <td>$$M=\frac{1+\sqrt{1+4D^2/K}}{2}$$</td>
+                  <td>$$\frac{v_{out}}{V_{in}}=-\frac{D}{\sqrt K} \quad (M=\frac{D}{\sqrt K})$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Tensão Máxima na Chave (\(V_{S,max}\))</strong></td>
-                  <td>$$V_{in}$$</td>
-                  <td>$$V_o$$</td>
-                  <td>$$V_{in} + V_o = \frac{V_{in}}{1 - D}$$</td>
+                  <td><strong>Intervalo \(D_2\)</strong></td>
+                  <td>$$D_2=D\left(\frac{1}{M}-1\right)$$</td>
+                  <td>$$D_2=\frac{D}{M-1}$$</td>
+                  <td>$$D_2=\frac{D}{M}=\sqrt K$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Tensão Máxima no Diodo (\(V_{D,max}\))</strong></td>
-                  <td>$$V_{in}$$</td>
-                  <td>$$V_o$$</td>
-                  <td>$$V_{in} + V_o$$</td>
+                  <td><strong>Corrente de pico em DCM</strong></td>
+                  <td>$$I_{pk}=\frac{(V_{in}-V_o)D}{Lf_s}$$</td>
+                  <td>$$I_{pk}=\frac{V_{in}D}{Lf_s}$$</td>
+                  <td>$$I_{pk}=\frac{V_{in}D}{Lf_s}$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Comportamento sem carga (\(R \to \infty\))</strong></td>
-                  <td>$$V_o \to V_{in}$$</td>
-                  <td>$$V_o \to +\infty \text{ (Perigo!)}$$</td>
-                  <td>$$V_o \to +\infty \text{ (Perigo!)}$$</td>
+                  <td><strong>Intervalo sem corrente</strong></td>
+                  <td colspan="3">$$D_3=1-D-D_2$$</td>
+                </tr>
+                <tr>
+                  <td><strong>Ondulação de tensão — DCM</strong><br><small>aprox. ideal, pequena ondulação</small></td>
+                  <td>$$\Delta V_o\approx\frac{I_o}{Cf_s}\left(1-\frac{D+D_2}{2}\right)^2$$</td>
+                  <td>$$\Delta V_o\approx\frac{I_o}{Cf_s}\left(1-\frac{D_2}{2}\right)^2$$</td>
+                  <td>$$\Delta V_o\approx\frac{I_o}{Cf_s}\left(1-\frac{D_2}{2}\right)^2$$</td>
+                </tr>
+                <tr><td colspan="4"><strong>Esforços ideais de tensão nos semicondutores</strong></td></tr>
+                <tr>
+                  <td><strong>Chave \(V_{S,max}\)</strong></td>
+                  <td>$$V_{in}$$</td><td>$$V_o$$</td><td>$$V_{in}+V_o$$</td>
+                </tr>
+                <tr>
+                  <td><strong>Diodo \(V_{D,max}\)</strong></td>
+                  <td>$$V_{in}$$</td><td>$$V_o$$</td><td>$$V_{in}+V_o$$</td>
                 </tr>
               </tbody>
             </table>
@@ -1537,7 +1619,7 @@
           <!-- Questão 1 -->
           <div class="exercise-box">
             <div class="exercise-header">
-              <span>Questão de Prova 1 — Dimensionamento Completo de Conversor Buck</span>
+              <span>Questão de Treino 1 — Dimensionamento Completo de Conversor Buck</span>
               <span>Tema: Buck CCM • Projeto de Filtros</span>
             </div>
             <div class="exercise-body">
@@ -1584,7 +1666,7 @@
           <!-- Questão 2 -->
           <div class="exercise-box">
             <div class="exercise-header">
-              <span>Questão de Prova 2 — Análise de Boost com Transição para DCM</span>
+              <span>Questão de Treino 2 — Análise de Boost com Transição para DCM</span>
               <span>Tema: Boost • DCM • Análise Paramétrica</span>
             </div>
             <div class="exercise-body">
@@ -1618,7 +1700,7 @@
           <!-- Questão 3 -->
           <div class="exercise-box">
             <div class="exercise-header">
-              <span>Questão de Prova 3 — Dedução e Projeto de Buck-Boost DCM</span>
+              <span>Questão de Treino 3 — Dedução e Projeto de Buck-Boost DCM</span>
               <span>Tema: Buck-Boost • DCM • Dimensionamento</span>
             </div>
             <div class="exercise-body">

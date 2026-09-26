@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Guia interativo de estudos">
+  <title>Guia de Estudos</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="assets/css/study-guide.css">
+  <script defer src="assets/js/progress.js"></script>
+  <script defer src="assets/js/study-guide.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-brand-wrap">
+      <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Abrir menu lateral">☰</button>
+      <a href="index.html" class="header-brand">
+        <div class="brand-icon" id="subjectIcon">📚</div>
+        <div class="brand-text">
+          <h1><span id="subjectTitle">Carregando…</span> <span class="brand-badge" id="subjectBadge"></span></h1>
+          <p id="subjectSubtitle">Guia didático interativo</p>
+        </div>
+      </a>
+    </div>
+
+    <div class="header-progress-container">
+      <div class="progress-info">
+        <div class="progress-label-row">
+          <span>Progresso:</span>
+          <span class="progress-percentage" id="globalProgressPercent">0%</span>
+        </div>
+        <span class="progress-count" id="globalProgressCount">0/0 metas atingidas</span>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="globalProgressBar"></div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="btn-icon" title="Voltar para matérias">← Matérias</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <input type="text" id="sidebarSearch" class="sidebar-search" placeholder="Buscar conceito ou módulo…">
+      </div>
+      <div class="sidebar-content" id="moduleNavigation"></div>
+      <div class="sidebar-footer">
+        <button id="btnResetProgress" class="quick-link-btn btn-reset">↺ Resetar progresso desta matéria</button>
+      </div>
+    </aside>
+
+    <main class="content-area" id="subjectContent">
+      <div class="loading-state">
+        <strong>Carregando guia…</strong>
+        <span>Montando conteúdo e restaurando seu progresso.</span>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+{
+  "id": "eletronica-potencia",
+  "name": "Eletrônica de Potência",
+  "shortName": "Eletrônica de Potência",
+  "badge": "Teoria P1",
+  "icon": "⚡",
+  "institution": "UTFPR",
+  "description": "Guia didático completo para a P1, com teoria, exercícios, fórmulas e simulador de conversores.",
+  "storageKey": "study_hub_eletronica_potencia_v1",
+  "legacyStorageKeys": [
+    "ep_p1_utfpr_progress_v1"
+  ],
+  "totalChecklistItems": 37,
+  "modules": [
+    {
+      "id": "mod-1",
+      "anchor": "mod1",
+      "code": "01",
+      "title": "Valor Médio e Eficaz"
+    },
+    {
+      "id": "mod-2",
+      "anchor": "mod2",
+      "code": "02",
+      "title": "Regime Dinâmico de L e C"
+    },
+    {
+      "id": "mod-3",
+      "anchor": "mod3",
+      "code": "03",
+      "title": "Diodo de Potência & Perdas"
+    },
+    {
+      "id": "mod-4",
+      "anchor": "mod4",
+      "code": "04",
+      "title": "Buck em CCM"
+    },
+    {
+      "id": "mod-5",
+      "anchor": "mod5",
+      "code": "05",
+      "title": "Boost em CCM"
+    },
+    {
+      "id": "mod-6",
+      "anchor": "mod6",
+      "code": "06",
+      "title": "Buck-Boost em CCM"
+    },
+    {
+      "id": "mod-7",
+      "anchor": "mod7",
+      "code": "07",
+      "title": "Buck em DCM"
+    },
+    {
+      "id": "mod-8",
+      "anchor": "mod8",
+      "code": "08",
+      "title": "Boost em DCM"
+    },
+    {
+      "id": "mod-9",
+      "anchor": "mod9",
+      "code": "09",
+      "title": "Buck-Boost em DCM"
+    }
+  ],
+  "tools": [
+    {
+      "anchor": "calculatorSection",
+      "code": "SIM",
+      "title": "Simulador Interativo"
+    },
+    {
+      "anchor": "cheatSheetSection",
+      "code": "TAB",
+      "title": "Cheat Sheet de Prova"
+    },
+    {
+      "anchor": "quizSection",
+      "code": "EX",
+      "title": "Simulado P1 Resolvido"
+    }
+  ],
+  "script": "subject.js"
+}

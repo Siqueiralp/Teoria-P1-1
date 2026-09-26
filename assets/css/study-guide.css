@@ -1179,3 +1179,30 @@ body {
     align-items: flex-start;
   }
 }
+
+
+/* Multi-subject shell additions */
+.header-brand-wrap {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.loading-state {
+  min-height: 50vh;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.loading-state strong {
+  color: var(--text-bright);
+  font-size: 1.1rem;
+}
+
+.loading-error a {
+  color: var(--accent-blue);
+}

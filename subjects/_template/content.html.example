@@ -1,0 +1,29 @@
+<section class="hero-banner">
+  <h2 class="hero-title">Minha Matéria</h2>
+  <p class="hero-subtitle">Introdução do guia.</p>
+</section>
+
+<section id="mod1" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 01</span>
+      <h2 class="module-title">Primeiro módulo</h2>
+      <p class="module-desc">Objetivo do módulo.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-1">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <p>Conteúdo didático aqui.</p>
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist de aprendizado</div>
+      <ul class="checklist-items">
+        <li class="checklist-item">
+          <input type="checkbox" data-check-id="mod1-item1">
+          <span>Meta de aprendizado.</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

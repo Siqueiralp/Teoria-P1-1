@@ -1,0 +1,744 @@
+
+<section class="hero-banner">
+  <h2 class="hero-title">Sistemas de Controle Contínuo — Guia P1</h2>
+  <p class="hero-subtitle">
+    Revisão orientada para a primeira prova de ELT76A, organizada a partir das aulas, laboratórios,
+    relatórios de estudo e exercícios realizados no semestre.
+  </p>
+  <div class="triad-grid">
+    <div class="triad-card">
+      <div class="triad-header">Polos contam a história</div>
+      <p>Estabilidade, rapidez e oscilação aparecem primeiro na posição dos polos de malha fechada.</p>
+    </div>
+    <div class="triad-card">
+      <div class="triad-header">K não é ω</div>
+      <p>No Root Locus variamos K. Em Bode e Nyquist mantemos o sistema fixo e varremos a frequência ω.</p>
+    </div>
+    <div class="triad-card">
+      <div class="triad-header">Controle é compromisso</div>
+      <p>Reduzir erro, acelerar a resposta e manter estabilidade são objetivos que frequentemente competem entre si.</p>
+    </div>
+  </div>
+</section>
+
+<section id="mod1" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 01 • Aula 01</span>
+      <h2 class="module-title">Fundamentos e Resposta Temporal</h2>
+      <p class="module-desc">Malha aberta/fechada, função de transferência, polos, zeros e sistemas de 1ª e 2ª ordem.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-1">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>1.1 Malha aberta e malha fechada</h3>
+    <p>
+      Em malha aberta a saída não influencia a ação de controle. Em malha fechada, a saída é medida,
+      comparada à referência e gera um erro que alimenta o controlador. A realimentação melhora robustez
+      e rejeição a distúrbios, mas pode introduzir instabilidade se for mal projetada.
+    </p>
+
+    <h3>1.2 Função de transferência</h3>
+    <div class="formula-block"><span class="formula-tag">(1)</span>$$G(s)=\frac{Y(s)}{X(s)}$$</div>
+    <div class="formula-block"><span class="formula-tag">(2)</span>
+      $$G(s)=K\frac{(s-z_1)\cdots(s-z_m)}{(s-p_1)\cdots(s-p_n)}$$
+    </div>
+    <p>Zeros são raízes do numerador; polos são raízes do denominador. A maior potência do denominador define a ordem.</p>
+
+    <h3>1.3 Malha fechada e equação característica</h3>
+    <div class="formula-block"><span class="formula-tag">(3)</span>$$T(s)=\frac{G(s)}{1+G(s)H(s)}$$</div>
+    <div class="formula-block"><span class="formula-tag">(4)</span>$$1+G(s)H(s)=0$$</div>
+    <p>A equação (4) reaparece em Routh, Root Locus e Nyquist. Suas raízes são os polos de malha fechada.</p>
+
+    <h3>1.4 Primeira ordem</h3>
+    <div class="formula-block"><span class="formula-tag">(5)</span>$$T_s\approx\frac{4}{a}$$</div>
+    <div class="formula-block"><span class="formula-tag">(6)</span>$$T_r\approx\frac{2{,}2}{a}$$</div>
+    <p>Essas aproximações valem para um sistema de primeira ordem sem zeros, com polo em \(-a\).</p>
+
+    <h3>1.5 Segunda ordem</h3>
+    <div class="formula-block"><span class="formula-tag">(7)</span>
+      $$T(s)=\frac{K_a\omega_n^2}{s^2+2\zeta\omega_ns+\omega_n^2}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(8)</span>
+      $$s_{1,2}=-\zeta\omega_n\pm j\omega_n\sqrt{1-\zeta^2}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(9)</span>
+      $$T_p=\frac{\pi}{\omega_n\sqrt{1-\zeta^2}}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(10)</span>
+      $$\%OS=100e^{-\frac{\zeta\pi}{\sqrt{1-\zeta^2}}}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(11)</span>
+      $$T_s\approx\frac{4}{\zeta\omega_n}$$
+    </div>
+
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>ζ</th><th>Comportamento</th><th>Interpretação</th></tr></thead>
+        <tbody>
+          <tr><td>\(\zeta&gt;1\)</td><td>Superamortecido</td><td>Sem oscilação, porém mais lento.</td></tr>
+          <tr><td>\(\zeta=1\)</td><td>Crítico</td><td>Mais rápido sem overshoot no modelo ideal.</td></tr>
+          <tr><td>\(0&lt;\zeta&lt;1\)</td><td>Subamortecido</td><td>Oscilação amortecida e overshoot.</td></tr>
+          <tr><td>\(\zeta=0\)</td><td>Não amortecido</td><td>Oscilação sustentada.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-exam">
+      <div class="callout-title">Leitura rápida</div>
+      <p>Polos mais à esquerda tendem a produzir resposta mais rápida. Aproximar polos do eixo imaginário reduz amortecimento e aproxima o sistema da instabilidade.</p>
+    </div>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 01</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m1-1"><span>Diferencio malha aberta, malha fechada, FTMA e FTMF.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m1-2"><span>Encontro polos, zeros e a equação característica.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m1-3"><span>Identifico \(\omega_n\) e \(\zeta\) em um sistema de segunda ordem.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m1-4"><span>Relaciono polos com rapidez, oscilação, overshoot e estabilidade.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod2" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 02 • Aula/Lab 02</span>
+      <h2 class="module-title">Estabilidade e Routh-Hurwitz</h2>
+      <p class="module-desc">Determinar estabilidade e faixas de ganho sem calcular explicitamente todas as raízes.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-2">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>2.1 Polos e estabilidade</h3>
+    <p>Para estabilidade assintótica, todos os polos de malha fechada devem estar no semiplano esquerdo.</p>
+    <ul>
+      <li>Semiplano esquerdo: exponenciais decrescentes.</li>
+      <li>Semiplano direito: exponenciais crescentes.</li>
+      <li>Eixo imaginário: limite de estabilidade, dependendo da multiplicidade.</li>
+    </ul>
+
+    <h3>2.2 Routh para uma cúbica</h3>
+    <div class="formula-block"><span class="formula-tag">(12)</span>$$P(s)=s^3+a_2s^2+a_1s+a_0$$</div>
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>Linha</th><th>1ª coluna</th><th>2ª coluna</th></tr></thead>
+        <tbody>
+          <tr><td>\(s^3\)</td><td>1</td><td>\(a_1\)</td></tr>
+          <tr><td>\(s^2\)</td><td>\(a_2\)</td><td>\(a_0\)</td></tr>
+          <tr><td>\(s^1\)</td><td>\((a_2a_1-a_0)/a_2\)</td><td>0</td></tr>
+          <tr><td>\(s^0\)</td><td>\(a_0\)</td><td></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>O número de mudanças de sinal da primeira coluna é igual ao número de polos no semiplano direito.</p>
+
+    <h3>2.3 Exercício real da Prática 2</h3>
+    <div class="formula-block"><span class="formula-tag">(13)</span>
+      $$G(s)=\frac{1}{s^2+10s+35},\qquad H(s)=\frac{s+20}{s+4}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(14)</span>
+      $$P(s)=(s^2+10s+35)(s+4)+K(s+20)$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(15)</span>
+      $$P(s)=s^3+14s^2+(75+K)s+(140+20K)$$
+    </div>
+    <p>A primeira coluna de Routh é:</p>
+    <div class="formula-block"><span class="formula-tag">(16)</span>
+      $$1,\quad14,\quad65-\frac{3K}{7},\quad140+20K$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(17)</span>
+      $$65-\frac{3K}{7}>0\Rightarrow K<151{,}667$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(18)</span>
+      $$140+20K>0\Rightarrow K>-7$$
+    </div>
+
+    <div class="callout callout-formula">
+      <div class="callout-title">Resultado</div>
+      <p>Faixa matemática: \(-7&lt;K&lt;151{,}667\). Para ganho positivo: \(0&lt;K&lt;151{,}667\).</p>
+    </div>
+
+    <h3>2.4 Cruzamento do eixo imaginário</h3>
+    <p>No limite superior, a linha de \(s^1\) zera. O polinômio auxiliar vem da linha de \(s^2\):</p>
+    <div class="formula-block"><span class="formula-tag">(19)</span>
+      $$14s^2+(140+20K)=0$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(20)</span>
+      $$K=151{,}667\Rightarrow s=\pm j15{,}055$$
+    </div>
+
+    <h3>2.5 Casos especiais</h3>
+    <ul>
+      <li><strong>Zero na primeira coluna:</strong> substitua por \(\varepsilon&gt;0\) e examine o limite.</li>
+      <li><strong>Linha inteira de zeros:</strong> forme o polinômio auxiliar com a linha superior, derive e use os coeficientes da derivada.</li>
+    </ul>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 02</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m2-1"><span>Monto uma tabela de Routh sem consultar um exemplo.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m2-2"><span>Transformo a primeira coluna em desigualdades de K.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m2-3"><span>Trato os dois casos especiais de Routh.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m2-4"><span>Entendo a origem de \(K=151{,}667\) e \(\omega=15{,}055\).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod3" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 03 • Aula/Lab 02</span>
+      <h2 class="module-title">Erro em Regime Permanente</h2>
+      <p class="module-desc">Tipo do sistema, teorema do valor final e constantes \(K_p\), \(K_v\) e \(K_a\).</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-3">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>3.1 Realimentação unitária</h3>
+    <div class="formula-block"><span class="formula-tag">(21)</span>$$\frac{E(s)}{R(s)}=\frac{1}{1+G(s)}$$</div>
+    <div class="formula-block"><span class="formula-tag">(22)</span>$$e_{ss}=\lim_{s\to0}sE(s)$$</div>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Condição necessária</div>
+      <p>O teorema do valor final só deve ser usado quando a dinâmica relevante é estável. Calcular erro estacionário de um sistema que diverge não faz sentido físico.</p>
+    </div>
+
+    <h3>3.2 Constantes</h3>
+    <div class="formula-block"><span class="formula-tag">(23)</span>$$K_p=\lim_{s\to0}G(s)$$</div>
+    <div class="formula-block"><span class="formula-tag">(24)</span>$$K_v=\lim_{s\to0}sG(s)$$</div>
+    <div class="formula-block"><span class="formula-tag">(25)</span>$$K_a=\lim_{s\to0}s^2G(s)$$</div>
+    <div class="formula-block"><span class="formula-tag">(26)</span>$$e_{degrau}=\frac{1}{1+K_p}$$</div>
+    <div class="formula-block"><span class="formula-tag">(27)</span>$$e_{rampa}=\frac{1}{K_v}$$</div>
+    <div class="formula-block"><span class="formula-tag">(28)</span>$$e_{parábola}=\frac{1}{K_a}$$</div>
+
+    <p>O tipo do sistema é o número de integradores puros na FTMA. Tipo e ordem são conceitos diferentes.</p>
+
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>Tipo</th><th>Degrau</th><th>Rampa</th><th>Parábola</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>Finito</td><td>\(\infty\)</td><td>\(\infty\)</td></tr>
+          <tr><td>1</td><td>0</td><td>Finito</td><td>\(\infty\)</td></tr>
+          <tr><td>2</td><td>0</td><td>0</td><td>Finito</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>3.3 Exercício do Laboratório 02</h3>
+    <div class="formula-block"><span class="formula-tag">(29)</span>
+      $$G(s)=\frac{15(s+6)}{s(s+2)(s+14)(s+135)}$$
+    </div>
+    <p>É um sistema Tipo 1.</p>
+    <div class="formula-block"><span class="formula-tag">(30)</span>$$K_p=\infty\Rightarrow e_{degrau}=0$$</div>
+    <div class="formula-block"><span class="formula-tag">(31)</span>
+      $$K_v=\frac{15\cdot6}{2\cdot14\cdot135}=\frac{1}{42}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(32)</span>$$e_{rampa}=42$$</div>
+    <div class="formula-block"><span class="formula-tag">(33)</span>$$K_a=0\Rightarrow e_{parábola}=\infty$$</div>
+
+    <h3>3.4 Projeto para \(e_{ss}=0{,}07\)</h3>
+    <p>Para \(G(s)=1/[(s+2)(s+14)(s+135)]\) com ganho K:</p>
+    <div class="formula-block"><span class="formula-tag">(34)</span>$$K_p=\frac{K}{3780}$$</div>
+    <div class="formula-block"><span class="formula-tag">(35)</span>$$0{,}07=\frac{1}{1+K/3780}$$</div>
+    <div class="formula-block"><span class="formula-tag">(36)</span>$$K=50220$$</div>
+    <p>Depois de dimensionar K pelo erro, ainda é obrigatório verificar estabilidade e transitório.</p>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 03</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m3-1"><span>Identifico o tipo do sistema.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m3-2"><span>Calculo \(K_p\), \(K_v\) e \(K_a\).</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m3-3"><span>Escolho a constante correta para cada entrada padrão.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m3-4"><span>Dimensiono K para uma especificação de erro e depois verifico estabilidade.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod4" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 04 • Aula 03</span>
+      <h2 class="module-title">Root Locus — Regras Fundamentais</h2>
+      <p class="module-desc">Traçar a trajetória dos polos de malha fechada quando o ganho K varia.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-4">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>4.1 Definição</h3>
+    <div class="formula-block"><span class="formula-tag">(37)</span>$$1+KG(s)H(s)=0$$</div>
+    <p>O LGR é o conjunto das posições dos polos de malha fechada para \(0\le K&lt;\infty\).</p>
+
+    <h3>4.2 Condições fundamentais</h3>
+    <div class="formula-block"><span class="formula-tag">(38)</span>
+      $$\angle G(s)H(s)=(2q+1)180^\circ$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(39)</span>
+      $$K=\frac{1}{|G(s)H(s)|}$$
+    </div>
+    <p>A condição de ângulo diz se um ponto pertence ao LGR; a de módulo fornece o ganho naquele ponto.</p>
+
+    <h3>4.3 Regras geométricas</h3>
+    <ul>
+      <li>O número de ramos é igual ao número de polos de malha aberta.</li>
+      <li>Os ramos começam nos polos e terminam nos zeros, inclusive zeros no infinito.</li>
+      <li>O diagrama é simétrico em relação ao eixo real.</li>
+      <li>Um trecho real pertence ao LGR quando há quantidade ímpar de polos e zeros reais à sua direita.</li>
+    </ul>
+
+    <div class="formula-block"><span class="formula-tag">(40)</span>$$N_\infty=N_p-N_z$$</div>
+    <div class="formula-block"><span class="formula-tag">(41)</span>
+      $$\theta_q=\frac{(2q+1)180^\circ}{N_p-N_z}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(42)</span>
+      $$\sigma_a=\frac{\sum p_i-\sum z_i}{N_p-N_z}$$
+    </div>
+
+    <h3>4.4 Pontos de saída/entrada</h3>
+    <div class="formula-block"><span class="formula-tag">(43)</span>
+      $$K(s)=-\frac{1}{G(s)H(s)}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(44)</span>
+      $$\frac{dK}{ds}=0$$
+    </div>
+    <p>As soluções da derivada são apenas candidatas. O ponto precisa estar sobre um trecho real válido e resultar em \(K&gt;0\).</p>
+
+    <h3>4.5 Exemplo da Aula 03</h3>
+    <div class="formula-block"><span class="formula-tag">(45)</span>
+      $$G(s)H(s)=\frac{1}{s(s+1)(s+4)}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(46)</span>
+      $$\theta=\{60^\circ,\ 180^\circ,\ 300^\circ\}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(47)</span>
+      $$\sigma_a=-\frac{5}{3}\approx-1{,}667$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(48)</span>
+      $$s_{ruptura}\approx-0{,}465,\qquad K\approx0{,}879$$
+    </div>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 04</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m4-1"><span>Sei o que varia no LGR e o que permanece fixo.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m4-2"><span>Marco corretamente os trechos reais.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m4-3"><span>Calculo centroide e ângulos das assíntotas.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m4-4"><span>Filtro corretamente candidatos obtidos por \(dK/ds=0\).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod5" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 05 • Labs 02 e 03</span>
+      <h2 class="module-title">Root Locus — Cruzamentos e Validação</h2>
+      <p class="module-desc">Combinar Routh, LGR e resposta temporal para verificar o mesmo fenômeno por três perspectivas.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-5">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>5.1 Routh e Root Locus se encontram no eixo imaginário</h3>
+    <p>
+      Routh fornece a faixa de ganho estável. O Root Locus mostra geometricamente o ponto em que os polos atravessam o eixo imaginário.
+      Para a Prática 2, os dois métodos levam ao mesmo limite.
+    </p>
+    <div class="formula-block"><span class="formula-tag">(49)</span>
+      $$K_{crit}\approx151{,}667$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(50)</span>
+      $$s=\pm j15{,}055$$
+    </div>
+
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>K</th><th>Polos dominantes</th><th>Resultado</th></tr></thead>
+        <tbody>
+          <tr><td>\(K&lt;151{,}667\)</td><td>Semiplano esquerdo</td><td>Estável</td></tr>
+          <tr><td>\(K=151{,}667\)</td><td>Eixo imaginário</td><td>Marginal</td></tr>
+          <tr><td>\(K&gt;151{,}667\)</td><td>Dois polos no semiplano direito</td><td>Instável</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>5.2 Validação MATLAB</h3>
+    <pre class="formula-block">G = tf(1,[1 10 35]);
+H = tf([1 20],[1 4]);
+L = G*H;
+
+rlocus(L)
+margin(L)
+
+K = 100;
+T = feedback(K*G,H);
+figure; step(T)
+figure; pzmap(T)</pre>
+
+    <p>O relatório da Prática 2 registrou aproximadamente:</p>
+    <ul>
+      <li>margem de ganho: \(151{,}667\);</li>
+      <li>frequência de cruzamento de fase: \(15{,}055\ rad/s\);</li>
+      <li>margem de fase infinita para \(K=1\), pois não ocorre cruzamento de 0 dB.</li>
+    </ul>
+
+    <h3>5.3 Sequência do Laboratório 03</h3>
+    <ol>
+      <li>Encontre polos e zeros de \(G(s)H(s)\).</li>
+      <li>Determine os trechos reais do LGR.</li>
+      <li>Calcule assíntotas e centroide.</li>
+      <li>Calcule candidatos de entrada/saída no eixo real.</li>
+      <li>Elimine candidatos que não pertencem ao LGR.</li>
+      <li>Trace o resultado analítico e depois valide com a função rlocus.</li>
+      <li>Determine o ganho de cruzamento com o eixo imaginário.</li>
+    </ol>
+
+    <div class="callout callout-exam">
+      <div class="callout-title">Escolha da ferramenta</div>
+      <p>Faixa de K para estabilidade: Routh. Geometria e posição desejada de polos: Root Locus. Comportamento no tempo: step/pzmap. Não force uma ferramenta a resolver o problema da outra.</p>
+    </div>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 05</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m5-1"><span>Relaciono o ganho crítico de Routh ao cruzamento do LGR.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m5-2"><span>Sei quando usar FTMA e quando fechar a malha no MATLAB.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m5-3"><span>Valido o esboço analítico com rlocus sem depender dele para raciocinar.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m5-4"><span>Consigo prever a resposta temporal observando a posição dos polos.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod6" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 06 • PID</span>
+      <h2 class="module-title">Ações P, I, D e Sintonia PID</h2>
+      <p class="module-desc">Entender o mecanismo de cada ação antes de aplicar tabelas de sintonia.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-6">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>6.1 Controlador PID</h3>
+    <div class="formula-block"><span class="formula-tag">(51)</span>
+      $$C(s)=K_p+\frac{K_i}{s}+K_ds$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(52)</span>
+      $$C(s)=K_p\left(1+\frac{1}{T_is}+T_ds\right)$$
+    </div>
+
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>Ação</th><th>Efeito principal</th><th>Custo típico</th></tr></thead>
+        <tbody>
+          <tr><td>P</td><td>Acelera e reduz erro.</td><td>Pode aumentar overshoot e reduzir margem.</td></tr>
+          <tr><td>I</td><td>Aumenta o tipo e reduz/elimina erro estacionário.</td><td>Adiciona polo na origem e tende a piorar amortecimento.</td></tr>
+          <tr><td>D</td><td>Adiciona ação antecipatória e tende a melhorar amortecimento.</td><td>Amplifica ruído de alta frequência.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>6.2 Sintonia manual</h3>
+    <ol>
+      <li>Comece com integral e derivativo reduzidos ou nulos.</li>
+      <li>Ajuste \(K_p\) até obter uma resposta suficientemente rápida.</li>
+      <li>Introduza integral para corrigir erro estacionário.</li>
+      <li>Introduza derivativo quando for necessário aumentar amortecimento.</li>
+      <li>Reavalie estabilidade e saturação após cada alteração.</li>
+    </ol>
+
+    <h3>6.3 Ziegler-Nichols por ganho crítico</h3>
+    <p>Se \(K_u\) é o ganho que produz oscilação sustentada e \(P_u\) o período dessa oscilação:</p>
+    <div class="formula-block"><span class="formula-tag">(53)</span>$$K_p=0{,}6K_u$$</div>
+    <div class="formula-block"><span class="formula-tag">(54)</span>$$T_i=\frac{P_u}{2}$$</div>
+    <div class="formula-block"><span class="formula-tag">(55)</span>$$T_d=\frac{P_u}{8}$$</div>
+
+    <p>O plano de ensino também prevê Cohen-Coon, Chien-Hrones-Reswick e Åström-Hägglund.</p>
+
+    <div class="callout callout-warning">
+      <div class="callout-title">Não transforme PID em receita</div>
+      <p>A tabela gera um ponto de partida. A planta real, ruído, saturação e especificações de desempenho continuam mandando no projeto.</p>
+    </div>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 06</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m6-1"><span>Escrevo o PID nas duas parametrizações usuais.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m6-2"><span>Prevejo qualitativamente o efeito de P, I e D.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m6-3"><span>Entendo o método de ganho crítico de Ziegler-Nichols.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m6-4"><span>Valido qualquer sintonia na malha fechada.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod7" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 07 • Frequência</span>
+      <h2 class="module-title">Bode, Margens e Nyquist</h2>
+      <p class="module-desc">Estabilidade relativa observada através da resposta em frequência da malha aberta.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-7">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>7.1 O que significa substituir \(s=j\omega\)?</h3>
+    <div class="formula-block"><span class="formula-tag">(56)</span>
+      $$G(j\omega)=G(s)\big|_{s=j\omega}$$
+    </div>
+    <p>Estamos avaliando a resposta do mesmo sistema a senoides de frequências diferentes. Aqui a variável varrida é \(\omega\), não K.</p>
+
+    <h3>7.2 Construção do Bode</h3>
+    <ol>
+      <li>Fatore a função de transferência.</li>
+      <li>Identifique ganho, integradores, polos e zeros.</li>
+      <li>Marque frequências de quebra.</li>
+      <li>Some inclinações de módulo.</li>
+      <li>Some contribuições de fase.</li>
+    </ol>
+    <div class="formula-block"><span class="formula-tag">(57)</span>
+      $$M_{dB}=20\log_{10}|G(j\omega)|$$
+    </div>
+
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>Fator</th><th>Inclinação</th><th>Fase</th></tr></thead>
+        <tbody>
+          <tr><td>\(1/j\omega\)</td><td>-20 dB/década</td><td>-90°</td></tr>
+          <tr><td>Zero de 1ª ordem</td><td>+20 dB/década após a quebra</td><td>0° → +90°</td></tr>
+          <tr><td>Polo de 1ª ordem</td><td>-20 dB/década após a quebra</td><td>0° → -90°</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>7.3 Margem de fase</h3>
+    <p>\(\omega_{gc}\) é a frequência onde o módulo vale 1 ou 0 dB.</p>
+    <div class="formula-block"><span class="formula-tag">(58)</span>
+      $$PM=180^\circ+\angle G(j\omega_{gc})H(j\omega_{gc})$$
+    </div>
+
+    <h3>7.4 Margem de ganho</h3>
+    <p>\(\omega_{pc}\) é a frequência onde a fase vale -180°.</p>
+    <div class="formula-block"><span class="formula-tag">(59)</span>
+      $$GM=\frac{1}{|G(j\omega_{pc})H(j\omega_{pc})|}$$
+    </div>
+    <div class="formula-block"><span class="formula-tag">(60)</span>
+      $$GM_{dB}=20\log_{10}(GM)$$
+    </div>
+
+    <h3>7.5 Nyquist</h3>
+    <p>
+      Nyquist representa \(G(j\omega)H(j\omega)\) diretamente no plano complexo. O ponto \(-1+j0\) é crítico porque equivale,
+      simultaneamente, a módulo 1 e fase -180°. Para uma malha aberta estável, a curva não deve envolver esse ponto para que a malha fechada permaneça estável.
+    </p>
+
+    <div class="callout callout-concept">
+      <div class="callout-title">A mesma fronteira vista por métodos diferentes</div>
+      <p>Na Prática 2, Routh fornece \(K_{crit}\approx151{,}667\); o Root Locus cruza o eixo em \(15{,}055\ rad/s\); a análise de frequência encontra a mesma margem de ganho e frequência crítica.</p>
+    </div>
+
+    <pre class="formula-block">margin(L)
+bode(L)
+nyquist(L)
+grid on</pre>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 07</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m7-1"><span>Diferencio claramente K de \(\omega\).</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m7-2"><span>Construo as assíntotas básicas de um Bode.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m7-3"><span>Calculo e interpreto margens de ganho e fase.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m7-4"><span>Entendo a função do ponto \(-1+j0\) no Nyquist.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="mod8" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Módulo 08 • Projeto</span>
+      <h2 class="module-title">Compensadores de Avanço e Atraso</h2>
+      <p class="module-desc">Alterar a geometria e a resposta em frequência quando variar apenas K não é suficiente.</p>
+    </div>
+    <div class="module-header-right">
+      <button class="btn-complete-module" data-mod-id="mod-8">Marcar como Concluído</button>
+    </div>
+  </div>
+  <div class="module-body">
+    <h3>8.1 Avanço de fase</h3>
+    <div class="formula-block"><span class="formula-tag">(61)</span>
+      $$C_{lead}(s)=K_c\frac{s+z_c}{s+p_c},\qquad |p_c|>|z_c|$$
+    </div>
+    <p>É usado para adicionar fase positiva, aumentar margem de fase e normalmente acelerar a dinâmica.</p>
+
+    <h3>8.2 Atraso de fase</h3>
+    <div class="formula-block"><span class="formula-tag">(62)</span>
+      $$C_{lag}(s)=K_c\frac{s+z_c}{s+p_c},\qquad |z_c|>|p_c|$$
+    </div>
+    <p>É usado principalmente para aumentar ganho em baixa frequência e melhorar erro estacionário sem alterar muito os polos dominantes.</p>
+
+    <h3>8.3 Projeto pelo Root Locus</h3>
+    <ol>
+      <li>Transforme as especificações em posição desejada de polos.</li>
+      <li>Calcule o déficit angular no ponto desejado.</li>
+      <li>Posicione polo e zero do compensador para suprir o déficit.</li>
+      <li>Use a condição de módulo para calcular o ganho.</li>
+      <li>Valide a resposta de malha fechada.</li>
+    </ol>
+
+    <h3>8.4 Projeto por resposta em frequência</h3>
+    <ol>
+      <li>Meça as margens atuais.</li>
+      <li>Defina margem e frequência de cruzamento desejadas.</li>
+      <li>Use avanço para adicionar fase na região de cruzamento.</li>
+      <li>Use atraso para elevar ganho de baixa frequência quando a precisão for a prioridade.</li>
+      <li>Valide com Bode, Nyquist e resposta temporal.</li>
+    </ol>
+
+    <div class="callout callout-exam">
+      <div class="callout-title">Decisão rápida</div>
+      <p>Rapidez e margem de fase: avanço. Erro estacionário com pouca mudança de dinâmica: atraso. As duas necessidades: atraso-avanço.</p>
+    </div>
+
+    <div class="module-checklist">
+      <div class="checklist-title">Checklist do módulo 08</div>
+      <ul class="checklist-items">
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m8-1"><span>Entendo por que variar somente K pode ser insuficiente.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m8-2"><span>Diferencio avanço e atraso pelo posicionamento de polo e zero.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m8-3"><span>Conheço a sequência de projeto via Root Locus.</span></li>
+        <li class="checklist-item"><input type="checkbox" data-check-id="c1-m8-4"><span>Conheço a sequência de projeto via resposta em frequência.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="cheatSheetSection" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Consulta rápida</span>
+      <h2 class="module-title">Tabela de Fórmulas — P1</h2>
+      <p class="module-desc">Fórmulas que valem a pena conseguir reconstruir sem MATLAB.</p>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="table-wrapper">
+      <table class="content-table">
+        <thead><tr><th>Tema</th><th>Expressão</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td>FTMF</td><td>\(T=G/(1+GH)\)</td><td>Fechar a malha.</td></tr>
+          <tr><td>2ª ordem</td><td>\(s^2+2\zeta\omega_ns+\omega_n^2\)</td><td>Identificar \(\zeta\) e \(\omega_n\).</td></tr>
+          <tr><td>Estabelecimento</td><td>\(T_s\approx4/(\zeta\omega_n)\)</td><td>Critério de 2%.</td></tr>
+          <tr><td>Erro degrau</td><td>\(1/(1+K_p)\)</td><td>Realimentação unitária.</td></tr>
+          <tr><td>Erro rampa</td><td>\(1/K_v\)</td><td>Realimentação unitária.</td></tr>
+          <tr><td>Erro parábola</td><td>\(1/K_a\)</td><td>Realimentação unitária.</td></tr>
+          <tr><td>LGR ângulo</td><td>\(\angle GH=(2q+1)180^\circ\)</td><td>Verificar ponto no LGR.</td></tr>
+          <tr><td>LGR módulo</td><td>\(K=1/|GH|\)</td><td>Ganho no ponto.</td></tr>
+          <tr><td>Centroide</td><td>\((\sum p-\sum z)/(N_p-N_z)\)</td><td>Assíntotas.</td></tr>
+          <tr><td>Bode</td><td>\(20\log_{10}|G|\)</td><td>Módulo em dB.</td></tr>
+          <tr><td>PM</td><td>\(180^\circ+\angle GH(j\omega_{gc})\)</td><td>Margem de fase.</td></tr>
+          <tr><td>GM</td><td>\(1/|GH(j\omega_{pc})|\)</td><td>Margem de ganho.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-formula">
+      <div class="callout-title">Sequência mental</div>
+      <p>Identifique FTMA → escreva a equação característica → verifique estabilidade → identifique se a questão pede erro, posição de polos, ganho ou frequência → escolha Routh, LGR ou resposta em frequência.</p>
+    </div>
+  </div>
+</section>
+
+<section id="quizSection" class="module-section">
+  <div class="module-header">
+    <div class="module-header-left">
+      <span class="module-tag">Treino</span>
+      <h2 class="module-title">Simulado P1</h2>
+      <p class="module-desc">Questões curtas para verificar domínio dos conceitos centrais.</p>
+    </div>
+  </div>
+  <div class="module-body">
+    <div class="exercise-box">
+      <div class="exercise-header"><span>Questão 1 — Routh</span><span>Nível: Médio</span></div>
+      <div class="exercise-body">
+        <p>Para \(P(s)=s^3+14s^2+(75+K)s+(140+20K)\), determine a faixa estável de K.</p>
+        <button class="solution-toggle" data-target="ctrl-sol1">▼ Ver Resolução Completa Passo a Passo</button>
+        <div id="ctrl-sol1" class="solution-content">
+          <p>A primeira coluna é \(1,\ 14,\ 65-3K/7,\ 140+20K\).</p>
+          <div class="formula-block"><span class="formula-tag">(63)</span>$$-7&lt;K&lt;151{,}667$$</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="exercise-header"><span>Questão 2 — Erro estacionário</span><span>Nível: Médio</span></div>
+      <div class="exercise-body">
+        <p>Para \(G(s)=15(s+6)/[s(s+2)(s+14)(s+135)]\), determine tipo e erros para degrau, rampa e parábola.</p>
+        <button class="solution-toggle" data-target="ctrl-sol2">▼ Ver Resolução Completa Passo a Passo</button>
+        <div id="ctrl-sol2" class="solution-content">
+          <p>Tipo 1; \(K_p=\infty\), \(K_v=1/42\) e \(K_a=0\).</p>
+          <div class="formula-block"><span class="formula-tag">(64)</span>
+            $$e_{degrau}=0,\qquad e_{rampa}=42,\qquad e_{parábola}=\infty$$
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="exercise-header"><span>Questão 3 — LGR</span><span>Nível: Médio</span></div>
+      <div class="exercise-body">
+        <p>Para \(G(s)H(s)=1/[s(s+1)(s+4)]\), determine assíntotas e centroide.</p>
+        <button class="solution-toggle" data-target="ctrl-sol3">▼ Ver Resolução Completa Passo a Passo</button>
+        <div id="ctrl-sol3" class="solution-content">
+          <div class="formula-block"><span class="formula-tag">(65)</span>
+            $$\theta=\{60^\circ,180^\circ,300^\circ\},\qquad\sigma_a=-5/3$$
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="exercise-header"><span>Questão 4 — Frequência</span><span>Nível: Conceitual</span></div>
+      <div class="exercise-body">
+        <p>Qual a diferença entre \(\omega_{gc}\) e \(\omega_{pc}\)?</p>
+        <button class="solution-toggle" data-target="ctrl-sol4">▼ Ver Resolução Completa Passo a Passo</button>
+        <div id="ctrl-sol4" class="solution-content">
+          <p>\(\omega_{gc}\) é o cruzamento de 0 dB e define PM. \(\omega_{pc}\) é o cruzamento de -180° e define GM.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="exercise-box">
+      <div class="exercise-header"><span>Questão 5 — PID</span><span>Nível: Conceitual</span></div>
+      <div class="exercise-body">
+        <p>Por que a integral reduz erro estacionário mas pode piorar estabilidade?</p>
+        <button class="solution-toggle" data-target="ctrl-sol5">▼ Ver Resolução Completa Passo a Passo</button>
+        <div id="ctrl-sol5" class="solution-content">
+          <p>Ela adiciona ganho em baixa frequência e um polo na origem. O primeiro melhora precisão; o segundo adiciona atraso de fase e pode reduzir amortecimento e margem.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout callout-concept">
+      <div class="callout-title">Material-base</div>
+      <p>Aula01–03, Lab01–03, ementa e planejamento de ELT76A, relatórios de estudo de 25–27/08, resultados da Prática 2 e capítulos correspondentes de Engenharia de Controle Moderno, de Ogata.</p>
+    </div>
+  </div>
+</section>

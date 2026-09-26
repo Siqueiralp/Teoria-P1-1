@@ -1,0 +1,73 @@
+{
+  "id": "controle-1",
+  "name": "Sistemas de Controle Contínuo",
+  "shortName": "Controle 1",
+  "badge": "P1",
+  "icon": "📈",
+  "institution": "UTFPR",
+  "description": "Estabilidade, erro estacionário, Root Locus, PID, compensadores e resposta em frequência.",
+  "storageKey": "study_hub_controle_1_v1",
+  "totalChecklistItems": 32,
+  "modules": [
+    {
+      "id": "mod-1",
+      "anchor": "mod1",
+      "code": "01",
+      "title": "Fundamentos e Resposta Temporal"
+    },
+    {
+      "id": "mod-2",
+      "anchor": "mod2",
+      "code": "02",
+      "title": "Estabilidade e Routh-Hurwitz"
+    },
+    {
+      "id": "mod-3",
+      "anchor": "mod3",
+      "code": "03",
+      "title": "Erro em Regime Permanente"
+    },
+    {
+      "id": "mod-4",
+      "anchor": "mod4",
+      "code": "04",
+      "title": "Root Locus — Regras Fundamentais"
+    },
+    {
+      "id": "mod-5",
+      "anchor": "mod5",
+      "code": "05",
+      "title": "Root Locus — Projeto e Cruzamentos"
+    },
+    {
+      "id": "mod-6",
+      "anchor": "mod6",
+      "code": "06",
+      "title": "Ações P, I, D e Sintonia PID"
+    },
+    {
+      "id": "mod-7",
+      "anchor": "mod7",
+      "code": "07",
+      "title": "Bode, Margens e Nyquist"
+    },
+    {
+      "id": "mod-8",
+      "anchor": "mod8",
+      "code": "08",
+      "title": "Compensadores de Avanço e Atraso"
+    }
+  ],
+  "tools": [
+    {
+      "anchor": "cheatSheetSection",
+      "code": "TAB",
+      "title": "Tabela de Fórmulas"
+    },
+    {
+      "anchor": "quizSection",
+      "code": "EX",
+      "title": "Simulado P1"
+    }
+  ]
+}

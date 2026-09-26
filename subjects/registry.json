@@ -3,6 +3,10 @@
     {
       "id": "eletronica-potencia",
       "path": "subjects/eletronica-potencia"
+    },
+    {
+      "id": "controle-1",
+      "path": "subjects/controle-1"
     }
   ]
 }

@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       applyManifest(manifest);
       document.getElementById("subjectContent").innerHTML = loaded[1];
+      if (window.UiIcons) window.UiIcons.hydrate(document.getElementById("subjectContent"));
       buildNavigation(manifest);
       initTracker(manifest);
       initNavigation();
@@ -49,7 +50,9 @@ document.addEventListener("DOMContentLoaded", function () {
     document.title = config.name + (config.badge ? " — " + config.badge : "") + " | Guia de Estudos";
     document.getElementById("subjectTitle").textContent = config.name;
     document.getElementById("subjectBadge").textContent = config.badge || "";
-    document.getElementById("subjectIcon").textContent = config.icon || "📚";
+    var iconHost = document.getElementById("subjectIcon");
+    iconHost.innerHTML = "";
+    iconHost.appendChild(window.UiIcons ? window.UiIcons.create(config.icon || "book") : document.createTextNode(""));
     document.getElementById("subjectSubtitle").textContent =
       (config.institution ? config.institution + " • " : "") + (config.description || "Guia didático interativo");
   }
@@ -103,7 +106,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (moduleId) {
       var check = document.createElement("div");
       check.className = "nav-item-check";
-      check.textContent = "✓";
+      if (window.UiIcons) check.appendChild(window.UiIcons.create("check"));
       a.appendChild(check);
     }
     return a;
@@ -184,7 +187,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function setModuleButton(button, completed) {
     button.classList.toggle("completed", completed);
-    button.textContent = completed ? "✓ Módulo Concluído" : "Marcar como Concluído";
+    button.innerHTML = "";
+    if (completed && window.UiIcons) button.appendChild(window.UiIcons.create("check"));
+    var label = document.createElement("span");
+    label.textContent = completed ? "Módulo Concluído" : "Marcar como Concluído";
+    button.appendChild(label);
   }
 
   function updateNavModuleState(moduleId, completed) {
@@ -256,9 +263,11 @@ document.addEventListener("DOMContentLoaded", function () {
         var content = document.getElementById(button.getAttribute("data-target"));
         if (!content) return;
         content.classList.toggle("open");
-        button.textContent = content.classList.contains("open")
-          ? "▲ Ocultar Resolução"
-          : "▼ Ver Resolução Completa Passo a Passo";
+        button.innerHTML = "";
+        if (window.UiIcons) button.appendChild(window.UiIcons.create(content.classList.contains("open") ? "chevronUp" : "chevronDown"));
+        var label = document.createElement("span");
+        label.textContent = content.classList.contains("open") ? "Ocultar Resolução" : "Ver Resolução Completa Passo a Passo";
+        button.appendChild(label);
         renderKaTeXIfAvailable();
       });
     });

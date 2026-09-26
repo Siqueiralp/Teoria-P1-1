@@ -1,24 +1,22 @@
 <!-- HERO BANNER PEDAGÓGICO -->
       <section class="hero-banner">
-        <h2 class="hero-title">🎓 Guia Definitivo para a Prova 1 (P1)</h2>
+        <h2 class="hero-title">Eletrônica de Potência — Guia P1</h2>
         <p class="hero-subtitle">
-          Bem-vindo ao seu ambiente de estudos de alta performance para <strong>Eletrônica de Potência</strong>.
-          Este material foi construído para transformar as deduções matemáticas das aulas teóricas da UTFPR em 
-          compreensão física intuitiva e domínio prático das equações de prova.
+          Estude os caminhos de corrente, as mudanças de estado e as equações dos conversores. Use as animações para inspecionar os instantes de comutação e os exercícios para conferir os cálculos.
         </p>
 
         <div class="triad-grid">
           <div class="triad-card">
             <div class="triad-header">1. Balanço Volts-Segundo</div>
-            <p>A tensão média sobre qualquer indutor em regime permanente periódico é nula: \(\langle v_L \rangle = 0\). As áreas positiva e negativa se anulam exatamente em um período.</p>
+            <p>A tensão média sobre um indutor ideal em regime permanente periódico é nula: \(\langle v_L \rangle = 0\). As áreas positiva e negativa se anulam exatamente em um período.</p>
           </div>
           <div class="triad-card">
             <div class="triad-header">2. Balanço Ampères-Segundo</div>
-            <p>A corrente média através de qualquer capacitor em regime permanente é zero: \(\langle i_C \rangle = 0\). Toda a corrente contínua média da fonte/indutor vai exclusivamente para a carga.</p>
+            <p>A corrente média através de qualquer capacitor em regime permanente é zero: \(\langle i_C \rangle = 0\). Na saída, a corrente média entregue pelo estágio de potência é igual à corrente média da carga.</p>
           </div>
           <div class="triad-card">
             <div class="triad-header">3. Hipótese de Pequenas Oscilações</div>
-            <p>Para filtros bem dimensionados (\(RC \gg T_s\)), a ondulação de tensão de saída \(\Delta v_o\) é muito menor que \(V_o\), permitindo considerar \(v_C(t) \approx V_o\) constante na análise.</p>
+            <p>As rampas lineares supõem \(\Delta v_o \ll V_o\). Confira essa condição usando os valores de L, C, carga e frequência; \(RC \gg T_s\), isoladamente, não garante pequena ondulação.</p>
           </div>
         </div>
       </section>
@@ -35,7 +33,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=YPSKKttbbao" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-1">Marcar como Concluído</button>
           </div>
@@ -44,7 +42,7 @@
         <div class="module-body">
           <h3>1.1 Por que precisamos de dois valores para a mesma forma de onda?</h3>
           <p>
-            Em circuitos CC lineares tradicionais, tensão e corrente são constantes. Contudo, em <strong>Eletrônica de Potência</strong>, 
+            Em circuitos lineares alimentados por fontes CC constantes, tensão e corrente se tornam constantes após o transitório, quando existe regime estável. Contudo, em <strong>Eletrônica de Potência</strong>,
             os semicondutores atuam como interruptores, gerando formas de onda fortemente chaveadas (pulsadas, triangulares, trapezoidais). 
             Para projetar componentes e dissipadores térmicos, precisamos responder a duas perguntas distintas:
           </p>
@@ -54,14 +52,14 @@
           </ul>
 
           <div class="callout callout-concept">
-            <div class="callout-title">💡 Definições Integrais Fundamentais</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="info"></span> Definições Integrais Fundamentais</div>
             <p>Para qualquer grandeza periódica \(x(t)\) com período \(T\):</p>
             $$\text{Valor Médio: } X_{med} = \langle x \rangle = \frac{1}{T} \int_0^T x(t) \, dt$$
             $$\text{Valor Eficaz (RMS): } X_{ef} = X_{rms} = \sqrt{\frac{1}{T} \int_0^T x^2(t) \, dt}$$
           </div>
 
           <h3>1.2 Formas de Onda Clássicas da Eletrônica de Potência</h3>
-          <p>Durante a prova, integrar funções por partes consome tempo valioso. Abaixo está a tabela canônica com as formas de onda essenciais já integradas:</p>
+          <p>Durante a prova, integrar funções por partes consome tempo valioso. A tabela abaixo considera amplitudes positivas. O fator de forma usa a média do módulo; nas ondas unipolares, ela coincide com a média comum. Na rampa com nível CC, \(\Delta I=I_{max}-I_{min}\) é pico a pico, sem intervalo de corrente nula:</p>
 
           <div class="table-wrapper">
             <table class="content-table">
@@ -71,7 +69,7 @@
                   <th>Equação no Período \(T\)</th>
                   <th>Valor Médio (\(X_{med}\))</th>
                   <th>Valor Eficaz (\(X_{ef}\))</th>
-                  <th>Fator de Forma (\(FF = \frac{X_{ef}}{X_{med}}\))</th>
+                  <th>Fator de Forma (\(FF = X_{ef}/\langle |x|\rangle\))</th>
                 </tr>
               </thead>
               <tbody>
@@ -138,11 +136,11 @@
           </p>
 
           <div class="callout callout-exam">
-            <div class="callout-title">⚠️ Pegadinha Clássica de Prova da UTFPR</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="warning"></span> Pegadinha Clássica de Prova da UTFPR</div>
             <p>
-              Nunca eleve o valor médio ao quadrado para calcular potências resistivas! 
-              Lembre-se sempre: \(P_{resistor} = R \cdot I_{ef}^2 \neq R \cdot I_{med}^2\).
-              A diferença entre \((I_{ef})^2\) e \((I_{med})^2\) corresponde à potência dissipada pelas componentes harmônicas alternadas (AC):
+              Use o valor eficaz para calcular perdas resistivas; ele coincide com o módulo do valor médio somente para corrente constante.
+              Lembre-se sempre: \(P_{resistor} = R \cdot I_{ef}^2 \ge R \cdot I_{med}^2\).
+              A diferença entre \((I_{ef})^2\) e \((I_{med})^2\) é o quadrado do valor eficaz da parcela alternada. Multiplicada por R, fornece a perda resistiva adicional:
               $$I_{ef}^2 = I_{med}^2 + I_{ac,ef}^2$$
             </p>
           </div>
@@ -156,11 +154,11 @@
             <div class="exercise-body">
               <p>
                 Em um conversor estático chaveado a \(50\text{ kHz}\) (\(T = 20\,\mu\text{s}\)), a corrente que flui por um transistor 
-                IGBT é retangular, com amplitude constante de \(I_p = 30\text{ A}\) durante um tempo de condução \(t_{on} = 5\,\mu\text{s}\), 
+                MOSFET é retangular, com amplitude constante de \(I_p = 30\text{ A}\) durante um tempo de condução \(t_{on} = 5\,\mu\text{s}\),
                 permanecendo nula no restante do período. 
                 Calcule: (a) A razão cíclica \(D\); (b) A corrente média \(I_{med}\); (c) A corrente eficaz \(I_{ef}\); (d) A potência dissipada se a chave possuir uma resistência de condução interna \(R_{on} = 0{,}15\,\Omega\).
               </p>
-              <button class="solution-toggle" data-target="sol1_1">▼ Ver Resolução Completa Passo a Passo</button>
+              <button class="solution-toggle" data-target="sol1_1">Ver Resolução Completa Passo a Passo</button>
               <div id="sol1_1" class="solution-content">
                 <p><strong>Passo 1: Razão cíclica \(D\)</strong></p>
                 $$D = \frac{t_{on}}{T} = \frac{5\,\mu\text{s}}{20\,\mu\text{s}} = 0{,}25 \quad (25\%)$$
@@ -215,7 +213,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=2PeBKp-TEgY" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-2">Marcar como Concluído</button>
           </div>
@@ -226,11 +224,11 @@
           <p>
             Em regime transitório clássico (Circuitos I e II), resolvemos equações diferenciais lineares de 1ª e 2ª ordem para obter respostas exponenciais. 
             Em <strong>Conversores Estáticos</strong>, contudo, a frequência de comutação \(f_s\) é alta (geralmente entre \(20\text{ kHz}\) e \(500\text{ kHz}\)), 
-            e os conversores operam em <strong>Regime Permanente Periódico (RPP)</strong>.
+            e a análise a seguir considera os conversores em <strong>Regime Permanente Periódico (RPP)</strong>, após os transitórios.
           </p>
 
           <div class="callout callout-math">
-            <div class="callout-title">📐 As Equações Constitutivas em Função do Tempo</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="ruler"></span> As Equações Constitutivas em Função do Tempo</div>
             <p><strong>No Indutor:</strong></p>
             $$v_L(t) = L \frac{di_L(t)}{dt} \iff i_L(t) = i_L(t_0) + \frac{1}{L} \int_{t_0}^t v_L(\tau) \, d\tau$$
             <p><strong>No Capacitor:</strong></p>
@@ -255,7 +253,7 @@
             A área positiva (tensão de magnetização \(\times\) tempo de condução) deve ser rigorosamente igual à área negativa (tensão de desmagnetização \(\times\) tempo de bloqueio):
           </p>
           $$\text{Área }(A^+) = \text{Área }(A^-)$$
-          <p>Se essa igualdade não fosse satisfeita, a corrente média aumentaria continuamente rumo ao infinito (saturação magnética) ou cairia a zero.</p>
+          <p>Se o balanço não for satisfeito, a corrente muda de um ciclo para o seguinte: ainda há transitório. Um desequilíbrio persistente pode levar a sobrecorrente ou corrente nula; saturação é um efeito do núcleo real, fora do modelo de indutância constante.</p>
 
           <h3>2.3 O Princípio do Balanço de Carga (Ampères-Segundo) no Capacitor</h3>
           <p>
@@ -271,11 +269,11 @@
 
           <p>
             <strong>Significado Físico:</strong> Em regime permanente, o capacitor não consome nem gera corrente contínua líquida. 
-            Toda a corrente média que sai do estágio anterior deve ir integralmente para a carga. O capacitor absorve apenas as oscilações de alta frequência.
+            Toda a corrente média que sai do estágio anterior deve ir integralmente para a carga. O capacitor troca carga durante o período; fora do regime periódico, também participa dos transitórios.
           </p>
 
           <div class="callout callout-concept">
-            <div class="callout-title">⚡ A Hipótese de Pequenas Oscilações (Small-Ripple Approximation)</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="bolt"></span> A Hipótese de Pequenas Oscilações (Small-Ripple Approximation)</div>
             <p>
               A aproximação de pequenas oscilações assume que a ondulação é pequena em relação ao valor médio
               (\(\Delta V_o \ll V_o\)). Essa hipótese não decorre apenas de \(R C \gg T_s\): ela deve ser verificada a partir
@@ -321,7 +319,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=5rIvMyEEph0" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-3">Marcar como Concluído</button>
           </div>
@@ -336,13 +334,13 @@
           </p>
 
           <div class="callout callout-math">
-            <div class="callout-title">⚡ Equação do Modelo Linear por Trechos</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="bolt"></span> Equação do Modelo Linear por Trechos</div>
             <p>Quando o diodo está em condução (\(i_D(t) > 0\)), sua tensão é modelada pela equação da reta:</p>
             $$v_D(t) = V_{T0} + r_D \cdot i_D(t)$$
             <p>Onde:</p>
             <ul>
-              <li>\(V_{T0}\) (ou \(V_\gamma\)): Tensão limiar de condução (aprox. \(0{,}7\text{ V}\) a \(1{,}1\text{ V}\) para silício; \(0{,}3\text{ V}\) a \(0{,}5\text{ V}\) para Schottky).</li>
-              <li>\(r_D\): Resistência dinâmica de condução (inclinação da curva \(I-V\) na região de trabalho).</li>
+              <li>\(V_{T0}\): intercepto do ajuste linear da característica direta. Deve ser extraído do datasheet na faixa de corrente e temperatura considerada; não é uma queda universal nem um limiar físico abrupto.</li>
+              <li>\(r_D\): resistência diferencial \(dv_D/di_D\), aproximada pela inclinação do ajuste de tensão em função da corrente.</li>
             </ul>
           </div>
 
@@ -362,7 +360,7 @@
           </div>
 
           <div class="callout callout-exam">
-            <div class="callout-title">⚠️ Questão Conceitual Importante</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="warning"></span> Questão Conceitual Importante</div>
             <p>
               <strong>Por que a primeira parcela utiliza o valor médio e a segunda utiliza o valor eficaz ao quadrado?</strong><br>
               <em>Resposta Didática:</em> A fonte ideal de tensão \(V_{T0}\) consome uma energia fixa por Coulomb de carga que atravessa o diodo (\(W = V_{T0} \cdot Q\)). 
@@ -375,7 +373,7 @@
           <p>
             Quando o diodo deixa de conduzir e uma tensão reversa é aplicada bruscamente, ele não bloqueia instantaneamente. 
             Portadores minoritários que estavam armazenados na junção precisam ser removidos ou se recombinar. Durante esse intervalo, 
-            o diodo conduz uma corrente reversa de pico (\(I_{RRM}\)) sob alta tensão reversa (\(V_R\)), gerando um pulso severo de dissipação de potência:
+            o diodo apresenta uma corrente reversa de pico (\(I_{RRM}\)) e uma tensão que evolui durante a recuperação. A sobreposição de tensão e corrente causa perdas de comutação; uma estimativa da energia envolvida usa a tensão de bloqueio \(V_R\):
           </p>
           $$P_{com} \approx Q_{rr} \cdot V_R \cdot f_s$$
           <p>
@@ -400,7 +398,7 @@
                 (b) Calcule a potência de condução total dissipada; 
                 (c) Se o conversor operar a \(f_s = 100\text{ kHz}\) com tensão reversa \(V_R = 150\text{ V}\) e \(Q_{rr} = 60\text{ nC}\), calcule as perdas por comutação.
               </p>
-              <button class="solution-toggle" data-target="sol3_1">▼ Ver Resolução Completa Passo a Passo</button>
+              <button class="solution-toggle" data-target="sol3_1">Ver Resolução Completa Passo a Passo</button>
               <div id="sol3_1" class="solution-content">
                 <p><strong>(a) Correntes Média e Eficaz:</strong></p>
                 $$I_{D,med} = D_d \cdot I_p = 0{,}4 \cdot 20\text{ A} = 8{,}0\text{ A}$$
@@ -408,11 +406,11 @@
 
                 <p><strong>(b) Perdas por Condução:</strong></p>
                 $$P_{cond} = V_{T0} \cdot I_{D,med} + r_D \cdot I_{D,ef}^2$$
-                $$P_{cond} = 0{,}85 \cdot 8{,}0 + 0{,}018 \cdot (12{,}65)^2 = 6{,}80\text{ W} + 0{,}018 \cdot 160{,}0\text{ W} = 6{,}80\text{ W} + 2{,}88\text{ W} = 9{,}68\text{ W}$$
+                $$P_{cond} = 0{,}85 \cdot 8{,}0 + 0{,}018 \cdot (12{,}65)^2 = 6{,}80\text{ W} + 0{,}018\,\Omega \cdot 160{,}0\text{ A}^2 = 6{,}80\text{ W} + 2{,}88\text{ W} = 9{,}68\text{ W}$$
 
                 <p><strong>(c) Perdas por Comutação:</strong></p>
                 $$P_{com} = Q_{rr} \cdot V_R \cdot f_s = (60 \times 10^{-9}\text{ C}) \cdot (150\text{ V}) \cdot (100 \times 10^3\text{ Hz}) = 0{,}90\text{ W}$$
-                <p><strong>Perda Total:</strong> \(P_{total} = P_{cond} + P_{com} = 9{,}68 + 0{,}90 = 10{,}58\text{ W}\).</p>
+                <p><strong>Estimativa de perda total atribuída ao diodo neste exercício:</strong> \(P_{total} = P_{cond} + P_{com} = 9{,}68 + 0{,}90 = 10{,}58\text{ W}\).</p>
               </div>
             </div>
           </div>
@@ -454,7 +452,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=gGUoB-HvKTY" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-4">Marcar como Concluído</button>
           </div>
@@ -479,7 +477,7 @@
           <ul>
             <li>A tensão no indutor é: \(v_L(t) = V_{in} - V_o > 0\).</li>
             <li>A corrente \(i_L(t)\) cresce linearmente com taxa de subida positiva: \(\frac{di_L}{dt} = \frac{V_{in} - V_o}{L}\).</li>
-            <li>A energia é transferida diretamente da fonte de entrada para o indutor, para o capacitor e para a carga.</li>
+            <li>A fonte alimenta o conjunto indutor e saída. C carrega quando iL > Io e descarrega quando iL < Io, mesmo com S ligada.</li>
           </ul>
 
           <p><strong>2ª Etapa (\(D T_s \le t \le T_s\) — Chave \(S\) ABERTA, Diodo \(D\) CONDUZINDO):</strong></p>
@@ -487,7 +485,7 @@
             <li>Para garantir a continuidade da corrente no indutor (\(i_L\)), o diodo \(D\) entra espontaneamente em condução (roda-livre).</li>
             <li>A tensão no indutor é: \(v_L(t) = -V_o < 0\).</li>
             <li>A corrente decresce linearmente: \(\frac{di_L}{dt} = -\frac{V_o}{L}\).</li>
-            <li>O indutor descarrega a energia magnética armazenada para a carga e para o capacitor.</li>
+            <li>O indutor fornece energia à saída. C só carrega enquanto iL > Io; depois complementa a corrente da carga.</li>
           </ul>
 
           <h3>4.3 Balanço de Volts-Segundo e Ganho Estático</h3>
@@ -601,7 +599,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=FRnqgkM-EN8" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-5">Marcar como Concluído</button>
           </div>
@@ -611,7 +609,7 @@
           <h3>5.1 Topologia e Operação Elevadora</h3>
           <p>
             O conversor Boost (ou <em>Step-Up</em>) eleva a tensão de entrada, de modo que \(V_o \ge V_{in}\). 
-            Ao contrário do Buck, o indutor \(L\) fica posicionado em série com a fonte de entrada \(V_{in}\), o que proporciona uma corrente de entrada contínua e suave, de baixo ruído eletromagnético.
+            Ao contrário do Buck, o indutor \(L\) fica posicionado em série com a fonte de entrada \(V_{in}\), o que mantém a corrente de entrada contínua em CCM. Em DCM há um intervalo de corrente nula; o ruído também depende da comutação, do filtro e do layout.
           </p>
 
           <!-- Simulador Dinâmico & Osciloscópio do Conversor Boost -->
@@ -644,17 +642,17 @@
           <h3>5.3 Relação entre Corrente no Indutor e Corrente de Saída</h3>
           <p>Considerando o conversor ideal (\(P_{in} = P_o \implies V_{in} I_{in} = V_o I_o\)):</p>
           $$I_{in} = I_o \cdot \frac{V_o}{V_{in}} = \frac{I_o}{1 - D}$$
-          <p>Como a corrente de entrada é exatamente a corrente média no indutor (\(I_L = I_{in}\)):</p>
+          <p>Como a corrente média de entrada é igual à corrente média no indutor (\(I_L = I_{in}\)):</p>
           $$I_L = \frac{I_o}{1 - D}$$
 
           <h3>5.4 Ondulação de Tensão de Saída (\(\Delta V_o\)) — CUIDADO!</h3>
           <p>
-            No conversor Boost, o capacitor não recebe uma corrente contínua como no Buck. Durante toda a 1ª etapa (\(D T_s\)), 
+            No Boost, a corrente entregue ao filtro de saída é pulsada, pois passa pelo diodo; no Buck, ela coincide com iL. Durante toda a 1ª etapa (\(D T_s\)),
             o diodo está cortado e a corrente que vai para a carga sai <strong>exclusivamente</strong> do capacitor (\(i_C = -I_o\)).
             A carga perdida é simplesmente:
           </p>
           $$\Delta Q = I_o \cdot D T_s$$
-          <p>Portanto, a ondulação de tensão de saída é:</p>
+          <p>Se iL ≥ Io durante todo o intervalo OFF, a carga perdida no intervalo ON determina a ondulação pico a pico:</p>
 
           <div class="formula-block">
             <span class="formula-tag">Ondulação de Tensão no Boost</span>
@@ -662,17 +660,23 @@
           </div>
 
           <div class="callout callout-warning">
-            <div class="callout-title">⚠️ Comparação Crítica de Projeto: Buck vs Boost</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="warning"></span> Comparação Crítica de Projeto: Buck vs Boost</div>
             <p>
               A diferença entre as expressões de ripple do Buck e do Boost vem do <strong>caminho da corrente do capacitor</strong>.
               No Buck, a corrente do capacitor é a componente alternada da corrente do indutor. No Boost, durante \(D T_s\),
               o diodo está bloqueado e o capacitor alimenta sozinho a carga, perdendo aproximadamente \(I_o D T_s\) de carga.
-              Isso conduz a \(\Delta V_o \approx I_oD/(Cf_s)\) sob pequena ondulação e ESR desprezível. Não se deve concluir,
+              Isso conduz a \(\Delta V_o \approx I_oD/(Cf_s)\) sob pequena ondulação, ESR desprezível e \(I_{L,min}\ge I_o\). Não se deve concluir,
               a partir dessa expressão, que o conversor Boost seja um sistema de primeira ordem nem que sua capacitância precise ser
               necessariamente ordens de grandeza maior que a do Buck.
             </p>
           </div>
 
+          <div class="callout callout-math">
+            <div class="callout-title">Quando a descarga de C continua após a abertura de S</div>
+            <p>Em Boost e Buck-Boost CCM, se \(I_{L,min}&lt;I_o\), o capacitor volta a descarregar antes do próximo ciclo. Então \(I_oD/(Cf_s)\) subestima a ondulação total. Integrando a região positiva de \(i_C=i_L-I_o\):</p>
+            $$\Delta V_o\approx\frac{(1-D)(I_{L,max}-I_o)^2}{2\Delta I_L C f_s}$$
+            <p>Use essa expressão quando \(I_{L,min}&lt;I_o\); se \(I_{L,min}\ge I_o\), use \(\Delta V_o\approx I_oD/(Cf_s)\). Ambas assumem saída com pequena ondulação e capacitor sem ESR/ESL. A calculadora seleciona o caso a partir da corrente mínima.</p>
+          </div>
           <h3>5.5 Esforços Máximos nos Semicondutores</h3>
           <ul>
             <li><strong>Tensão máxima na chave \(S\):</strong> \(V_{S,max} = V_o\).</li>
@@ -716,7 +720,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=KIQG-LcaO88" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-6">Marcar como Concluído</button>
           </div>
@@ -735,7 +739,7 @@
 
           <h3>6.2 Dedução do Ganho e Relações de Corrente</h3>
           <p><strong>1ª Etapa (\(0 \le t \le D T_s\)):</strong> \(S\) conduz, \(D\) bloqueado. \(v_L(t) = V_{in}\). O indutor armazena energia exclusivamente da entrada.</p>
-          <p><strong>2ª Etapa (\(D T_s \le t \le T_s\)):</strong> \(S\) abre, \(D\) conduz. A corrente no indutor flui do terra para o nó de saída, impondo \(v_L(t) = -V_o\) (magnitude).</p>
+          <p><strong>2ª Etapa (\(D T_s \le t \le T_s\)):</strong> \(S\) abre, \(D\) conduz. A corrente no indutor mantém o sentido do nó comutado para o terra. O retorno passa do terra pela carga/capacitor até a saída negativa e pelo diodo até o nó comutado, impondo \(v_L(t) = -V_o\) (magnitude).</p>
 
           <p>Aplicando o Balanço de Volts-Segundo:</p>
           $$V_{in} \cdot D T_s + (-V_o) \cdot (1 - D) T_s = 0 \implies V_o = \frac{D}{1 - D} V_{in}$$
@@ -758,7 +762,7 @@
           <p>Durante a condução da chave, \(v_L=V_{in}\). Assim, a ondulação pico a pico da corrente é:</p>
           $\Delta I_L = \frac{V_{in}D}{Lf_s}$
           <p>
-            Nesse mesmo intervalo o diodo está bloqueado e o capacitor alimenta a carga. Sob pequena ondulação e ESR desprezível:
+            Nesse mesmo intervalo o diodo está bloqueado e o capacitor alimenta a carga. Com pequena ondulação, ESR desprezível e iL ≥ Io durante todo o intervalo OFF:
           </p>
           $\Delta V_o \approx \frac{I_oD}{Cf_s}$
 
@@ -811,7 +815,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=q6POKt6s0Kc" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-7">Marcar como Concluído</button>
           </div>
@@ -830,7 +834,7 @@
           </p>
 
           <div class="callout callout-math">
-            <div class="callout-title">📐 A Fronteira Crítica de Condução (Limite CCM / DCM)</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="ruler"></span> A Fronteira Crítica de Condução (Limite CCM / DCM)</div>
             <p>Na fronteira exata entre os modos contínuo e descontínuo, a corrente mínima no indutor tangencia o zero:</p>
             $$I_{L,min} = I_{o,crit} - \frac{\Delta I_L}{2} = 0 \implies I_{o,crit} = \frac{\Delta I_L}{2}$$
             <p>Substituindo a ondulação de corrente do Buck (\(\Delta I_L = \frac{V_o (1 - D)}{L f_s}\)):</p>
@@ -882,7 +886,7 @@
           </div>
 
           <div class="callout callout-exam">
-            <div class="callout-title">⚠️ Consequência Prática Fundamental em DCM</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="warning"></span> Consequência Prática Fundamental em DCM</div>
             <p>
               Em CCM, o ganho estático \(M(D) = D\) depende <em>apenas</em> da razão cíclica da chave e independe totalmente da carga \(R\).<br>
               Em DCM, contudo, \(M(D, K)\) é uma função explícita da carga (\(R\)), da indutância (\(L\)) e da frequência (\(f_s\)) através de \(K\)! 
@@ -927,7 +931,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=6p6B0mKMqrA" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-8">Marcar como Concluído</button>
           </div>
@@ -969,7 +973,7 @@
           </div>
 
           <div class="callout callout-exam">
-            <div class="callout-title">⚠️ Elevação Descontrolada da Tensão em Vazio no Boost</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="warning"></span> Elevação Descontrolada da Tensão em Vazio no Boost</div>
             <p>
               Observe a equação acima quando a carga é desconectada (\(R \to \infty \implies K \to 0\)):
               $$\lim_{K \to 0} M(D, K) = \lim_{K \to 0} \frac{1 + \sqrt{1 + 4D^2/K}}{2} = +\infty$$
@@ -1014,7 +1018,7 @@
           </div>
           <div class="module-header-right">
             <a href="https://www.youtube.com/watch?v=WNAwMG7TjFo" target="_blank" rel="noopener" class="video-pill">
-              ▶ Videoaula Oficial (UTFPR)
+              Videoaula Oficial (UTFPR)
             </a>
             <button class="btn-complete-module" data-mod-id="mod-9">Marcar como Concluído</button>
           </div>
@@ -1054,7 +1058,7 @@
           </div>
 
           <div class="callout callout-concept">
-            <div class="callout-title">💡 Notável Propriedade Linear do Buck-Boost em DCM</div>
+            <div class="callout-title"><span class="inline-icon" data-icon="info"></span> Notável Propriedade Linear do Buck-Boost em DCM</div>
             <p>
               Veja como o resultado do Buck-Boost em DCM é extraordinariamente simples e linear: 
               A tensão de saída é <strong>diretamente proporcional à razão cíclica \(D\)</strong> e inversamente proporcional a \(\sqrt{K}\). 
@@ -1096,7 +1100,7 @@
       <section id="calculatorSection" class="calculator-section">
         <div class="calc-header">
           <div class="calc-title">
-            <span>🧮 Simulador & Calculadora de Conversores CC-CC</span>
+            <span><span class="inline-icon" data-icon="calculator"></span> Simulador & Calculadora de Conversores CC-CC</span>
           </div>
           <span style="font-size: 0.8rem; color: var(--text-muted);">Cálculo analítico em tempo real • CCM e DCM</span>
         </div>
@@ -1115,39 +1119,41 @@
 
             <div class="input-group">
               <label for="calcVin">Tensão de Entrada (Vin) <span class="unit">[V]</span></label>
-              <input type="number" id="calcVin" class="calc-input" value="24" step="1" min="1">
+              <input type="number" id="calcVin" class="calc-input" aria-describedby="calcError" value="24" step="1" min="1">
             </div>
 
             <div class="input-group">
-              <label for="calcVo">Tensão de Saída Desejada (Vo) <span class="unit">[V]</span></label>
-              <input type="number" id="calcVo" class="calc-input" value="12" step="0.5" min="1">
+              <label for="calcVo">Magnitude da Saída (|Vo|) <span class="unit">[V]</span></label>
+              <input type="number" id="calcVo" class="calc-input" aria-describedby="calcError" value="12" step="0.5" min="1">
             </div>
 
             <div class="input-group">
               <label for="calcPo">Potência de Saída (Po) <span class="unit">[W]</span></label>
-              <input type="number" id="calcPo" class="calc-input" value="48" step="1" min="0.5">
+              <input type="number" id="calcPo" class="calc-input" aria-describedby="calcError" value="48" step="1" min="0.5">
             </div>
 
             <div class="input-group">
               <label for="calcFs">Frequência de Chaveamento (fs) <span class="unit">[kHz]</span></label>
-              <input type="number" id="calcFs" class="calc-input" value="50" step="5" min="1">
+              <input type="number" id="calcFs" class="calc-input" aria-describedby="calcError" value="50" step="5" min="1">
             </div>
 
             <div class="input-group">
               <label for="calcL">Indutância (L) <span class="unit">[µH]</span></label>
-              <input type="number" id="calcL" class="calc-input" value="100" step="5" min="1">
+              <input type="number" id="calcL" class="calc-input" aria-describedby="calcError" value="100" step="5" min="1">
             </div>
 
             <div class="input-group">
               <label for="calcC">Capacitância de Filtro (C) <span class="unit">[µF]</span></label>
-              <input type="number" id="calcC" class="calc-input" value="47" step="1" min="0.1">
+              <input type="number" id="calcC" class="calc-input" aria-describedby="calcError" value="47" step="1" min="0.1">
             </div>
           </div>
 
           <!-- Resultados & Gráfico SVG -->
           <div class="calc-results">
+            <p id="calcError" class="callout callout-warning" role="status" hidden></p>
+            <p class="converter-conventions">Conversor ideal em regime periódico, capacitor sem ESR e saída com pequena ondulação. No inversor, vout = −|Vo|. Lcrit corresponde à fronteira para a tensão e a carga informadas.</p>
             <div id="resConductionMode" class="results-status-badge status-ccm">
-              ⚡ Modo de Condução Contínua (CCM)
+              <span class="inline-icon" data-icon="bolt"></span> Modo de Condução Contínua (CCM)
             </div>
 
             <div class="results-metrics-grid">
@@ -1240,7 +1246,7 @@
                   <td>$$\Delta I_L=\frac{V_{in}D}{Lf_s}$$</td>
                 </tr>
                 <tr>
-                  <td><strong>Ondulação de tensão — CCM</strong><br><small>capacitor ideal, ESR desprezível</small></td>
+                  <td><strong>Ondulação de tensão — CCM</strong><br><small>pequena ondulação, ESR desprezível; Boost/inversor exigem IL,min ≥ Io nesta expressão (ver §5.4–5.5)</small></td>
                   <td>$$\Delta V_o\approx\frac{\Delta I_L}{8Cf_s}$$</td>
                   <td>$$\Delta V_o\approx\frac{I_oD}{Cf_s}$$</td>
                   <td>$$\Delta V_o\approx\frac{I_oD}{Cf_s}$$</td>
@@ -1334,7 +1340,7 @@
                 (iii) O conversor permaneça em CCM mesmo se a carga for reduzida para \(25\%\) da potência nominal. 
                 Calcule a razão cíclica \(D\), a indutância \(L\), a capacitância \(C\) e os esforços de tensão e corrente nos semicondutores.
               </p>
-              <button class="solution-toggle" data-target="solP1_1">▼ Ver Resolução Completa Passo a Passo</button>
+              <button class="solution-toggle" data-target="solP1_1">Ver Resolução Completa Passo a Passo</button>
               <div id="solP1_1" class="solution-content">
                 <p><strong>1. Cálculo da Razão Cíclica \(D\) e Corrente Nominal de Carga:</strong></p>
                 $$D = \frac{V_o}{V_{in}} = \frac{24}{60} = 0{,}40 \quad (40\%)$$
@@ -1376,10 +1382,10 @@
                 Um conversor Boost opera com \(V_{in} = 12\text{ V}\), razão cíclica fixa \(D = 0{,}60\), frequência \(f_s = 25\text{ kHz}\) 
                 e indutância \(L = 40\,\mu\text{H}\). 
                 (a) Determine o valor da resistência de carga crítica \(R_{crit}\) que define a transição entre CCM e DCM. 
-                (b) Se a carga for \(R = 100\,\Omega\), verifique em qual modo de condução o conversor opera e calcule a tensão de saída real \(V_o\). 
+                (b) Se a carga for \(R = 100\,\Omega\), verifique em qual modo de condução o conversor opera e calcule a tensão de saída prevista pelo modelo ideal \(V_o\).
                 (c) Compare essa tensão com a que seria obtida caso o conversor estivesse em CCM.
               </p>
-              <button class="solution-toggle" data-target="solP1_2">▼ Ver Resolução Completa Passo a Passo</button>
+              <button class="solution-toggle" data-target="solP1_2">Ver Resolução Completa Passo a Passo</button>
               <div id="solP1_2" class="solution-content">
                 <p><strong>(a) Cálculo de \(R_{crit}\):</strong></p>
                 $$K_{crit} = D (1 - D)^2 = 0{,}60 \cdot (1 - 0{,}60)^2 = 0{,}60 \cdot 0{,}16 = 0{,}096$$
@@ -1394,7 +1400,7 @@
 
                 <p><strong>(c) Comparação com o modelo de CCM:</strong></p>
                 $$V_{o,CCM} = \frac{V_{in}}{1 - D} = \frac{12}{1 - 0{,}60} = \frac{12}{0{,}40} = 30{,}0\text{ V}$$
-                <p><em>Conclusão Pedagógica:</em> Devido à descontinuidade de condução provocada pela carga leve (\(100\,\Omega\)), a tensão de saída subiu de \(30\text{ V}\) para quase \(57{,}3\text{ V}\) (um acréscimo de mais de \(90\%\))! Isso comprova na prática por que conversores em DCM exigem controle em malha fechada para não queimar as cargas.</p>
+                <p><em>Conclusão Pedagógica:</em> Devido à descontinuidade de condução provocada pela carga leve (\(100\,\Omega\)), a tensão de saída subiu de \(30\text{ V}\) para quase \(57{,}3\text{ V}\) (um acréscimo de mais de \(90\%\))! Este cálculo ilustra a dependência da carga em malha aberta. Controle e proteção devem ser dimensionados para a faixa de operação; DCM, por si só, não implica dano à carga.</p>
               </div>
             </div>
           </div>
@@ -1415,7 +1421,7 @@
                 (c) Calcule o tempo de condução da chave (\(t_{on}\)) e o tempo de condução do diodo (\(t_{diodo}\)); 
                 (d) Verifique a condição de condução descontínua.
               </p>
-              <button class="solution-toggle" data-target="solP1_3">▼ Ver Resolução Completa Passo a Passo</button>
+              <button class="solution-toggle" data-target="solP1_3">Ver Resolução Completa Passo a Passo</button>
               <div id="solP1_3" class="solution-content">
                 <p><strong>(a) Cálculo da Resistência e Parâmetro \(K\):</strong></p>
                 $$I_o = \frac{P_o}{V_o} = \frac{15\text{ W}}{15\text{ V}} = 1{,}0\text{ A} \implies R = \frac{15}{1{,}0} = 15\,\Omega$$
@@ -1433,7 +1439,7 @@
 
                 <p><strong>(d) Verificação do Limite CCM/DCM:</strong></p>
                 $$D + D_2 = 0{,}2582 + 0{,}5164 = 0{,}7746 < 1{,}0$$
-                <p>Como \(D + D_2 < 1\) (e \(K = 0{,}2667 < K_{crit} = (1 - D_{ccm})^2 = (1 - 0{,}333)^2 = 0{,}444\)), confirma-se plenamente a operação em modo descontínuo com margem segura!</p>
+                <p>Como \(D + D_2 < 1\) (e \(K = 0{,}2667 < K_{crit}(D) = (1 - 0{,}2582)^2 \approx 0{,}5503\)), confirma-se plenamente a operação em modo descontínuo para os parâmetros ideais informados.</p>
               </div>
             </div>
           </div>
@@ -1442,6 +1448,6 @@
 
       <!-- RODAPÉ TÉCNICO -->
       <footer style="margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border-subtle); text-align: center; font-size: 0.82rem; color: var(--text-dim);">
-        <p>⚡ <strong>Eletrônica de Potência — Teoria P1</strong> • Material Didático baseado na grade curricular da UTFPR.</p>
-        <p style="margin-top: 4px;">Desenvolvido com renderização KaTeX, armazenamento local persistente e simulação analítica integrada.</p>
+        <p><span class="inline-icon" data-icon="bolt"></span> <strong>Eletrônica de Potência — Teoria P1</strong> • Material Didático baseado na grade curricular da UTFPR.</p>
+        <p style="margin-top: 4px;">Convenções: corrente convencional, componentes ideais nos conversores e saída aproximadamente constante durante cada ciclo.</p>
       </footer>

@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         var icon = document.createElement("div");
         icon.className = "subject-card-icon";
-        icon.textContent = manifest.icon || "📘";
+        if (window.UiIcons) icon.appendChild(window.UiIcons.create(manifest.icon || "book"));
 
         var meta = document.createElement("div");
         meta.className = "subject-card-meta";
@@ -72,7 +72,8 @@ document.addEventListener("DOMContentLoaded", function () {
         var link = document.createElement("a");
         link.className = "subject-card-link";
         link.href = "guide.html?subject=" + encodeURIComponent(manifest.id);
-        link.textContent = progress.completed ? "Continuar estudando →" : "Começar guia →";
+        link.textContent = progress.completed ? "Continuar estudando" : "Começar guia";
+        if (window.UiIcons) link.appendChild(window.UiIcons.create("arrowRight"));
 
         article.appendChild(top);
         article.appendChild(stats);

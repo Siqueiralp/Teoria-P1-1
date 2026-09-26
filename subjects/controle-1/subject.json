@@ -3,7 +3,7 @@
   "name": "Sistemas de Controle Contínuo",
   "shortName": "Controle 1",
   "badge": "P1",
-  "icon": "📈",
+  "icon": "chart",
   "institution": "UTFPR",
   "description": "Estabilidade, erro estacionário, Root Locus, PID, compensadores e resposta em frequência.",
   "storageKey": "study_hub_controle_1_v1",

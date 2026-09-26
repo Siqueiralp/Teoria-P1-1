@@ -2,7 +2,7 @@
   "id": "minha-materia",
   "name": "Minha Matéria",
   "badge": "P1",
-  "icon": "📘",
+  "icon": "book",
   "institution": "UTFPR",
   "description": "Resumo do guia.",
   "storageKey": "study_hub_minha_materia_v1",

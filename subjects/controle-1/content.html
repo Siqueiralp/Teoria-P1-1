@@ -36,8 +36,8 @@
     <h3>1.1 Malha aberta e malha fechada</h3>
     <p>
       Em malha aberta a saída não influencia a ação de controle. Em malha fechada, a saída é medida,
-      comparada à referência e gera um erro que alimenta o controlador. A realimentação melhora robustez
-      e rejeição a distúrbios, mas pode introduzir instabilidade se for mal projetada.
+      comparada à referência e gera um erro que alimenta o controlador. A realimentação pode melhorar robustez
+      e rejeição a distúrbios na faixa de frequências do projeto, mas pode introduzir instabilidade se for mal projetada.
     </p>
 
     <h3>1.2 Função de transferência</h3>
@@ -45,19 +45,19 @@
     <div class="formula-block"><span class="formula-tag">(2)</span>
       $$G(s)=K\frac{(s-z_1)\cdots(s-z_m)}{(s-p_1)\cdots(s-p_n)}$$
     </div>
-    <p>Zeros são raízes do numerador; polos são raízes do denominador. A maior potência do denominador define a ordem.</p>
+    <p>Para sistemas lineares invariantes no tempo, a função de transferência relaciona entrada e saída com condições iniciais nulas. Após cancelamentos, zeros e polos são as raízes do numerador e do denominador; o grau do denominador é a ordem da realização mínima. Modos internos cancelados exigem análise separada.</p>
 
     <h3>1.3 Malha fechada e equação característica</h3>
     <div class="formula-block"><span class="formula-tag">(3)</span>$$T(s)=\frac{G(s)}{1+G(s)H(s)}$$</div>
     <div class="formula-block"><span class="formula-tag">(4)</span>$$1+G(s)H(s)=0$$</div>
-    <p>A equação (4) reaparece em Routh, Root Locus e Nyquist. Suas raízes são os polos de malha fechada.</p>
+    <p>As expressões (3) e (4) consideram realimentação negativa. Escreva a equação característica como polinômio após eliminar denominadores. Verifique também modos internos ocultos por cancelamentos, especialmente se forem instáveis.</p>
 
     <h3>1.4 Primeira ordem</h3>
     <div class="formula-block"><span class="formula-tag">(5)</span>$$T_s\approx\frac{4}{a}$$</div>
     <div class="formula-block"><span class="formula-tag">(6)</span>$$T_r\approx\frac{2{,}2}{a}$$</div>
-    <p>Essas aproximações valem para um sistema de primeira ordem sem zeros, com polo em \(-a\).</p>
+    <p>Para um sistema estável de primeira ordem sem zeros, com polo em \(-a\), \(a>0\), e entrada degrau: \(T_s\) usa a faixa de 2% e \(T_r\) mede a subida de 10% a 90%.</p>
 
-    <h3>1.5 Segunda ordem</h3>
+    <h3>1.5 Segunda ordem</h3><p>Modelo canônico sem zeros, \(\omega_n>0\). As expressões de pico e overshoot valem para o degrau com \(0<\zeta<1\). A estimativa \(T_s\approx4/(\zeta\omega_n)\) usa 2% e a envoltória exponencial; não é uma expressão exata nem se aplica indiscriminadamente ao caso superamortecido.</p>
     <div class="formula-block"><span class="formula-tag">(7)</span>
       $$T(s)=\frac{K_a\omega_n^2}{s^2+2\zeta\omega_ns+\omega_n^2}$$
     </div>
@@ -79,7 +79,7 @@
         <thead><tr><th>ζ</th><th>Comportamento</th><th>Interpretação</th></tr></thead>
         <tbody>
           <tr><td>\(\zeta&gt;1\)</td><td>Superamortecido</td><td>Sem oscilação, porém mais lento.</td></tr>
-          <tr><td>\(\zeta=1\)</td><td>Crítico</td><td>Mais rápido sem overshoot no modelo ideal.</td></tr>
+          <tr><td>\(\zeta=1\)</td><td>Crítico</td><td>Limite entre polos reais e complexos; resposta monotônica no modelo sem zeros.</td></tr>
           <tr><td>\(0&lt;\zeta&lt;1\)</td><td>Subamortecido</td><td>Oscilação amortecida e overshoot.</td></tr>
           <tr><td>\(\zeta=0\)</td><td>Não amortecido</td><td>Oscilação sustentada.</td></tr>
         </tbody>
@@ -120,7 +120,7 @@
     <ul>
       <li>Semiplano esquerdo: exponenciais decrescentes.</li>
       <li>Semiplano direito: exponenciais crescentes.</li>
-      <li>Eixo imaginário: limite de estabilidade, dependendo da multiplicidade.</li>
+      <li>Polos simples no eixo imaginário, sem polos no semiplano direito, podem dar estabilidade marginal da resposta livre; polos repetidos podem gerar crescimento. Uma função de transferência mínima com polos no eixo não é BIBO estável.</li>
     </ul>
 
     <h3>2.2 Routh para uma cúbica</h3>
@@ -209,10 +209,10 @@
 
     <div class="callout callout-warning">
       <div class="callout-title">Condição necessária</div>
-      <p>O teorema do valor final só deve ser usado quando a dinâmica relevante é estável. Calcular erro estacionário de um sistema que diverge não faz sentido físico.</p>
+      <p>Para obter um limite final finito pelo teorema, todos os polos de \(sE(s)\), após simplificação, devem estar estritamente no semiplano esquerdo. Isso depende também da entrada. Um sistema de malha fechada estável ainda pode ter erro crescente para rampa ou parábola; nesses casos, analise a divergência sem usar o teorema como prova de um limite finito.</p>
     </div>
 
-    <h3>3.2 Constantes</h3>
+    <h3>3.2 Constantes</h3><p>Nas fórmulas abaixo, a malha é estável, a realimentação é unitária e as entradas padrão são \(r(t)=1\), \(r(t)=t\) e \(r(t)=t^2/2\), para \(t\ge0\). Outras amplitudes multiplicam o erro correspondente.</p>
     <div class="formula-block"><span class="formula-tag">(23)</span>$$K_p=\lim_{s\to0}G(s)$$</div>
     <div class="formula-block"><span class="formula-tag">(24)</span>$$K_v=\lim_{s\to0}sG(s)$$</div>
     <div class="formula-block"><span class="formula-tag">(25)</span>$$K_a=\lim_{s\to0}s^2G(s)$$</div>
@@ -250,7 +250,7 @@
     <div class="formula-block"><span class="formula-tag">(34)</span>$$K_p=\frac{K}{3780}$$</div>
     <div class="formula-block"><span class="formula-tag">(35)</span>$$0{,}07=\frac{1}{1+K/3780}$$</div>
     <div class="formula-block"><span class="formula-tag">(36)</span>$$K=50220$$</div>
-    <p>Depois de dimensionar K pelo erro, ainda é obrigatório verificar estabilidade e transitório.</p>
+    <p>Para conferir a estabilidade: \(P(s)=s^3+151s^2+2188s+(3780+K)\). Routh exige \(-3780<K<326608\); portanto, \(K=50220\) é estável. O desempenho transitório ainda deve ser avaliado.</p>
 
     <div class="module-checklist">
       <div class="checklist-title">Checklist do módulo 03</div>
@@ -289,7 +289,7 @@
     </div>
     <p>A condição de ângulo diz se um ponto pertence ao LGR; a de módulo fornece o ganho naquele ponto.</p>
 
-    <h3>4.3 Regras geométricas</h3>
+    <h3>4.3 Regras geométricas</h3><p>Considere realimentação negativa, \(K\ge0\) e função racional própria, sem cancelamentos ocultando modos instáveis. As fórmulas de assíntotas exigem \(N_p>N_z\); conte polos e zeros com suas multiplicidades.</p>
     <ul>
       <li>O número de ramos é igual ao número de polos de malha aberta.</li>
       <li>Os ramos começam nos polos e terminam nos zeros, inclusive zeros no infinito.</li>
@@ -368,9 +368,9 @@
       <table class="content-table">
         <thead><tr><th>K</th><th>Polos dominantes</th><th>Resultado</th></tr></thead>
         <tbody>
-          <tr><td>\(K&lt;151{,}667\)</td><td>Semiplano esquerdo</td><td>Estável</td></tr>
-          <tr><td>\(K=151{,}667\)</td><td>Eixo imaginário</td><td>Marginal</td></tr>
-          <tr><td>\(K&gt;151{,}667\)</td><td>Dois polos no semiplano direito</td><td>Instável</td></tr>
+          <tr><td>\(-7&lt;K&lt;455/3\)</td><td>Semiplano esquerdo</td><td>Estável</td></tr>
+          <tr><td>\(K=455/3\approx151{,}667\)</td><td>Eixo imaginário</td><td>Marginal</td></tr>
+          <tr><td>\(K&gt;455/3\)</td><td>Dois polos no semiplano direito</td><td>Instável</td></tr>
         </tbody>
       </table>
     </div>
@@ -390,7 +390,7 @@ figure; pzmap(T)</pre>
 
     <p>O relatório da Prática 2 registrou aproximadamente:</p>
     <ul>
-      <li>margem de ganho: \(151{,}667\);</li>
+      <li>margem de ganho para \(K=1\): fator \(151{,}667\), aproximadamente \(43{,}62\,dB\);</li>
       <li>frequência de cruzamento de fase: \(15{,}055\ rad/s\);</li>
       <li>margem de fase infinita para \(K=1\), pois não ocorre cruzamento de 0 dB.</li>
     </ul>
@@ -454,7 +454,7 @@ figure; pzmap(T)</pre>
       </table>
     </div>
 
-    <h3>6.2 Sintonia manual</h3>
+    <p>As duas formas do PID se relacionam por \(K_i=K_p/T_i\) e \(K_d=K_pT_d\). Aqui \(K_p\) é ganho proporcional do controlador, distinto da constante de erro de posição do módulo 3. Na prática, a derivada precisa de filtro e a integral deve considerar saturação (anti-windup). Os efeitos da tabela são tendências, não garantias para toda planta.</p><h3>6.2 Sintonia manual</h3>
     <ol>
       <li>Comece com integral e derivativo reduzidos ou nulos.</li>
       <li>Ajuste \(K_p\) até obter uma resposta suficientemente rápida.</li>
@@ -464,12 +464,12 @@ figure; pzmap(T)</pre>
     </ol>
 
     <h3>6.3 Ziegler-Nichols por ganho crítico</h3>
-    <p>Se \(K_u\) é o ganho que produz oscilação sustentada e \(P_u\) o período dessa oscilação:</p>
+    <p>No método clássico, zere I e D e considere uma planta para a qual o aumento de ganho proporcional permite encontrar uma oscilação sustentada. Se \(K_u\) é esse ganho e \(P_u\) é o período, a tabela para PID na forma ideal fornece:</p>
     <div class="formula-block"><span class="formula-tag">(53)</span>$$K_p=0{,}6K_u$$</div>
     <div class="formula-block"><span class="formula-tag">(54)</span>$$T_i=\frac{P_u}{2}$$</div>
     <div class="formula-block"><span class="formula-tag">(55)</span>$$T_d=\frac{P_u}{8}$$</div>
 
-    <p>O plano de ensino também prevê Cohen-Coon, Chien-Hrones-Reswick e Åström-Hägglund.</p>
+    <p>Outros métodos de sintonia incluem Cohen-Coon, Chien-Hrones-Reswick e Åström-Hägglund.</p>
 
     <div class="callout callout-warning">
       <div class="callout-title">Não transforme PID em receita</div>
@@ -523,13 +523,13 @@ figure; pzmap(T)</pre>
         <thead><tr><th>Fator</th><th>Inclinação</th><th>Fase</th></tr></thead>
         <tbody>
           <tr><td>\(1/j\omega\)</td><td>-20 dB/década</td><td>-90°</td></tr>
-          <tr><td>Zero de 1ª ordem</td><td>+20 dB/década após a quebra</td><td>0° → +90°</td></tr>
-          <tr><td>Polo de 1ª ordem</td><td>-20 dB/década após a quebra</td><td>0° → -90°</td></tr>
+          <tr><td>Zero real no semiplano esquerdo</td><td>+20 dB/década após a quebra</td><td>0° → +90°</td></tr>
+          <tr><td>Polo real no semiplano esquerdo</td><td>-20 dB/década após a quebra</td><td>0° → -90°</td></tr>
         </tbody>
       </table>
     </div>
 
-    <h3>7.3 Margem de fase</h3>
+    <p>Zeros no semiplano direito mantêm o efeito de módulo, mas acrescentam atraso de fase. Para margens, use o ganho de malha completo \(L(s)=C(s)G(s)H(s)\), incluindo o ganho K adotado. Com múltiplos cruzamentos ou malha aberta instável, uma margem isolada não basta: confira todos os cruzamentos, os polos de malha fechada e Nyquist.</p><h3>7.3 Margem de fase</h3>
     <p>\(\omega_{gc}\) é a frequência onde o módulo vale 1 ou 0 dB.</p>
     <div class="formula-block"><span class="formula-tag">(58)</span>
       $$PM=180^\circ+\angle G(j\omega_{gc})H(j\omega_{gc})$$
@@ -547,7 +547,7 @@ figure; pzmap(T)</pre>
     <h3>7.5 Nyquist</h3>
     <p>
       Nyquist representa \(G(j\omega)H(j\omega)\) diretamente no plano complexo. O ponto \(-1+j0\) é crítico porque equivale,
-      simultaneamente, a módulo 1 e fase -180°. Para uma malha aberta estável, a curva não deve envolver esse ponto para que a malha fechada permaneça estável.
+      simultaneamente, a módulo 1 e fase -180°. No contorno completo de Nyquist orientado no sentido horário ao redor do semiplano direito, defina N como o número líquido de envolvimentos horários de −1. Então \(Z=P+N\), onde P conta polos de malha aberta no semiplano direito e Z conta zeros de \(1+L\) nesse semiplano. Para estabilidade, \(Z=0\). Se \(P=0\), exige-se \(N=0\), sem passar por −1. Polos sobre o contorno exigem desvios e tratamento próprio.
     </p>
 
     <div class="callout callout-concept">
@@ -586,15 +586,15 @@ grid on</pre>
   <div class="module-body">
     <h3>8.1 Avanço de fase</h3>
     <div class="formula-block"><span class="formula-tag">(61)</span>
-      $$C_{lead}(s)=K_c\frac{s+z_c}{s+p_c},\qquad |p_c|>|z_c|$$
+      $$C_{lead}(s)=K_c\frac{s+z_c}{s+p_c},\qquad 0<z_c<p_c$$
     </div>
-    <p>É usado para adicionar fase positiva, aumentar margem de fase e normalmente acelerar a dinâmica.</p>
+    <p>Com \(K_c>0\), o polo está em \(-p_c\) e o zero em \(-z_c\). O avanço acrescenta fase positiva em uma faixa de frequências; o aumento de margem e rapidez depende do projeto completo.</p>
 
     <h3>8.2 Atraso de fase</h3>
     <div class="formula-block"><span class="formula-tag">(62)</span>
-      $$C_{lag}(s)=K_c\frac{s+z_c}{s+p_c},\qquad |z_c|>|p_c|$$
+      $$C_{lag}(s)=K_c\frac{s+z_c}{s+p_c},\qquad 0<p_c<z_c$$
     </div>
-    <p>É usado principalmente para aumentar ganho em baixa frequência e melhorar erro estacionário sem alterar muito os polos dominantes.</p>
+    <p>Com \(K_c>0\), o atraso tem ganho CC \(K_c z_c/p_c>K_c\). Posicionados adequadamente, polo e zero permitem aumentar o ganho em baixa frequência preservando aproximadamente a dinâmica dominante; também introduzem atraso de fase.</p>
 
     <h3>8.3 Projeto pelo Root Locus</h3>
     <ol>
@@ -679,7 +679,7 @@ grid on</pre>
       <div class="exercise-header"><span>Questão 1 — Routh</span><span>Nível: Médio</span></div>
       <div class="exercise-body">
         <p>Para \(P(s)=s^3+14s^2+(75+K)s+(140+20K)\), determine a faixa estável de K.</p>
-        <button class="solution-toggle" data-target="ctrl-sol1">▼ Ver Resolução Completa Passo a Passo</button>
+        <button class="solution-toggle" data-target="ctrl-sol1">Ver Resolução Completa Passo a Passo</button>
         <div id="ctrl-sol1" class="solution-content">
           <p>A primeira coluna é \(1,\ 14,\ 65-3K/7,\ 140+20K\).</p>
           <div class="formula-block"><span class="formula-tag">(63)</span>$$-7&lt;K&lt;151{,}667$$</div>
@@ -691,7 +691,7 @@ grid on</pre>
       <div class="exercise-header"><span>Questão 2 — Erro estacionário</span><span>Nível: Médio</span></div>
       <div class="exercise-body">
         <p>Para \(G(s)=15(s+6)/[s(s+2)(s+14)(s+135)]\), determine tipo e erros para degrau, rampa e parábola.</p>
-        <button class="solution-toggle" data-target="ctrl-sol2">▼ Ver Resolução Completa Passo a Passo</button>
+        <button class="solution-toggle" data-target="ctrl-sol2">Ver Resolução Completa Passo a Passo</button>
         <div id="ctrl-sol2" class="solution-content">
           <p>Tipo 1; \(K_p=\infty\), \(K_v=1/42\) e \(K_a=0\).</p>
           <div class="formula-block"><span class="formula-tag">(64)</span>
@@ -705,7 +705,7 @@ grid on</pre>
       <div class="exercise-header"><span>Questão 3 — LGR</span><span>Nível: Médio</span></div>
       <div class="exercise-body">
         <p>Para \(G(s)H(s)=1/[s(s+1)(s+4)]\), determine assíntotas e centroide.</p>
-        <button class="solution-toggle" data-target="ctrl-sol3">▼ Ver Resolução Completa Passo a Passo</button>
+        <button class="solution-toggle" data-target="ctrl-sol3">Ver Resolução Completa Passo a Passo</button>
         <div id="ctrl-sol3" class="solution-content">
           <div class="formula-block"><span class="formula-tag">(65)</span>
             $$\theta=\{60^\circ,180^\circ,300^\circ\},\qquad\sigma_a=-5/3$$
@@ -718,7 +718,7 @@ grid on</pre>
       <div class="exercise-header"><span>Questão 4 — Frequência</span><span>Nível: Conceitual</span></div>
       <div class="exercise-body">
         <p>Qual a diferença entre \(\omega_{gc}\) e \(\omega_{pc}\)?</p>
-        <button class="solution-toggle" data-target="ctrl-sol4">▼ Ver Resolução Completa Passo a Passo</button>
+        <button class="solution-toggle" data-target="ctrl-sol4">Ver Resolução Completa Passo a Passo</button>
         <div id="ctrl-sol4" class="solution-content">
           <p>\(\omega_{gc}\) é o cruzamento de 0 dB e define PM. \(\omega_{pc}\) é o cruzamento de -180° e define GM.</p>
         </div>
@@ -729,7 +729,7 @@ grid on</pre>
       <div class="exercise-header"><span>Questão 5 — PID</span><span>Nível: Conceitual</span></div>
       <div class="exercise-body">
         <p>Por que a integral reduz erro estacionário mas pode piorar estabilidade?</p>
-        <button class="solution-toggle" data-target="ctrl-sol5">▼ Ver Resolução Completa Passo a Passo</button>
+        <button class="solution-toggle" data-target="ctrl-sol5">Ver Resolução Completa Passo a Passo</button>
         <div id="ctrl-sol5" class="solution-content">
           <p>Ela adiciona ganho em baixa frequência e um polo na origem. O primeiro melhora precisão; o segundo adiciona atraso de fase e pode reduzir amortecimento e margem.</p>
         </div>

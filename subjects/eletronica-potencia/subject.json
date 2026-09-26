@@ -3,7 +3,7 @@
   "name": "Eletrônica de Potência",
   "shortName": "Eletrônica de Potência",
   "badge": "Teoria P1",
-  "icon": "⚡",
+  "icon": "bolt",
   "institution": "UTFPR",
   "description": "Guia didático completo para a P1, com teoria, exercícios, fórmulas e simulador de conversores.",
   "storageKey": "study_hub_eletronica_potencia_v1",

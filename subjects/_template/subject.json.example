@@ -1,0 +1,19 @@
+{
+  "id": "minha-materia",
+  "name": "Minha Matéria",
+  "badge": "P1",
+  "icon": "📘",
+  "institution": "UTFPR",
+  "description": "Resumo do guia.",
+  "storageKey": "study_hub_minha_materia_v1",
+  "totalChecklistItems": 1,
+  "modules": [
+    {
+      "id": "mod-1",
+      "anchor": "mod1",
+      "code": "01",
+      "title": "Primeiro módulo"
+    }
+  ],
+  "tools": []
+}

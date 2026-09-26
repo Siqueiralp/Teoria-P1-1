@@ -308,284 +308,1122 @@ function drawWaveformsSVG(params) {
 
 
 /* ==========================================================================
-   3. DASHBOARDS INTERATIVOS — ETAPAS DOS CONVERSORES
+   3. SIMULADORES ANIMADOS & OSCILOSCÓPIO DE CONVERSORES (CCM & DCM)
+   Renderiza o circuito com fluxo animado de corrente, polaridades dinâmicas,
+   telemetria instantânea (v e i) e formas de onda sincronizadas com playhead.
    ========================================================================== */
-function initConverterDashboards() {
-  var configs = {
-    mod4: { title: 'Buck em CCM', topology: 'buck', mode: 'CCM', formula: 'Vo = D · Vin',
-      stages: [
-        {label:'Etapa 1 · Chave ON', interval:'0 → D·Ts', kind:'on', sw:'conduz', diode:'bloqueado', current:'iL cresce', note:'A fonte alimenta a carga e magnetiza o indutor.'},
-        {label:'Etapa 2 · Chave OFF', interval:'D·Ts → Ts', kind:'off', sw:'bloqueada', diode:'conduz', current:'iL decresce', note:'O indutor mantém a corrente pela malha de roda livre.'}
-      ]},
-    mod5: { title: 'Boost em CCM', topology: 'boost', mode: 'CCM', formula: 'Vo = Vin / (1 − D)',
-      stages: [
-        {label:'Etapa 1 · Chave ON', interval:'0 → D·Ts', kind:'on', sw:'conduz', diode:'bloqueado', current:'iL cresce', note:'O indutor armazena energia; o capacitor sustenta a carga.'},
-        {label:'Etapa 2 · Chave OFF', interval:'D·Ts → Ts', kind:'off', sw:'bloqueada', diode:'conduz', current:'iL decresce', note:'Fonte e indutor transferem energia para a saída.'}
-      ]},
-    mod6: { title: 'Buck-Boost inversor em CCM', topology: 'buckboost', mode: 'CCM', formula: 'vo / Vin = −D / (1 − D)',
-      stages: [
-        {label:'Etapa 1 · Chave ON', interval:'0 → D·Ts', kind:'on', sw:'conduz', diode:'bloqueado', current:'iL cresce', note:'A fonte magnetiza o indutor; o capacitor mantém a carga.'},
-        {label:'Etapa 2 · Chave OFF', interval:'D·Ts → Ts', kind:'off', sw:'bloqueada', diode:'conduz', current:'iL decresce', note:'O indutor entrega energia à saída com polaridade invertida.'}
-      ]},
-    mod7: { title: 'Buck em DCM', topology: 'buck', mode: 'DCM', formula: 'M = 2 / [1 + √(1 + 4K/D²)]',
-      stages: [
-        {label:'Etapa 1 · Chave ON', interval:'0 → D·Ts', kind:'on', sw:'conduz', diode:'bloqueado', current:'0 → Ipk', note:'A corrente do indutor parte de zero e cresce linearmente.'},
-        {label:'Etapa 2 · Diodo conduz', interval:'D·Ts → (D + D2)·Ts', kind:'off', sw:'bloqueada', diode:'conduz', current:'Ipk → 0', note:'O indutor descarrega completamente pela carga.'},
-        {label:'Etapa 3 · Corrente nula', interval:'(D + D2)·Ts → Ts', kind:'idle', sw:'bloqueada', diode:'bloqueado', current:'iL = 0', note:'O capacitor sozinho sustenta a tensão de saída.'}
-      ]},
-    mod8: { title: 'Boost em DCM', topology: 'boost', mode: 'DCM', formula: 'M = [1 + √(1 + 4D²/K)] / 2',
-      stages: [
-        {label:'Etapa 1 · Chave ON', interval:'0 → D·Ts', kind:'on', sw:'conduz', diode:'bloqueado', current:'0 → Ipk', note:'A fonte magnetiza o indutor; o capacitor alimenta a carga.'},
-        {label:'Etapa 2 · Diodo conduz', interval:'D·Ts → (D + D2)·Ts', kind:'off', sw:'bloqueada', diode:'conduz', current:'Ipk → 0', note:'Fonte e indutor entregam energia à saída até iL zerar.'},
-        {label:'Etapa 3 · Corrente nula', interval:'(D + D2)·Ts → Ts', kind:'idle', sw:'bloqueada', diode:'bloqueado', current:'iL = 0', note:'O indutor fica sem energia e o capacitor mantém a carga.'}
-      ]},
-    mod9: { title: 'Buck-Boost inversor em DCM', topology: 'buckboost', mode: 'DCM', formula: '|Vo| / Vin = D / √K',
-      stages: [
-        {label:'Etapa 1 · Chave ON', interval:'0 → D·Ts', kind:'on', sw:'conduz', diode:'bloqueado', current:'0 → Ipk', note:'A fonte magnetiza o indutor; o capacitor sustenta a carga.'},
-        {label:'Etapa 2 · Diodo conduz', interval:'D·Ts → (D + D2)·Ts', kind:'off', sw:'bloqueada', diode:'conduz', current:'Ipk → 0', note:'O indutor transfere energia à saída invertida.'},
-        {label:'Etapa 3 · Corrente nula', interval:'(D + D2)·Ts → Ts', kind:'idle', sw:'bloqueada', diode:'bloqueado', current:'iL = 0', note:'Chave e diodo ficam bloqueados; o capacitor alimenta a carga.'}
-      ]}
-  };
 
-  Object.keys(configs).forEach(function(moduleId) {
-    var section = document.getElementById(moduleId);
-    if (!section || section.querySelector('.converter-dashboard')) return;
-    var body = section.querySelector('.module-body');
-    if (!body) return;
-    var heading = body.querySelector('h3');
-    var host = document.createElement('section');
-    host.className = 'converter-dashboard';
-    host.setAttribute('aria-label', 'Circuito interativo de ' + configs[moduleId].title);
-    if (heading) heading.insertAdjacentElement('afterend', host);
-    else body.insertBefore(host, body.firstChild);
-    createConverterDashboard(host, configs[moduleId]);
+var CONVERTER_CONFIGS = {
+  mod4: {
+    id: 'mod4',
+    title: 'Buck em CCM',
+    topology: 'buck',
+    mode: 'CCM',
+    formula: 'Vo = D · Vin = 0,50 · 24V = 12V',
+    params: { Vin: 24, Vo: 12, D: 0.5, Io: 2.0, deltaIL: 1.2, Imin: 1.4, Imax: 2.6 },
+    stages: [
+      {
+        name: 'Etapa 1 · Chave ON',
+        interval: '0 → D·Ts (0% a 50%)',
+        kind: 'on',
+        sw: 'FECHADA (Conduz)',
+        diode: 'BLOQUEADO (Reverso)',
+        vL: '+12.0 V (Vin − Vo)',
+        iL: 'Cresce linearmente (1.4A → 2.6A)',
+        vS: '0.0 V (Condução)',
+        iS: 'Conduz iL (1.4A → 2.6A)',
+        vD: '−24.0 V (−Vin)',
+        iD: '0.0 A (Bloqueado)',
+        iC: 'iL − Io (−0.6A → +0.6A)',
+        note: 'A chave S conecta a fonte à malha indutor-carga. O indutor magnetiza armazenando energia magnética com vL = Vin − Vo > 0. O diodo D fica sob tensão reversa −Vin e o capacitor auxilia na filtragem.'
+      },
+      {
+        name: 'Etapa 2 · Roda-Livre (Chave OFF)',
+        interval: 'D·Ts → Ts (50% a 100%)',
+        kind: 'off',
+        sw: 'ABERTA (Bloqueada)',
+        diode: 'CONDUZ (Roda-Livre)',
+        vL: '−12.0 V (−Vo)',
+        iL: 'Decresce linearmente (2.6A → 1.4A)',
+        vS: '+24.0 V (Vin)',
+        iS: '0.0 A (Aberto)',
+        vD: '0.0 V (Condução)',
+        iD: 'Conduz iL (2.6A → 1.4A)',
+        iC: 'iL − Io (+0.6A → −0.6A)',
+        note: 'A chave abre e o indutor inverte sua tensão para vL = −Vo para manter a corrente contínua, forçando o diodo de roda-livre a conduzir. A fonte é desconectada e a energia do indutor alimenta a carga.'
+      }
+    ]
+  },
+  mod5: {
+    id: 'mod5',
+    title: 'Boost em CCM',
+    topology: 'boost',
+    mode: 'CCM',
+    formula: 'Vo = Vin / (1 − D) = 12V / 0,50 = 24V',
+    params: { Vin: 12, Vo: 24, D: 0.5, Io: 1.5, ILavg: 3.0, deltaIL: 1.2, Imin: 2.4, Imax: 3.6 },
+    stages: [
+      {
+        name: 'Etapa 1 · Chave ON',
+        interval: '0 → D·Ts (0% a 50%)',
+        kind: 'on',
+        sw: 'FECHADA (Conduz)',
+        diode: 'BLOQUEADO (Reverso)',
+        vL: '+12.0 V (+Vin)',
+        iL: 'Cresce linearmente (2.4A → 3.6A)',
+        vS: '0.0 V (Condução)',
+        iS: 'Conduz iL (2.4A → 3.6A)',
+        vD: '−24.0 V (−Vo)',
+        iD: '0.0 A (Bloqueado)',
+        iC: '−1.5 A (−Io)',
+        note: 'A chave S fecha para o terra, aplicando toda a tensão Vin sobre o indutor (vL = +Vin). O diodo bloqueia com tensão reversa −Vo. O capacitor sustenta a corrente da carga sozinho.'
+      },
+      {
+        name: 'Etapa 2 · Transferência (Chave OFF)',
+        interval: 'D·Ts → Ts (50% a 100%)',
+        kind: 'off',
+        sw: 'ABERTA (Bloqueada)',
+        diode: 'CONDUZ',
+        vL: '−12.0 V (Vin − Vo)',
+        iL: 'Decresce linearmente (3.6A → 2.4A)',
+        vS: '+24.0 V (Vo)',
+        iS: '0.0 A',
+        vD: '0.0 V (Condução)',
+        iD: 'Conduz iL (3.6A → 2.4A)',
+        iC: 'iL − Io (+2.1A → +0.9A)',
+        note: 'A chave abre. A tensão no indutor inverte para (Vin − Vo = −12V), somando-se à tensão da fonte para vencer Vo e conduzir pelo diodo, descarregando energia magnética para a saída.'
+      }
+    ]
+  },
+  mod6: {
+    id: 'mod6',
+    title: 'Buck-Boost Inversor em CCM',
+    topology: 'buckboost',
+    mode: 'CCM',
+    formula: '|Vo| / Vin = D / (1 − D) = 0,5 / 0,5 = 1,0 (Vo = −24V)',
+    params: { Vin: 24, Vo: 24, D: 0.5, Io: 1.5, ILavg: 3.0, deltaIL: 1.2, Imin: 2.4, Imax: 3.6 },
+    stages: [
+      {
+        name: 'Etapa 1 · Chave ON',
+        interval: '0 → D·Ts (0% a 50%)',
+        kind: 'on',
+        sw: 'FECHADA (Conduz)',
+        diode: 'BLOQUEADO (Reverso)',
+        vL: '+24.0 V (+Vin)',
+        iL: 'Cresce linearmente (2.4A → 3.6A)',
+        vS: '0.0 V',
+        iS: 'Conduz iL (2.4A → 3.6A)',
+        vD: '−48.0 V (−(Vin + |Vo|))',
+        iD: '0.0 A',
+        iC: '−1.5 A (−Io)',
+        note: 'A chave S conecta Vin diretamente ao indutor shunt para o terra. O diodo bloqueia com o esforço total -(Vin + |Vo|). O capacitor alimenta a saída invertida durante este intervalo.'
+      },
+      {
+        name: 'Etapa 2 · Descarga Invertida',
+        interval: 'D·Ts → Ts (50% a 100%)',
+        kind: 'off',
+        sw: 'ABERTA (Bloqueada)',
+        diode: 'CONDUZ',
+        vL: '−24.0 V (−|Vo|)',
+        iL: 'Decresce linearmente (3.6A → 2.4A)',
+        vS: '+48.0 V (Vin + |Vo|)',
+        iS: '0.0 A',
+        vD: '0.0 V',
+        iD: 'Conduz iL (3.6A → 2.4A)',
+        iC: 'iL − Io (+2.1A → +0.9A)',
+        note: 'A chave abre. A corrente do indutor continua descendo em direção ao terra, retornando pelo terra através da carga e do diodo, gerando tensão de saída negativa −Vo.'
+      }
+    ]
+  },
+  mod7: {
+    id: 'mod7',
+    title: 'Buck em DCM',
+    topology: 'buck',
+    mode: 'DCM',
+    formula: 'M = 2 / [1 + √(1 + 4K/D²)]',
+    params: { Vin: 24, Vo: 12, D: 0.35, D2: 0.35, D3: 0.30, Io: 1.0, Ipk: 2.8 },
+    stages: [
+      {
+        name: 'Etapa 1 · Magnetização',
+        interval: '0 → D·Ts (0% a 35%)',
+        kind: 'on',
+        sw: 'FECHADA (Conduz)',
+        diode: 'BLOQUEADO',
+        vL: '+12.0 V (Vin − Vo)',
+        iL: 'Rampa de 0.0A a 2.8A (Ipk)',
+        vS: '0.0 V',
+        iS: '0.0A → 2.8A',
+        vD: '−24.0 V',
+        iD: '0.0 A',
+        iC: 'iL − Io (−1.0A → +1.8A)',
+        note: 'A corrente do indutor parte de ZERO e cresce linearmente até o pico Ipk. S conduz e D bloqueado.'
+      },
+      {
+        name: 'Etapa 2 · Desmagnetização',
+        interval: 'D·Ts → (D+D2)·Ts (35% a 70%)',
+        kind: 'off',
+        sw: 'ABERTA',
+        diode: 'CONDUZ',
+        vL: '−12.0 V (−Vo)',
+        iL: 'Rampa de 2.8A a 0.0A (Zera!)',
+        vS: '+24.0 V',
+        iS: '0.0 A',
+        vD: '0.0 V',
+        iD: '2.8A → 0.0A',
+        iC: 'iL − Io (+1.8A → −1.0A)',
+        note: 'S abre e D conduz. O indutor entrega toda sua energia e sua corrente atinge rigorosamente ZERO em (D+D2)Ts.'
+      },
+      {
+        name: 'Etapa 3 · Corrente Nula',
+        interval: '(D+D2)·Ts → Ts (70% a 100%)',
+        kind: 'idle',
+        sw: 'ABERTA',
+        diode: 'BLOQUEADO (Corte)',
+        vL: '0.0 V (Nula)',
+        iL: '0.0 A (Nula)',
+        vS: '+12.0 V (Vin − Vo)',
+        iS: '0.0 A',
+        vD: '−12.0 V (−Vo)',
+        iD: '0.0 A',
+        iC: '−1.0 A (−Io)',
+        note: 'Com iL = 0, o diodo despolariza espontaneamente. Ambos os semicondutores ficam abertos! O capacitor sozinho sustenta a carga até o próximo ciclo.'
+      }
+    ]
+  },
+  mod8: {
+    id: 'mod8',
+    title: 'Boost em DCM',
+    topology: 'boost',
+    mode: 'DCM',
+    formula: 'M = [1 + √(1 + 4D²/K)] / 2',
+    params: { Vin: 12, Vo: 24, D: 0.35, D2: 0.35, D3: 0.30, Io: 1.0, Ipk: 3.2 },
+    stages: [
+      {
+        name: 'Etapa 1 · Magnetização',
+        interval: '0 → D·Ts (0% a 35%)',
+        kind: 'on',
+        sw: 'FECHADA',
+        diode: 'BLOQUEADO',
+        vL: '+12.0 V (+Vin)',
+        iL: 'Rampa de 0.0A a 3.2A (Ipk)',
+        vS: '0.0 V',
+        iS: '0.0A → 3.2A',
+        vD: '−24.0 V (−Vo)',
+        iD: '0.0 A',
+        iC: '−1.0 A (−Io)',
+        note: 'A chave S conduz para o terra; a corrente no indutor parte de zero e atinge Ipk. O capacitor sustenta a saída sozinho.'
+      },
+      {
+        name: 'Etapa 2 · Descarga Rápida',
+        interval: 'D·Ts → (D+D2)·Ts (35% a 70%)',
+        kind: 'off',
+        sw: 'ABERTA',
+        diode: 'CONDUZ',
+        vL: '−12.0 V (Vin − Vo)',
+        iL: 'Rampa de 3.2A a 0.0A',
+        vS: '+24.0 V',
+        iS: '0.0 A',
+        vD: '0.0 V',
+        iD: '3.2A → 0.0A',
+        iC: '+2.2A → −1.0A',
+        note: 'S abre, D conduz. Toda a energia do indutor é transferida para a saída até a corrente iL anular-se completamente.'
+      },
+      {
+        name: 'Etapa 3 · Corrente Nula',
+        interval: '(D+D2)·Ts → Ts (70% a 100%)',
+        kind: 'idle',
+        sw: 'ABERTA',
+        diode: 'BLOQUEADO',
+        vL: '0.0 V (Nula)',
+        iL: '0.0 A (Nula)',
+        vS: '+12.0 V (+Vin)',
+        iS: '0.0 A',
+        vD: '−12.0 V (Vin − Vo)',
+        iD: '0.0 A',
+        iC: '−1.0 A (−Io)',
+        note: 'O indutor esgotou sua energia. S e D estão em corte simultâneo. A tensão no nó central flutua em Vin e o capacitor mantém a carga.'
+      }
+    ]
+  },
+  mod9: {
+    id: 'mod9',
+    title: 'Buck-Boost Inversor em DCM',
+    topology: 'buckboost',
+    mode: 'DCM',
+    formula: '|Vo| / Vin = D / √K',
+    params: { Vin: 24, Vo: 24, D: 0.35, D2: 0.35, D3: 0.30, Io: 1.0, Ipk: 3.2 },
+    stages: [
+      {
+        name: 'Etapa 1 · Magnetização',
+        interval: '0 → D·Ts (0% a 35%)',
+        kind: 'on',
+        sw: 'FECHADA',
+        diode: 'BLOQUEADO',
+        vL: '+24.0 V (+Vin)',
+        iL: 'Rampa de 0.0A a 3.2A (Ipk)',
+        vS: '0.0 V',
+        iS: '0.0A → 3.2A',
+        vD: '−48.0 V',
+        iD: '0.0 A',
+        iC: '−1.0 A (−Io)',
+        note: 'S fecha, L magnetiza a partir de zero até Ipk sob tensão constante Vin. D bloqueado e C alimenta a carga invertida.'
+      },
+      {
+        name: 'Etapa 2 · Desmagnetização',
+        interval: 'D·Ts → (D+D2)·Ts (35% a 70%)',
+        kind: 'off',
+        sw: 'ABERTA',
+        diode: 'CONDUZ',
+        vL: '−24.0 V (−|Vo|)',
+        iL: 'Rampa de 3.2A a 0.0A',
+        vS: '+48.0 V',
+        iS: '0.0 A',
+        vD: '0.0 V',
+        iD: '3.2A → 0.0A',
+        iC: '+2.2A → −1.0A',
+        note: 'S abre, D conduz. O indutor descarrega sua corrente pela malha invertida da carga até zerar no instante (D+D2)Ts.'
+      },
+      {
+        name: 'Etapa 3 · Corrente Nula',
+        interval: '(D+D2)·Ts → Ts (70% a 100%)',
+        kind: 'idle',
+        sw: 'ABERTA',
+        diode: 'BLOQUEADO',
+        vL: '0.0 V (Nula)',
+        iL: '0.0 A (Nula)',
+        vS: '+24.0 V (+Vin)',
+        iS: '0.0 A',
+        vD: '−24.0 V (−|Vo|)',
+        iD: '0.0 A',
+        iC: '−1.0 A (−Io)',
+        note: 'Corrente nula no indutor. S e D bloqueados. A tensão de saída é mantida unicamente pela carga residual do capacitor.'
+      }
+    ]
+  }
+};
+
+function initConverterDashboards() {
+  Object.keys(CONVERTER_CONFIGS).forEach(function (moduleId) {
+    var host = document.getElementById('dashboard-host-' + moduleId);
+    if (!host) {
+      var section = document.getElementById(moduleId);
+      if (!section || section.querySelector('.converter-dashboard')) return;
+      var body = section.querySelector('.module-body');
+      if (!body) return;
+      var slot = body.querySelector('.converter-dashboard-slot');
+      if (slot) {
+        host = slot;
+      } else {
+        var heading = body.querySelector('h3');
+        host = document.createElement('div');
+        host.className = 'converter-dashboard-slot';
+        if (heading) heading.insertAdjacentElement('afterend', host);
+        else body.insertBefore(host, body.firstChild);
+      }
+    }
+    createAnimatedConverterSimulator(host, CONVERTER_CONFIGS[moduleId]);
   });
 }
 
-function createConverterDashboard(host, config) {
-  var activeStage = 0;
-  var timer = null;
+function calculateInstantState(config, tau) {
+  var p = config.params;
+  var isCCM = config.mode === 'CCM';
+  var D = p.D;
+  var D2 = isCCM ? 1 - D : p.D2;
+  var D3 = isCCM ? 0 : p.D3;
 
-  host.innerHTML =
+  var stageIdx = 0;
+  var stageProgress = 0;
+
+  if (isCCM) {
+    if (tau < D) {
+      stageIdx = 0;
+      stageProgress = tau / Math.max(0.001, D);
+    } else {
+      stageIdx = 1;
+      stageProgress = (tau - D) / Math.max(0.001, 1 - D);
+    }
+  } else {
+    if (tau < D) {
+      stageIdx = 0;
+      stageProgress = tau / Math.max(0.001, D);
+    } else if (tau < D + D2) {
+      stageIdx = 1;
+      stageProgress = (tau - D) / Math.max(0.001, D2);
+    } else {
+      stageIdx = 2;
+      stageProgress = (tau - D - D2) / Math.max(0.001, D3);
+    }
+  }
+
+  var vL = 0, iL = 0, vS = 0, iS = 0, vD = 0, iD = 0, iC = 0;
+  var polLeft = '+', polRight = '−';
+
+  if (config.topology === 'buck') {
+    if (isCCM) {
+      if (stageIdx === 0) {
+        vL = p.Vin - p.Vo;
+        iL = p.Imin + p.deltaIL * stageProgress;
+        vS = 0; iS = iL;
+        vD = -p.Vin; iD = 0;
+        iC = iL - p.Io;
+        polLeft = '+'; polRight = '−';
+      } else {
+        vL = -p.Vo;
+        iL = p.Imax - p.deltaIL * stageProgress;
+        vS = p.Vin; iS = 0;
+        vD = 0; iD = iL;
+        iC = iL - p.Io;
+        polLeft = '−'; polRight = '+';
+      }
+    } else {
+      if (stageIdx === 0) {
+        vL = p.Vin - p.Vo;
+        iL = p.Ipk * stageProgress;
+        vS = 0; iS = iL;
+        vD = -p.Vin; iD = 0;
+        iC = iL - p.Io;
+        polLeft = '+'; polRight = '−';
+      } else if (stageIdx === 1) {
+        vL = -p.Vo;
+        iL = p.Ipk * (1 - stageProgress);
+        vS = p.Vin; iS = 0;
+        vD = 0; iD = iL;
+        iC = iL - p.Io;
+        polLeft = '−'; polRight = '+';
+      } else {
+        vL = 0; iL = 0;
+        vS = p.Vin - p.Vo; iS = 0;
+        vD = -p.Vo; iD = 0;
+        iC = -p.Io;
+        polLeft = '0'; polRight = '0';
+      }
+    }
+  } else if (config.topology === 'boost') {
+    if (isCCM) {
+      if (stageIdx === 0) {
+        vL = p.Vin;
+        iL = p.Imin + p.deltaIL * stageProgress;
+        vS = 0; iS = iL;
+        vD = -p.Vo; iD = 0;
+        iC = -p.Io;
+        polLeft = '+'; polRight = '−';
+      } else {
+        vL = p.Vin - p.Vo;
+        iL = p.Imax - p.deltaIL * stageProgress;
+        vS = p.Vo; iS = 0;
+        vD = 0; iD = iL;
+        iC = iL - p.Io;
+        polLeft = '−'; polRight = '+';
+      }
+    } else {
+      if (stageIdx === 0) {
+        vL = p.Vin;
+        iL = p.Ipk * stageProgress;
+        vS = 0; iS = iL;
+        vD = -p.Vo; iD = 0;
+        iC = -p.Io;
+        polLeft = '+'; polRight = '−';
+      } else if (stageIdx === 1) {
+        vL = p.Vin - p.Vo;
+        iL = p.Ipk * (1 - stageProgress);
+        vS = p.Vo; iS = 0;
+        vD = 0; iD = iL;
+        iC = iL - p.Io;
+        polLeft = '−'; polRight = '+';
+      } else {
+        vL = 0; iL = 0;
+        vS = p.Vin; iS = 0;
+        vD = p.Vin - p.Vo; iD = 0;
+        iC = -p.Io;
+        polLeft = '0'; polRight = '0';
+      }
+    }
+  } else if (config.topology === 'buckboost') {
+    if (isCCM) {
+      if (stageIdx === 0) {
+        vL = p.Vin;
+        iL = p.Imin + p.deltaIL * stageProgress;
+        vS = 0; iS = iL;
+        vD = -(p.Vin + p.Vo); iD = 0;
+        iC = -p.Io;
+        polLeft = '+'; polRight = '−';
+      } else {
+        vL = -p.Vo;
+        iL = p.Imax - p.deltaIL * stageProgress;
+        vS = p.Vin + p.Vo; iS = 0;
+        vD = 0; iD = iL;
+        iC = iL - p.Io;
+        polLeft = '−'; polRight = '+';
+      }
+    } else {
+      if (stageIdx === 0) {
+        vL = p.Vin;
+        iL = p.Ipk * stageProgress;
+        vS = 0; iS = iL;
+        vD = -(p.Vin + p.Vo); iD = 0;
+        iC = -p.Io;
+        polLeft = '+'; polRight = '−';
+      } else if (stageIdx === 1) {
+        vL = -p.Vo;
+        iL = p.Ipk * (1 - stageProgress);
+        vS = p.Vin + p.Vo; iS = 0;
+        vD = 0; iD = iL;
+        iC = iL - p.Io;
+        polLeft = '−'; polRight = '+';
+      } else {
+        vL = 0; iL = 0;
+        vS = p.Vin; iS = 0;
+        vD = -p.Vo; iD = 0;
+        iC = -p.Io;
+        polLeft = '0'; polRight = '0';
+      }
+    }
+  }
+
+  return {
+    tau: tau,
+    stageIdx: stageIdx,
+    stage: config.stages[stageIdx],
+    vL: vL,
+    iL: Math.max(0, iL),
+    vS: vS,
+    iS: Math.max(0, iS),
+    vD: vD,
+    iD: Math.max(0, iD),
+    iC: iC,
+    polLeft: polLeft,
+    polRight: polRight
+  };
+}
+
+function createAnimatedConverterSimulator(host, config) {
+  var tau = 0.15;
+  var isPlaying = true;
+  var speed = 1.0;
+  var activeChannel = 'indutor';
+  var lastTimestamp = null;
+  var animId = null;
+
+  var container = document.createElement('section');
+  container.className = 'converter-dashboard';
+  container.setAttribute('aria-label', 'Simulador dinâmico de ' + config.title);
+
+  container.innerHTML =
     '<div class="converter-dashboard-head">' +
-      '<div><span class="converter-dashboard-kicker">Circuito interativo</span><h4></h4>' +
-      '<p>Selecione uma etapa ou use a animação automática para acompanhar o caminho de energia.</p></div>' +
-      '<div class="converter-dashboard-tags"><span>' + config.mode + '</span><span>' +
-      (config.topology === 'buckboost' ? 'Buck-Boost' : config.topology.charAt(0).toUpperCase() + config.topology.slice(1)) +
-      '</span></div></div>' +
+      '<div>' +
+        '<span class="converter-dashboard-kicker">Simulador Interativo • Circuito & Osciloscópio</span>' +
+        '<h4>' + config.title + '</h4>' +
+        '<p>Acompanhe o caminho físico da corrente, as polaridades de tensão e as formas de onda simultâneas.</p>' +
+      '</div>' +
+      '<div class="converter-dashboard-tags">' +
+        '<span class="tag-mode">' + config.mode + '</span>' +
+        '<span>' + (config.topology === 'buckboost' ? 'Buck-Boost' : config.topology.charAt(0).toUpperCase() + config.topology.slice(1)) + '</span>' +
+      '</div>' +
+    '</div>' +
     '<div class="converter-dashboard-layout">' +
-      '<div class="converter-dashboard-visual"><div class="converter-dashboard-svg"></div>' +
-      '<div class="converter-dashboard-legend"><span><i class="legend-current"></i>Caminho ativo</span>' +
-      '<span><i class="legend-blocked"></i>Bloqueado</span><span><i class="legend-il"></i>iL</span></div></div>' +
-      '<div class="converter-dashboard-panel"><div class="converter-stage-buttons"></div>' +
-      '<div class="converter-stage-card"></div><div class="converter-stage-timeline"></div>' +
-      '<div class="converter-dashboard-formula"><span>Relação-chave</span><strong>' + config.formula + '</strong></div></div>' +
+      '<div class="converter-animator-visual">' +
+        '<div class="converter-circuit-box">' +
+          '<div class="converter-box-title">' +
+            '<span>Esquemático Dinâmico com Fluxo de Carga</span>' +
+            '<span class="active-indicator" id="simStageIndicator">● Etapa 1</span>' +
+          '</div>' +
+          '<div class="converter-dashboard-svg" id="simCircuitSvg"></div>' +
+          '<div class="converter-dashboard-legend">' +
+            '<span><i class="legend-current"></i> Corrente Ativa</span>' +
+            '<span><i class="legend-blocked"></i> Ramo Bloqueado</span>' +
+            '<span><i class="legend-vl"></i> Tensão (vL)</span>' +
+            '<span><i class="legend-idle"></i> Descarga C</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="converter-scope-box">' +
+          '<div class="converter-box-title">' +
+            '<span>Osciloscópio de Formas de Onda (v e i)</span>' +
+            '<div class="converter-channel-tabs" id="simChannelTabs">' +
+              '<button type="button" data-chan="indutor" class="active">Indutor (vL, iL)</button>' +
+              '<button type="button" data-chan="semicondutores">Semicondutores (S, D)</button>' +
+              '<button type="button" data-chan="filtro">Capacitor (iC)</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="converter-scope-svg" id="simScopeSvg"></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="converter-dashboard-panel">' +
+        '<div class="dashboard-controls-bar">' +
+          '<div class="dashboard-controls-main">' +
+            '<button type="button" class="btn-ctrl-play" id="simPlayBtn">⏸ Pausar</button>' +
+            '<div class="btn-ctrl-speed-group">' +
+              '<button type="button" class="btn-ctrl-speed" data-speed="0.5">0.5x</button>' +
+              '<button type="button" class="btn-ctrl-speed active" data-speed="1.0">1.0x</button>' +
+              '<button type="button" class="btn-ctrl-speed" data-speed="2.0">2.0x</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="dashboard-scrubber-row">' +
+            '<input type="range" class="timeline-scrubber" id="simScrubber" min="0" max="1000" value="150" aria-label="Tempo normalizado t / Ts">' +
+            '<span class="scrubber-time-badge" id="simTimeBadge">15% Ts</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="converter-stage-buttons" id="simStageButtons"></div>' +
+        '<div class="converter-stage-card" id="simStageCard"></div>' +
+        '<div class="stage-telemetry-grid" id="simTelemetryGrid">' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>vL (Indutor)</span><span>L</span></div><div class="telemetry-cell-val highlight-v" id="telVL">+12.0 V</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iL (Indutor)</span><span>L</span></div><div class="telemetry-cell-val highlight-i" id="telIL">2.10 A</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>vS (Chave)</span><span>S</span></div><div class="telemetry-cell-val" id="telVS">0.0 V</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iS (Chave)</span><span>S</span></div><div class="telemetry-cell-val" id="telIS">2.10 A</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>vD (Diodo)</span><span>D</span></div><div class="telemetry-cell-val highlight-warn" id="telVD">-24.0 V</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iD (Diodo)</span><span>D</span></div><div class="telemetry-cell-val" id="telID">0.0 A</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iC (Capacitor)</span><span>C</span></div><div class="telemetry-cell-val" id="telIC">+0.10 A</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>Saída (Vo, Io)</span><span>R</span></div><div class="telemetry-cell-val" id="telVo">' + config.params.Vo + 'V / ' + config.params.Io + 'A</div></div>' +
+        '</div>' +
+        '<div class="converter-dashboard-formula">' +
+          '<span>Relação Teórica de Ganho</span>' +
+          '<strong>' + config.formula + '</strong>' +
+        '</div>' +
+      '</div>' +
     '</div>';
 
-  host.querySelector('h4').textContent = config.title;
-  var visual = host.querySelector('.converter-dashboard-svg');
-  var buttons = host.querySelector('.converter-stage-buttons');
-  var card = host.querySelector('.converter-stage-card');
-  var timeline = host.querySelector('.converter-stage-timeline');
+  host.innerHTML = '';
+  host.appendChild(container);
 
-  function stop() {
-    if (timer) clearInterval(timer);
-    timer = null;
-  }
+  var circuitSvgBox = container.querySelector('#simCircuitSvg');
+  var scopeSvgBox = container.querySelector('#simScopeSvg');
+  var stageIndicator = container.querySelector('#simStageIndicator');
+  var playBtn = container.querySelector('#simPlayBtn');
+  var scrubber = container.querySelector('#simScrubber');
+  var timeBadge = container.querySelector('#simTimeBadge');
+  var stageButtons = container.querySelector('#simStageButtons');
+  var stageCard = container.querySelector('#simStageCard');
+  var channelTabs = container.querySelectorAll('#simChannelTabs button');
+  var speedButtons = container.querySelectorAll('.btn-ctrl-speed');
 
-  function render() {
-    var stage = config.stages[activeStage];
-    visual.innerHTML = buildConverterSvg(config, activeStage);
+  var telVL = container.querySelector('#telVL');
+  var telIL = container.querySelector('#telIL');
+  var telVS = container.querySelector('#telVS');
+  var telIS = container.querySelector('#telIS');
+  var telVD = container.querySelector('#telVD');
+  var telID = container.querySelector('#telID');
+  var telIC = container.querySelector('#telIC');
 
-    buttons.innerHTML = '';
-    config.stages.forEach(function(item, index) {
-      var btn = document.createElement('button');
-      btn.type = 'button';
-      btn.textContent = String(index + 1);
-      if (index === activeStage) btn.className = 'active';
-      btn.addEventListener('click', function() {
-        stop();
-        activeStage = index;
-        render();
-      });
-      buttons.appendChild(btn);
-    });
-
-    var auto = document.createElement('button');
-    auto.type = 'button';
-    auto.className = 'dashboard-auto';
-    auto.textContent = timer ? 'Parar ■' : 'Auto ▶';
-    auto.addEventListener('click', function() {
-      if (timer) {
-        stop();
-        render();
-        return;
-      }
-      timer = setInterval(function() {
-        activeStage = (activeStage + 1) % config.stages.length;
-        render();
-      }, 1650);
+  config.stages.forEach(function (stg, idx) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.innerHTML = '<strong>' + (idx + 1) + '</strong> ' + stg.name.split('·')[0];
+    btn.addEventListener('click', function () {
+      isPlaying = false;
+      updatePlayBtnUI();
+      if (idx === 0) tau = 0.05;
+      else if (idx === 1) tau = config.params.D + 0.05;
+      else tau = config.params.D + config.params.D2 + 0.05;
+      tau = Math.min(0.999, Math.max(0.001, tau));
+      scrubber.value = Math.round(tau * 1000);
       render();
     });
-    buttons.appendChild(auto);
+    stageButtons.appendChild(btn);
+  });
 
-    var swClass = stage.sw === 'conduz' ? 'state-on' : 'state-off';
-    var diodeClass = stage.diode === 'conduz' ? 'state-on' : 'state-off';
-    var currentClass = stage.kind === 'idle' ? 'state-idle' : 'state-current';
+  playBtn.addEventListener('click', function () {
+    isPlaying = !isPlaying;
+    updatePlayBtnUI();
+    if (isPlaying) {
+      lastTimestamp = null;
+      animId = requestAnimationFrame(animLoop);
+    }
+  });
 
-    card.innerHTML =
-      '<span class="stage-number">Etapa ' + (activeStage + 1) + ' de ' + config.stages.length + '</span>' +
-      '<h5>' + stage.label + '</h5><p class="stage-interval">' + stage.interval + '</p>' +
-      '<div class="stage-status-grid">' +
-        '<div class="' + swClass + '"><b>Chave S</b><span>' + stage.sw + '</span></div>' +
-        '<div class="' + diodeClass + '"><b>Diodo D</b><span>' + stage.diode + '</span></div>' +
-        '<div class="' + currentClass + '"><b>Corrente iL</b><span>' + stage.current + '</span></div>' +
-      '</div><p class="stage-note">' + stage.note + '</p>';
-
-    timeline.innerHTML = '';
-    config.stages.forEach(function(item, index) {
-      var cell = document.createElement('div');
-      cell.className = 'timeline-stage ' + item.kind + (index === activeStage ? ' active' : '');
-      cell.innerHTML = '<b>' + (index + 1) + '</b><span>' + item.interval + '</span>';
-      timeline.appendChild(cell);
-    });
-    timeline.style.gridTemplateColumns = 'repeat(' + config.stages.length + ', minmax(0, 1fr))';
+  function updatePlayBtnUI() {
+    playBtn.textContent = isPlaying ? '⏸ Pausar' : '▶ Reproduzir';
+    playBtn.style.borderColor = isPlaying ? '#388bfd' : '#3fb950';
+    playBtn.style.color = isPlaying ? '#58a6ff' : '#3fb950';
   }
+
+  speedButtons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      speedButtons.forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      speed = parseFloat(btn.getAttribute('data-speed')) || 1.0;
+    });
+  });
+
+  channelTabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      channelTabs.forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      activeChannel = tab.getAttribute('data-chan');
+      render();
+    });
+  });
+
+  scrubber.addEventListener('input', function () {
+    isPlaying = false;
+    updatePlayBtnUI();
+    tau = parseFloat(scrubber.value) / 1000;
+    render();
+  });
+
+  function render() {
+    var state = calculateInstantState(config, tau);
+
+    timeBadge.textContent = (tau * 100).toFixed(0) + '% Ts';
+    stageIndicator.textContent = '● ' + state.stage.name;
+    stageIndicator.style.color = state.stage.kind === 'on' ? '#3fb950' : (state.stage.kind === 'off' ? '#58a6ff' : '#bc8cff');
+
+    var stageBtns = stageButtons.querySelectorAll('button');
+    stageBtns.forEach(function (btn, i) {
+      if (i === state.stageIdx) btn.classList.add('active');
+      else btn.classList.remove('active');
+    });
+
+    stageCard.innerHTML =
+      '<div class="stage-number"><span>Etapa ' + (state.stageIdx + 1) + ' de ' + config.stages.length + '</span><span>' + state.stage.interval + '</span></div>' +
+      '<h5>' + state.stage.name + '</h5>' +
+      '<div class="stage-interval">Chave: ' + state.stage.sw + ' • Diodo: ' + state.stage.diode + '</div>' +
+      '<p class="stage-note">' + state.stage.note + '</p>';
+
+    telVL.textContent = (state.vL > 0 ? '+' : '') + state.vL.toFixed(1) + ' V';
+    telVL.className = 'telemetry-cell-val ' + (state.vL > 0 ? 'highlight-v' : (state.vL < 0 ? 'highlight-warn' : 'highlight-zero'));
+
+    telIL.textContent = state.iL.toFixed(2) + ' A';
+    telIL.className = 'telemetry-cell-val ' + (state.iL > 0 ? 'highlight-i' : 'highlight-zero');
+
+    telVS.textContent = state.vS.toFixed(1) + ' V';
+    telVS.className = 'telemetry-cell-val ' + (state.vS > 0 ? 'highlight-warn' : 'highlight-zero');
+
+    telIS.textContent = state.iS.toFixed(2) + ' A';
+    telIS.className = 'telemetry-cell-val ' + (state.iS > 0 ? 'highlight-i' : 'highlight-zero');
+
+    telVD.textContent = state.vD.toFixed(1) + ' V';
+    telVD.className = 'telemetry-cell-val ' + (state.vD < 0 ? 'highlight-warn' : 'highlight-zero');
+
+    telID.textContent = state.iD.toFixed(2) + ' A';
+    telID.className = 'telemetry-cell-val ' + (state.iD > 0 ? 'highlight-i' : 'highlight-zero');
+
+    telIC.textContent = (state.iC > 0 ? '+' : '') + state.iC.toFixed(2) + ' A';
+    telIC.className = 'telemetry-cell-val ' + (state.iC >= 0 ? 'highlight-i' : 'highlight-v');
+
+    circuitSvgBox.innerHTML = generateCircuitSvgContent(config, state);
+    scopeSvgBox.innerHTML = generateOscilloscopeSvgContent(config, state, activeChannel);
+  }
+
+  function animLoop(timestamp) {
+    if (!isPlaying) return;
+    if (!lastTimestamp) lastTimestamp = timestamp;
+    var dt = (timestamp - lastTimestamp) / 1000;
+    lastTimestamp = timestamp;
+
+    var cycleDuration = 3.6 / speed;
+    tau = (tau + (dt / cycleDuration)) % 1.0;
+    scrubber.value = Math.round(tau * 1000);
+
+    render();
+    animId = requestAnimationFrame(animLoop);
+  }
+
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        if (isPlaying && !animId) {
+          lastTimestamp = null;
+          animId = requestAnimationFrame(animLoop);
+        }
+      } else {
+        if (animId) {
+          cancelAnimationFrame(animId);
+          animId = null;
+        }
+      }
+    });
+  }, { threshold: 0.1 });
+
+  observer.observe(container);
 
   render();
+  animId = requestAnimationFrame(animLoop);
 }
 
-function buildConverterSvg(config, activeStage) {
-  var stage = config.stages[activeStage];
-  var green = '#3fb950', red = '#f85149', blue = '#58a6ff', violet = '#bc8cff';
-  var white = '#c9d1d9', muted = '#8b949e';
-  var swOn = stage.sw === 'conduz';
-  var diodeOn = stage.diode === 'conduz';
+function generateCircuitSvgContent(config, state) {
+  var W = 680, H = 220;
+  var topY = 66, botY = 175;
+  var stageKind = state.stage.kind;
+  var swOn = stageKind === 'on';
+  var diodeOn = stageKind === 'off';
+  var isIdle = stageKind === 'idle';
 
-  function ln(x1,y1,x2,y2,color,width,dash) {
-    var s = '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (color || white) +
-      '" stroke-width="' + (width || 3) + '" stroke-linecap="round"';
-    if (dash) s += ' stroke-dasharray="' + dash + '"';
-    return s + '/>';
+  var top = config.topology;
+  var defs =
+    '<defs>' +
+      '<marker id="arrG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">' +
+        '<path d="M 0 1 L 9 5 L 0 9 z" fill="#3fb950"/>' +
+      '</marker>' +
+      '<marker id="arrV" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">' +
+        '<path d="M 0 1 L 9 5 L 0 9 z" fill="#bc8cff"/>' +
+      '</marker>' +
+    '</defs>';
+
+  function wire(x1, y1, x2, y2, cls) {
+    return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="#21262d" stroke-width="3" stroke-linecap="round"/>' +
+      (cls ? '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" class="' + cls + '" stroke-width="3" stroke-linecap="round"/>' : '');
   }
-  function txt(x,y,value,color,size,anchor,weight) {
-    return '<text x="' + x + '" y="' + y + '" fill="' + (color || white) + '" font-size="' + (size || 16) +
-      '" text-anchor="' + (anchor || 'middle') + '" font-family="system-ui,Segoe UI,sans-serif" font-weight="' +
-      (weight || 600) + '">' + value + '</text>';
+
+  function node(x, y) {
+    return '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="#c9d1d9"/>';
   }
-  function nd(x,y,color) {
-    return '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="' + (color || white) + '"/>';
+
+  function src(x, y, label) {
+    return '<circle cx="' + x + '" cy="' + y + '" r="22" fill="#161b22" stroke="#58a6ff" stroke-width="2.5"/>' +
+      '<text x="' + x + '" y="' + (y - 3) + '" fill="#58a6ff" font-size="12" font-weight="bold" text-anchor="middle" font-family="sans-serif">' + label + '</text>' +
+      '<text x="' + x + '" y="' + (y + 11) + '" fill="#8b949e" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">+  −</text>';
   }
-  function ar(x1,y1,x2,y2,color) {
-    return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + (color || green) +
-      '" stroke-width="5" stroke-linecap="round" marker-end="url(#flowArrow)"/>';
-  }
-  function src(cx,cy) {
-    return '<circle cx="' + cx + '" cy="' + cy + '" r="25" fill="none" stroke="' + white + '" stroke-width="3"/>' +
-      ln(cx,cy-43,cx,cy-25) + ln(cx,cy+25,cx,cy+43) + ln(cx-6,cy-9,cx+6,cy-9) + ln(cx,cy-15,cx,cy-3) +
-      ln(cx-6,cy+10,cx+6,cy+10) + txt(cx-34,cy+5,'Vin',white,15,'end');
-  }
-  function ind(x,y,length) {
-    var d = '', pitch = length / 4;
-    for (var i=0;i<4;i++) {
-      var sx=x+i*pitch, mx=sx+pitch/2, ex=sx+pitch;
-      d += 'M ' + sx + ' ' + y + ' Q ' + mx + ' ' + (y-22) + ' ' + ex + ' ' + y + ' ';
+
+  function indH(x, y, len, isMag) {
+    var d = '', n = 4, pitch = len / n;
+    for (var i = 0; i < n; i++) {
+      var sx = x + i * pitch, mx = sx + pitch / 2, ex = sx + pitch;
+      d += 'M ' + sx + ' ' + y + ' Q ' + mx + ' ' + (y - 20) + ' ' + ex + ' ' + y + ' ';
     }
-    return '<path d="' + d + '" fill="none" stroke="' + white + '" stroke-width="3.5" stroke-linecap="round"/>';
-  }
-  function cap(x,y1,y2) {
-    return ln(x,y1,x,y1+22) + ln(x-16,y1+22,x+16,y1+22) + ln(x-16,y1+36,x+16,y1+36) + ln(x,y1+36,x,y2);
-  }
-  function res(x,y1,y2) {
-    var step=(y2-y1-16)/6, y=y1+8, side=-1;
-    var d='M '+x+' '+y1+' L '+x+' '+(y1+8);
-    for(var i=0;i<6;i++){ y+=step; d+=' L '+(x+side*10)+' '+y; side*=-1; }
-    d+=' L '+x+' '+y2;
-    return '<path d="' + d + '" fill="none" stroke="' + white + '" stroke-width="3" stroke-linejoin="round"/>';
-  }
-  function swH(x1,x2,y) {
-    var c=swOn?green:red;
-    return '<circle cx="'+x1+'" cy="'+y+'" r="5" fill="'+c+'"/><circle cx="'+x2+'" cy="'+y+'" r="5" fill="'+c+'"/>' +
-      '<line x1="'+x1+'" y1="'+y+'" x2="'+(swOn?x2:x2-5)+'" y2="'+(swOn?y:y-17)+'" stroke="'+c+'" stroke-width="4" stroke-linecap="round"/>';
-  }
-  function swV(x,y1,y2) {
-    var c=swOn?green:red;
-    return '<circle cx="'+x+'" cy="'+y1+'" r="5" fill="'+c+'"/><circle cx="'+x+'" cy="'+y2+'" r="5" fill="'+c+'"/>' +
-      '<line x1="'+x+'" y1="'+y1+'" x2="'+(swOn?x:x-17)+'" y2="'+(swOn?y2:y2-5)+'" stroke="'+c+'" stroke-width="4" stroke-linecap="round"/>';
-  }
-  function diodeH(x,y) {
-    var c=diodeOn?green:red;
-    return ln(x-30,y,x-10,y) + '<path d="M '+(x-10)+' '+(y-16)+' L '+(x-10)+' '+(y+16)+' L '+(x+10)+' '+y+' Z" fill="none" stroke="'+c+'" stroke-width="3.5"/>' +
-      ln(x+16,y-16,x+16,y+16,c,3.5) + ln(x+16,y,x+34,y);
-  }
-  function diodeV(x,y1,y2) {
-    var c=diodeOn?green:red, mid=(y1+y2)/2;
-    return ln(x,y1,x,mid-22) + '<path d="M '+(x-16)+' '+(mid+6)+' L '+(x+16)+' '+(mid+6)+' L '+x+' '+(mid-14)+' Z" fill="none" stroke="'+c+'" stroke-width="3.5"/>' +
-      ln(x-16,mid+14,x+16,mid+14,c,3.5) + ln(x,mid+14,x,y2);
+    var col = isMag ? '#58a6ff' : (state.iL > 0 ? '#3fb950' : '#8b949e');
+    return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="3.5" stroke-linecap="round"/>';
   }
 
-  var top=111, bottom=214, circuit='';
-
-  if(config.topology==='buck'){
-    circuit += src(62,154) + ln(62,111,120,111) + ln(62,197,62,bottom) + ln(62,bottom,612,bottom);
-    circuit += swH(132,182,111) + txt(157,82,'S',swOn?green:red);
-    circuit += ln(182,111,204,111) + nd(204,111) + ind(226,111,104) + txt(278,80,'L') + txt(295,99,'iL',blue,14);
-    circuit += ln(330,111,452,111) + nd(452,111) + cap(492,111,bottom) + txt(492,153,'C') + res(574,111,bottom) + txt(591,153,'R',white,15,'start');
-    circuit += ln(452,111,595,111) + ln(452,bottom,595,bottom) + diodeV(204,111,bottom) + txt(229,171,'D',diodeOn?green:red,15,'start');
-    if(stage.kind==='on') circuit += ar(76,111,118,111)+ar(139,111,178,111)+ar(209,111,326,111)+ar(338,111,445,111);
-    else if(stage.kind==='off') circuit += ar(204,202,204,132)+ar(226,111,326,111)+ar(338,111,445,111)+ar(590,bottom,505,bottom);
-    else circuit += ar(590,bottom,505,bottom,violet)+ar(505,bottom,505,163,violet);
+  function indV(x, y1, y2, isMag) {
+    var len = y2 - y1, n = 4, pitch = len / n, d = '';
+    for (var i = 0; i < n; i++) {
+      var sy = y1 + i * pitch, my = sy + pitch / 2, ey = sy + pitch;
+      d += 'M ' + x + ' ' + sy + ' Q ' + (x - 20) + ' ' + my + ' ' + x + ' ' + ey + ' ';
+    }
+    var col = isMag ? '#58a6ff' : (state.iL > 0 ? '#3fb950' : '#8b949e');
+    return '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="3.5" stroke-linecap="round"/>';
   }
 
-  if(config.topology==='boost'){
-    circuit += src(62,154) + ln(62,111,132,111) + ln(62,197,62,bottom) + ln(62,bottom,620,bottom);
-    circuit += ind(132,111,104)+txt(184,80,'L')+txt(201,99,'iL',blue,14)+ln(236,111,295,111)+nd(295,111);
-    circuit += swV(295,145,202)+txt(321,182,'S',swOn?green:red,15,'start')+diodeH(355,111)+txt(355,80,'D',diodeOn?green:red);
-    circuit += ln(389,111,505,111)+nd(505,111)+cap(505,111,bottom)+txt(505,153,'C')+res(586,111,bottom)+txt(602,153,'R',white,15,'start');
-    if(stage.kind==='on') circuit += ar(76,111,128,111)+ar(240,111,289,111)+ar(295,152,295,198)+ar(590,bottom,518,bottom,violet);
-    else if(stage.kind==='off') circuit += ar(76,111,128,111)+ar(240,111,291,111)+ar(399,111,497,111)+ar(512,111,580,111);
-    else circuit += ar(590,bottom,518,bottom,violet)+ar(518,bottom,518,162,violet);
+  function capV(x, y1, y2) {
+    var mid = (y1 + y2) / 2;
+    return wire(x, y1, x, mid - 7) +
+      '<line x1="' + (x - 16) + '" y1="' + (mid - 7) + '" x2="' + (x + 16) + '" y2="' + (mid - 7) + '" stroke="#bc8cff" stroke-width="3"/>' +
+      '<line x1="' + (x - 16) + '" y1="' + (mid + 7) + '" x2="' + (x + 16) + '" y2="' + (mid + 7) + '" stroke="#bc8cff" stroke-width="3"/>' +
+      wire(x, mid + 7, x, y2);
   }
 
-  if(config.topology==='buckboost'){
-    circuit += src(62,154) + ln(62,111,132,111) + ln(62,197,62,bottom) + ln(62,bottom,620,bottom);
-    circuit += ind(132,111,104)+txt(184,80,'L')+txt(201,99,'iL',blue,14)+ln(236,111,295,111)+nd(295,111);
-    circuit += swV(295,145,202)+txt(321,182,'S',swOn?green:red,15,'start')+diodeH(355,111)+txt(355,80,'D',diodeOn?green:red);
-    circuit += ln(389,111,505,111)+nd(505,111)+cap(505,111,bottom)+txt(505,153,'C')+res(586,111,bottom)+txt(602,153,'R',white,15,'start')+txt(625,128,'−Vo',white,14,'start');
-    if(stage.kind==='on') circuit += ar(76,111,128,111)+ar(240,111,291,111)+ar(295,152,295,198)+ar(590,115,590,199,violet);
-    else if(stage.kind==='off') circuit += ar(240,111,291,111)+ar(399,111,497,111)+ar(512,111,580,111)+ar(590,115,590,199);
-    else circuit += ar(590,115,590,199,violet);
+  function resV(x, y1, y2, label) {
+    var mid = (y1 + y2) / 2;
+    return wire(x, y1, x, mid - 20) +
+      '<rect x="' + (x - 10) + '" y="' + (mid - 20) + '" width="20" height="40" rx="3" fill="#161b22" stroke="#d29922" stroke-width="2.5"/>' +
+      '<text x="' + (x + 16) + '" y="' + (mid + 4) + '" fill="#d29922" font-size="12" font-weight="bold" font-family="sans-serif">' + label + '</text>' +
+      wire(x, mid + 20, x, y2);
   }
 
-  var wave = buildDashboardCurrentWaveform(config, activeStage, blue, white, muted, green, violet);
-  var arrowColor = stage.kind==='idle' ? violet : green;
+  function swH(x1, x2, y, on) {
+    var col = on ? '#3fb950' : '#f85149';
+    var arm = on
+      ? '<line x1="' + x1 + '" y1="' + y + '" x2="' + x2 + '" y2="' + y + '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>'
+      : '<line x1="' + x1 + '" y1="' + y + '" x2="' + (x2 - 6) + '" y2="' + (y - 18) + '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>';
+    return '<circle cx="' + x1 + '" cy="' + y + '" r="5" fill="' + col + '"/>' +
+      '<circle cx="' + x2 + '" cy="' + y + '" r="5" fill="' + col + '"/>' + arm;
+  }
 
-  return '<svg viewBox="0 0 700 350" role="img" aria-label="'+config.title+' — '+stage.label+'">' +
-    '<defs><marker id="flowArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">' +
-    '<path d="M 0 0 L 10 5 L 0 10 z" fill="'+arrowColor+'"/></marker></defs>' +
-    '<rect x="0" y="0" width="700" height="350" rx="16" fill="#0d1117"/>' +
-    txt(24,32,stage.label,white,18,'start',700)+txt(676,32,stage.interval,muted,13,'end',600)+circuit+wave+'</svg>';
+  function swV(x, y1, y2, on) {
+    var col = on ? '#3fb950' : '#f85149';
+    var arm = on
+      ? '<line x1="' + x + '" y1="' + y1 + '" x2="' + x + '" y2="' + y2 + '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>'
+      : '<line x1="' + x + '" y1="' + y1 + '" x2="' + (x - 18) + '" y2="' + (y2 - 8) + '" stroke="' + col + '" stroke-width="4" stroke-linecap="round"/>';
+    return '<circle cx="' + x + '" cy="' + y1 + '" r="5" fill="' + col + '"/>' +
+      '<circle cx="' + x + '" cy="' + y2 + '" r="5" fill="' + col + '"/>' + arm;
+  }
+
+  function diodeV(x, y1, y2, on, pointingUp) {
+    var mid = (y1 + y2) / 2;
+    var col = on ? '#3fb950' : '#f85149';
+    var tri = pointingUp
+      ? 'M ' + (x - 14) + ' ' + (mid + 8) + ' L ' + (x + 14) + ' ' + (mid + 8) + ' L ' + x + ' ' + (mid - 12) + ' Z'
+      : 'M ' + (x - 14) + ' ' + (mid - 8) + ' L ' + (x + 14) + ' ' + (mid - 8) + ' L ' + x + ' ' + (mid + 12) + ' Z';
+    var barY = pointingUp ? mid - 12 : mid + 12;
+    return wire(x, y1, x, pointingUp ? mid + 8 : mid - 8) +
+      '<path d="' + tri + '" fill="' + (on ? '#238636' : '#21262d') + '" stroke="' + col + '" stroke-width="2.5"/>' +
+      '<line x1="' + (x - 14) + '" y1="' + barY + '" x2="' + (x + 14) + '" y2="' + barY + '" stroke="' + col + '" stroke-width="3"/>' +
+      wire(x, barY, x, y2);
+  }
+
+  function diodeH(x1, x2, y, on, pointingRight) {
+    var mid = (x1 + x2) / 2;
+    var col = on ? '#3fb950' : '#f85149';
+    var tri = pointingRight
+      ? 'M ' + (mid - 8) + ' ' + (y - 14) + ' L ' + (mid - 8) + ' ' + (y + 14) + ' L ' + (mid + 12) + ' ' + y + ' Z'
+      : 'M ' + (mid + 8) + ' ' + (y - 14) + ' L ' + (mid + 8) + ' ' + (y + 14) + ' L ' + (mid - 12) + ' ' + y + ' Z';
+    var barX = pointingRight ? mid + 12 : mid - 12;
+    return wire(x1, y, pointingRight ? mid - 8 : mid + 8, y) +
+      '<path d="' + tri + '" fill="' + (on ? '#238636' : '#21262d') + '" stroke="' + col + '" stroke-width="2.5"/>' +
+      '<line x1="' + barX + '" y1="' + (y - 14) + '" x2="' + barX + '" y2="' + (y + 14) + '" stroke="' + col + '" stroke-width="3"/>' +
+      wire(barX, y, x2, y);
+  }
+
+  function hudBadge(x, y, text1, text2, color) {
+    var w = 84, h = 22;
+    return '<g transform="translate(' + (x - w / 2) + ',' + (y - h / 2) + ')">' +
+      '<rect width="' + w + '" height="' + h + '" rx="5" fill="#161b22" stroke="#30363d" stroke-width="1.2"/>' +
+      '<text x="5" y="15" fill="' + (color || '#c9d1d9') + '" font-size="10" font-family="ui-monospace,monospace" font-weight="700">' + text1 + '</text>' +
+      '<text x="' + (w - 5) + '" y="15" fill="#8b949e" font-size="9" font-family="ui-monospace,monospace" text-anchor="end">' + (text2 || '') + '</text>' +
+    '</g>';
+  }
+
+  function polBadge(x, y, sym) {
+    var col = sym === '+' ? '#3fb950' : (sym === '−' ? '#f85149' : '#8b949e');
+    return '<circle cx="' + x + '" cy="' + y + '" r="8" fill="#161b22" stroke="' + col + '" stroke-width="1.5"/>' +
+      '<text x="' + x + '" y="' + (y + 3.5) + '" fill="' + col + '" font-size="10" font-weight="bold" text-anchor="middle" font-family="sans-serif">' + sym + '</text>';
+  }
+
+  var cHtml = '';
+
+  if (top === 'buck') {
+    var pActive = swOn ? 'flow-active' : null;
+    var pFree = diodeOn ? 'flow-active' : null;
+    var pCap = isIdle ? 'flow-active-violet' : null;
+
+    cHtml += src(65, 122, 'Vin');
+    cHtml += wire(65, 100, 65, topY, pActive);
+    cHtml += wire(65, topY, 120, topY, pActive);
+    cHtml += swH(120, 180, topY, swOn);
+    cHtml += wire(180, topY, 215, topY, pActive);
+    cHtml += node(215, topY);
+
+    cHtml += diodeV(215, topY, botY, diodeOn, true);
+    cHtml += node(215, botY);
+
+    cHtml += wire(215, topY, 240, topY, (pActive || pFree));
+    cHtml += indH(240, topY, 110, swOn);
+    cHtml += wire(350, topY, 410, topY, (pActive || pFree));
+    cHtml += node(410, topY);
+
+    cHtml += capV(450, topY, botY);
+    cHtml += wire(410, topY, 450, topY, (pActive || pFree || pCap));
+    cHtml += wire(450, topY, 560, topY, (pActive || pFree || pCap));
+    cHtml += node(450, topY);
+    cHtml += node(450, botY);
+
+    cHtml += resV(560, topY, botY, 'R');
+    cHtml += node(560, topY);
+    cHtml += node(560, botY);
+
+    cHtml += wire(65, 144, 65, botY, pActive);
+    cHtml += wire(65, botY, 215, botY, pActive);
+    cHtml += wire(215, botY, 450, botY, (pActive || pFree || pCap));
+    cHtml += wire(450, botY, 560, botY, (pActive || pFree || pCap));
+
+    cHtml += polBadge(235, topY - 14, state.polLeft);
+    cHtml += polBadge(355, topY - 14, state.polRight);
+
+    cHtml += hudBadge(150, topY - 26, 'S: ' + (swOn ? 'ON' : 'OFF'), state.vS.toFixed(0) + 'V', swOn ? '#3fb950' : '#f85149');
+    cHtml += hudBadge(295, topY - 26, 'vL ' + (state.vL > 0 ? '+' : '') + state.vL.toFixed(0) + 'V', state.iL.toFixed(1) + 'A', '#58a6ff');
+    cHtml += hudBadge(215, 122, 'D: ' + (diodeOn ? 'ON' : 'OFF'), state.vD.toFixed(0) + 'V', diodeOn ? '#3fb950' : '#f85149');
+    cHtml += hudBadge(450, 122, 'iC', (state.iC > 0 ? '+' : '') + state.iC.toFixed(1) + 'A', '#bc8cff');
+    cHtml += hudBadge(610, 122, '+Vo−', config.params.Vo + 'V', '#d29922');
+  } else if (top === 'boost') {
+    var pOn = swOn ? 'flow-active' : null;
+    var pOff = diodeOn ? 'flow-active' : null;
+    var pCapB = (swOn || isIdle) ? 'flow-active-violet' : null;
+
+    cHtml += src(65, 122, 'Vin');
+    cHtml += wire(65, 100, 65, topY, (pOn || pOff));
+    cHtml += wire(65, topY, 115, topY, (pOn || pOff));
+    cHtml += indH(115, topY, 110, swOn);
+    cHtml += wire(225, topY, 260, topY, (pOn || pOff));
+    cHtml += node(260, topY);
+
+    cHtml += swV(260, topY, botY, swOn);
+    cHtml += node(260, botY);
+
+    cHtml += diodeH(260, 360, topY, diodeOn, true);
+    cHtml += wire(360, topY, 440, topY, pOff);
+    cHtml += node(440, topY);
+
+    cHtml += capV(460, topY, botY);
+    cHtml += wire(440, topY, 460, topY, (pOff || pCapB));
+    cHtml += wire(460, topY, 560, topY, (pOff || pCapB));
+    cHtml += node(460, topY);
+    cHtml += node(460, botY);
+
+    cHtml += resV(560, topY, botY, 'R');
+    cHtml += node(560, topY);
+    cHtml += node(560, botY);
+
+    cHtml += wire(65, 144, 65, botY, (pOn || pOff));
+    cHtml += wire(65, botY, 260, botY, (pOn || pOff));
+    cHtml += wire(260, botY, 460, botY, (pOff || pCapB));
+    cHtml += wire(460, botY, 560, botY, (pOff || pCapB));
+
+    cHtml += polBadge(110, topY - 14, state.polLeft);
+    cHtml += polBadge(230, topY - 14, state.polRight);
+
+    cHtml += hudBadge(170, topY - 26, 'vL ' + (state.vL > 0 ? '+' : '') + state.vL.toFixed(0) + 'V', state.iL.toFixed(1) + 'A', '#58a6ff');
+    cHtml += hudBadge(295, 122, 'S: ' + (swOn ? 'ON' : 'OFF'), state.vS.toFixed(0) + 'V', swOn ? '#3fb950' : '#f85149');
+    cHtml += hudBadge(335, topY - 26, 'D: ' + (diodeOn ? 'ON' : 'OFF'), state.vD.toFixed(0) + 'V', diodeOn ? '#3fb950' : '#f85149');
+    cHtml += hudBadge(460, 122, 'iC', (state.iC > 0 ? '+' : '') + state.iC.toFixed(1) + 'A', '#bc8cff');
+    cHtml += hudBadge(610, 122, '+Vo−', config.params.Vo + 'V', '#d29922');
+  } else if (top === 'buckboost') {
+    var pOnBB = swOn ? 'flow-active' : null;
+    var pOffBB = diodeOn ? 'flow-active-reverse' : null;
+    var pCapBB = (swOn || isIdle) ? 'flow-active-violet' : null;
+
+    cHtml += src(65, 122, 'Vin');
+    cHtml += wire(65, 100, 65, topY, pOnBB);
+    cHtml += wire(65, topY, 115, topY, pOnBB);
+    cHtml += swH(115, 185, topY, swOn);
+    cHtml += wire(185, topY, 230, topY, pOnBB);
+    cHtml += node(230, topY);
+
+    cHtml += indV(230, topY, botY, swOn);
+    cHtml += node(230, botY);
+
+    cHtml += diodeH(230, 360, topY, diodeOn, false);
+    cHtml += wire(360, topY, 440, topY, pOffBB);
+    cHtml += node(440, topY);
+
+    cHtml += capV(460, topY, botY);
+    cHtml += wire(440, topY, 460, topY, (pOffBB || pCapBB));
+    cHtml += wire(460, topY, 560, topY, (pOffBB || pCapBB));
+    cHtml += node(460, topY);
+    cHtml += node(460, botY);
+
+    cHtml += resV(560, topY, botY, 'R');
+    cHtml += node(560, topY);
+    cHtml += node(560, botY);
+
+    cHtml += wire(65, 144, 65, botY, pOnBB);
+    cHtml += wire(65, botY, 230, botY, pOnBB);
+    cHtml += wire(230, botY, 460, botY, (pOffBB || pCapBB));
+    cHtml += wire(460, botY, 560, botY, (pOffBB || pCapBB));
+
+    cHtml += polBadge(230 + 16, topY + 14, state.polLeft);
+    cHtml += polBadge(230 + 16, botY - 14, state.polRight);
+
+    cHtml += hudBadge(150, topY - 26, 'S: ' + (swOn ? 'ON' : 'OFF'), state.vS.toFixed(0) + 'V', swOn ? '#3fb950' : '#f85149');
+    cHtml += hudBadge(290, 122, 'vL ' + (state.vL > 0 ? '+' : '') + state.vL.toFixed(0) + 'V', state.iL.toFixed(1) + 'A', '#58a6ff');
+    cHtml += hudBadge(335, topY - 26, 'D: ' + (diodeOn ? 'ON' : 'OFF'), state.vD.toFixed(0) + 'V', diodeOn ? '#3fb950' : '#f85149');
+    cHtml += hudBadge(460, 122, 'iC', (state.iC > 0 ? '+' : '') + state.iC.toFixed(1) + 'A', '#bc8cff');
+    cHtml += hudBadge(610, 122, '−Vo+', '−' + config.params.Vo + 'V', '#f85149');
+  }
+
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama do circuito">' +
+    defs + '<rect width="' + W + '" height="' + H + '" rx="10" fill="#080c12"/>' + cHtml + '</svg>';
 }
 
-function buildDashboardCurrentWaveform(config, activeStage, blue, white, muted, green, violet) {
-  var x0=78, y0=318, width=540, top=256, n=config.stages.length, segment=width/n;
-  var path = config.mode==='CCM'
-    ? 'M '+x0+' '+(y0-18)+' L '+(x0+segment)+' '+(top+8)+' L '+(x0+width)+' '+(y0-18)
-    : 'M '+x0+' '+y0+' L '+(x0+segment)+' '+(top+8)+' L '+(x0+segment*2)+' '+y0+' L '+(x0+width)+' '+y0;
-  var markers='';
-  config.stages.forEach(function(stage,index){
-    var start=x0+index*segment;
-    var color=stage.kind==='on'?green:(stage.kind==='off'?blue:violet);
-    markers += '<rect x="'+(start+2)+'" y="228" width="'+(segment-4)+'" height="18" rx="6" fill="'+(index===activeStage?color:'#161b22')+'" opacity="'+(index===activeStage?0.55:1)+'" stroke="#30363d"/>';
-    markers += '<text x="'+(start+segment/2)+'" y="241" fill="'+white+'" font-size="10" text-anchor="middle" font-family="system-ui,Segoe UI,sans-serif">'+(index+1)+'</text>';
-    if(index>0) markers += '<line x1="'+start+'" y1="224" x2="'+start+'" y2="'+(y0+4)+'" stroke="#30363d" stroke-dasharray="4,4"/>';
-  });
-  var zeroNote=config.mode==='DCM'
-    ? '<text x="'+(x0+width-4)+'" y="'+(y0-8)+'" fill="'+muted+'" font-size="11" text-anchor="end" font-family="system-ui,Segoe UI,sans-serif">iL = 0</text>'
-    : '';
-  return '<text x="28" y="275" fill="'+blue+'" font-size="14" text-anchor="start" font-family="system-ui,Segoe UI,sans-serif" font-weight="700">iL(t)</text>' +
-    '<line x1="'+x0+'" y1="'+y0+'" x2="'+(x0+width+10)+'" y2="'+y0+'" stroke="#484f58" stroke-width="1.5"/>' +
-    markers + '<path d="'+path+'" fill="none" stroke="'+blue+'" stroke-width="3.5" stroke-linejoin="round"/>' + zeroNote;
+function generateOscilloscopeSvgContent(config, state, channel) {
+  var W = 680, H = 220;
+  var padLeft = 60, padRight = 24, padTop = 16;
+  var plotW = W - padLeft - padRight;
+  var p = config.params;
+  var isCCM = config.mode === 'CCM';
+  var D = p.D;
+  var D2 = isCCM ? 1 - D : p.D2;
+
+  var x0 = padLeft;
+  var x1 = padLeft + D * plotW;
+  var x2 = isCCM ? padLeft + plotW : padLeft + (D + D2) * plotW;
+  var xEnd = padLeft + plotW;
+
+  var yV_mid = padTop + 42;
+  var scaleV = 1.35;
+
+  var vL_on = (config.topology === 'buck') ? (p.Vin - p.Vo) : p.Vin;
+  var vL_off = (config.topology === 'buck') ? (-p.Vo) : ((config.topology === 'boost') ? (p.Vin - p.Vo) : (-p.Vo));
+  var yV_on = yV_mid - vL_on * scaleV;
+  var yV_off = yV_mid - vL_off * scaleV;
+
+  var yI_bot = padTop + 85 + 24 + 75;
+  var maxI = isCCM ? (p.Imax * 1.25) : (p.Ipk * 1.25);
+  var scaleI = 68 / maxI;
+
+  var yI_min = isCCM ? (yI_bot - p.Imin * scaleI) : yI_bot;
+  var yI_max = isCCM ? (yI_bot - p.Imax * scaleI) : (yI_bot - p.Ipk * scaleI);
+
+  var xCursor = padLeft + state.tau * plotW;
+  var yCurV = yV_mid - state.vL * scaleV;
+  var yCurI = yI_bot - state.iL * scaleI;
+
+  var defs =
+    '<defs>' +
+      '<linearGradient id="gVpos" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#388bfd" stop-opacity="0.35"/><stop offset="100%" stop-color="#388bfd" stop-opacity="0.05"/></linearGradient>' +
+      '<linearGradient id="gVneg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f85149" stop-opacity="0.05"/><stop offset="100%" stop-color="#f85149" stop-opacity="0.30"/></linearGradient>' +
+      '<linearGradient id="gI" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3fb950" stop-opacity="0.32"/><stop offset="100%" stop-color="#3fb950" stop-opacity="0.02"/></linearGradient>' +
+    '</defs>';
+
+  var grid =
+    '<line x1="' + x0 + '" y1="' + yV_mid + '" x2="' + (xEnd + 8) + '" y2="' + yV_mid + '" stroke="#30363d" stroke-dasharray="3,3" stroke-width="1.2"/>' +
+    '<text x="' + (x0 - 8) + '" y="' + (yV_mid + 4) + '" fill="#8b949e" font-size="10" font-family="monospace" text-anchor="end">0V</text>' +
+    '<text x="' + x0 + '" y="' + (padTop - 3) + '" fill="#58a6ff" font-size="11" font-weight="bold" font-family="sans-serif">v_L(t) [Tensão no Indutor] • Balanço Volts-Segundo: ∫v_L dt = 0</text>' +
+
+    '<line x1="' + x1 + '" y1="' + (padTop - 4) + '" x2="' + x1 + '" y2="' + (yI_bot + 12) + '" stroke="#484f58" stroke-dasharray="4,4" stroke-width="1"/>' +
+    '<text x="' + x1 + '" y="' + (yI_bot + 14) + '" fill="#8b949e" font-size="10" font-family="monospace" text-anchor="middle">DTs</text>';
+
+  if (!isCCM) {
+    grid +=
+      '<line x1="' + x2 + '" y1="' + (padTop - 4) + '" x2="' + x2 + '" y2="' + (yI_bot + 12) + '" stroke="#d29922" stroke-dasharray="4,4" stroke-width="1"/>' +
+      '<text x="' + x2 + '" y="' + (yI_bot + 14) + '" fill="#d29922" font-size="10" font-family="monospace" text-anchor="middle">(D+D2)Ts</text>';
+  }
+
+  grid +=
+    '<line x1="' + xEnd + '" y1="' + (padTop - 4) + '" x2="' + xEnd + '" y2="' + (yI_bot + 12) + '" stroke="#484f58" stroke-dasharray="4,4" stroke-width="1"/>' +
+    '<text x="' + xEnd + '" y="' + (yI_bot + 14) + '" fill="#8b949e" font-size="10" font-family="monospace" text-anchor="middle">Ts</text>' +
+
+    '<line x1="' + x0 + '" y1="' + yI_bot + '" x2="' + (xEnd + 8) + '" y2="' + yI_bot + '" stroke="#30363d" stroke-width="1.4"/>' +
+    '<text x="' + (x0 - 8) + '" y="' + (yI_bot + 4) + '" fill="#8b949e" font-size="10" font-family="monospace" text-anchor="end">0A</text>' +
+    '<text x="' + x0 + '" y="' + (padTop + 85 + 16) + '" fill="#3fb950" font-size="11" font-weight="bold" font-family="sans-serif">i_L(t) [Corrente no Indutor]' + (isCCM ? ' • CCM (Sobe e desce)' : ' • DCM (Zera em D2Ts!)') + '</text>';
+
+  var areaVpos = '<path d="M ' + x0 + ' ' + yV_mid + ' L ' + x0 + ' ' + yV_on + ' L ' + x1 + ' ' + yV_on + ' L ' + x1 + ' ' + yV_mid + ' Z" fill="url(#gVpos)"/>';
+  var areaVneg = '<path d="M ' + x1 + ' ' + yV_mid + ' L ' + x1 + ' ' + yV_off + ' L ' + x2 + ' ' + yV_off + ' L ' + x2 + ' ' + yV_mid + ' Z" fill="url(#gVneg)"/>';
+
+  var pathVL = 'M ' + x0 + ' ' + yV_mid + ' L ' + x0 + ' ' + yV_on + ' L ' + x1 + ' ' + yV_on + ' L ' + x1 + ' ' + yV_off + ' L ' + x2 + ' ' + yV_off;
+  if (!isCCM) {
+    pathVL += ' L ' + x2 + ' ' + yV_mid + ' L ' + xEnd + ' ' + yV_mid;
+  }
+  var vLTrace = '<path d="' + pathVL + '" fill="none" stroke="#58a6ff" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<text x="' + (x0 - 8) + '" y="' + (yV_on + 4) + '" fill="#58a6ff" font-size="10" font-family="monospace" text-anchor="end">+' + vL_on.toFixed(0) + 'V</text>' +
+    '<text x="' + (x0 - 8) + '" y="' + (yV_off + 4) + '" fill="#f85149" font-size="10" font-family="monospace" text-anchor="end">' + vL_off.toFixed(0) + 'V</text>' +
+    '<text x="' + ((x0 + x1) / 2) + '" y="' + ((yV_mid + yV_on) / 2 + 4) + '" fill="#58a6ff" font-size="10" font-family="monospace" text-anchor="middle">+A1</text>' +
+    '<text x="' + ((x1 + x2) / 2) + '" y="' + ((yV_mid + yV_off) / 2 + 4) + '" fill="#f85149" font-size="10" font-family="monospace" text-anchor="middle">−A2</text>';
+
+  var pathIL = '', areaIL = '';
+  if (isCCM) {
+    pathIL = 'M ' + x0 + ' ' + yI_min + ' L ' + x1 + ' ' + yI_max + ' L ' + xEnd + ' ' + yI_min;
+    areaIL = 'M ' + x0 + ' ' + yI_bot + ' L ' + x0 + ' ' + yI_min + ' L ' + x1 + ' ' + yI_max + ' L ' + xEnd + ' ' + yI_min + ' L ' + xEnd + ' ' + yI_bot + ' Z';
+  } else {
+    pathIL = 'M ' + x0 + ' ' + yI_bot + ' L ' + x1 + ' ' + yI_max + ' L ' + x2 + ' ' + yI_bot + ' L ' + xEnd + ' ' + yI_bot;
+    areaIL = 'M ' + x0 + ' ' + yI_bot + ' L ' + x1 + ' ' + yI_max + ' L ' + x2 + ' ' + yI_bot + ' Z';
+  }
+
+  var iLTrace =
+    '<path d="' + areaIL + '" fill="url(#gI)"/>' +
+    '<path d="' + pathIL + '" fill="none" stroke="#3fb950" stroke-width="2.5" stroke-linejoin="round"/>' +
+    '<text x="' + (x0 - 8) + '" y="' + (yI_max + 4) + '" fill="#3fb950" font-size="10" font-family="monospace" text-anchor="end">' + (isCCM ? p.Imax.toFixed(1) : p.Ipk.toFixed(1)) + 'A</text>';
+
+  if (isCCM) {
+    iLTrace += '<text x="' + (x0 - 8) + '" y="' + (yI_min + 4) + '" fill="#3fb950" font-size="10" font-family="monospace" text-anchor="end">' + p.Imin.toFixed(1) + 'A</text>';
+  }
+
+  var extraTraces = '';
+  if (channel === 'semicondutores') {
+    var pIS = 'M ' + x0 + ' ' + yI_min + ' L ' + x1 + ' ' + yI_max + ' L ' + x1 + ' ' + yI_bot + ' L ' + xEnd + ' ' + yI_bot;
+    var pID = 'M ' + x0 + ' ' + yI_bot + ' L ' + x1 + ' ' + yI_bot + ' L ' + x1 + ' ' + yI_max + ' L ' + x2 + ' ' + (isCCM ? yI_min : yI_bot) + (isCCM ? '' : ' L ' + xEnd + ' ' + yI_bot);
+    extraTraces =
+      '<path d="' + pIS + '" fill="none" stroke="#e3b341" stroke-width="1.8" stroke-dasharray="3,3"/>' +
+      '<text x="' + ((x0 + x1) / 2) + '" y="' + (yI_bot - 10) + '" fill="#e3b341" font-size="10" font-family="monospace" text-anchor="middle">iS(t)</text>' +
+      '<path d="' + pID + '" fill="none" stroke="#bc8cff" stroke-width="1.8" stroke-dasharray="3,3"/>' +
+      '<text x="' + ((x1 + x2) / 2) + '" y="' + (yI_bot - 10) + '" fill="#bc8cff" font-size="10" font-family="monospace" text-anchor="middle">iD(t)</text>';
+  } else if (channel === 'filtro') {
+    var yC_mid = yI_bot - 24;
+    extraTraces =
+      '<line x1="' + x0 + '" y1="' + yC_mid + '" x2="' + xEnd + '" y2="' + yC_mid + '" stroke="#bc8cff" stroke-width="1" stroke-dasharray="2,2"/>' +
+      '<text x="' + (xEnd - 5) + '" y="' + (yC_mid - 4) + '" fill="#bc8cff" font-size="10" font-family="monospace" text-anchor="end">iC média = 0A</text>';
+  }
+
+  var playhead =
+    '<line x1="' + xCursor + '" y1="' + (padTop - 6) + '" x2="' + xCursor + '" y2="' + (yI_bot + 6) + '" stroke="#58a6ff" stroke-width="1.8" stroke-dasharray="2,2"/>' +
+    '<circle cx="' + xCursor + '" cy="' + yCurV + '" r="5" fill="#58a6ff" stroke="#ffffff" stroke-width="1.5"/>' +
+    '<circle cx="' + xCursor + '" cy="' + yCurI + '" r="5" fill="#3fb950" stroke="#ffffff" stroke-width="1.5"/>' +
+    '<g transform="translate(' + (xCursor - 27) + ',' + (padTop - 12) + ')">' +
+      '<rect width="54" height="15" rx="4" fill="#161b22" stroke="#388bfd" stroke-width="1"/>' +
+      '<text x="27" y="11" fill="#79c0ff" font-size="9" font-family="monospace" text-anchor="middle" font-weight="bold">' + (state.tau * 100).toFixed(0) + '% Ts</text>' +
+    '</g>';
+
+  return '<svg viewBox="0 0 ' + W + ' ' + H + '" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Osciloscópio de formas de onda">' +
+    defs + '<rect width="' + W + '" height="' + H + '" rx="10" fill="#080c12"/>' +
+    grid + areaVpos + areaVneg + vLTrace + iLTrace + extraTraces + playhead + '</svg>';
 }
 
 window.initSubjectTools = function () {

@@ -1209,45 +1209,481 @@ body {
 
 
 /* ==========================================================================
-   DASHBOARDS INTERATIVOS DOS CONVERSORES
+   DASHBOARDS & SIMULADORES ANIMADOS DOS CONVERSORES
    ========================================================================== */
-.converter-dashboard{margin:18px 0 28px;border:1px solid #30363d;border-radius:16px;background:linear-gradient(145deg,#0d1117,#111821);overflow:hidden;box-shadow:0 12px 32px rgba(0,0,0,.2)}
-.converter-dashboard-head{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;padding:18px 20px 14px;border-bottom:1px solid #21262d}
-.converter-dashboard-kicker{display:inline-block;margin-bottom:5px;color:#58a6ff;font-size:.72rem;font-weight:800;letter-spacing:.11em;text-transform:uppercase}
-.converter-dashboard-head h4{margin:0 0 4px;color:#f0f6fc;font-size:1.08rem}
-.converter-dashboard-head p{margin:0;color:#8b949e;font-size:.86rem}
-.converter-dashboard-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
-.converter-dashboard-tags span{border:1px solid #30363d;border-radius:999px;background:#161b22;padding:5px 9px;color:#c9d1d9;font-size:.7rem;font-weight:800}
-.converter-dashboard-layout{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.8fr);gap:14px;padding:16px}
-.converter-dashboard-visual{min-width:0;border:1px solid #21262d;border-radius:14px;background:#080c12;padding:10px}
-.converter-dashboard-svg svg{display:block;width:100%;height:auto}
-.converter-dashboard-legend{display:flex;flex-wrap:wrap;gap:12px;margin:8px 6px 2px;color:#8b949e;font-size:.76rem}
-.converter-dashboard-legend span{display:inline-flex;align-items:center;gap:6px}
-.converter-dashboard-legend i{width:18px;height:3px;border-radius:999px;display:inline-block}
-.legend-current{background:#3fb950}.legend-blocked{background:#f85149}.legend-il{background:#58a6ff}
-.converter-dashboard-panel{display:flex;flex-direction:column;gap:10px}
-.converter-stage-buttons{display:flex;gap:7px}
-.converter-stage-buttons button{min-width:38px;border:1px solid #30363d;border-radius:9px;background:#0d1117;padding:7px 10px;color:#c9d1d9;font:inherit;font-size:.78rem;cursor:pointer}
-.converter-stage-buttons button:hover{border-color:#58a6ff}
-.converter-stage-buttons button.active{border-color:#58a6ff;background:rgba(88,166,255,.12);color:#79c0ff}
-.converter-stage-buttons .dashboard-auto{margin-left:auto;min-width:74px}
-.converter-stage-card,.converter-dashboard-formula{border:1px solid #30363d;border-radius:12px;background:#0d1117;padding:13px 14px}
-.converter-stage-card .stage-number{color:#8b949e;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.converter-stage-card h5{margin:5px 0 3px;color:#f0f6fc;font-size:.96rem}
-.converter-stage-card .stage-interval{margin:0 0 10px;color:#58a6ff;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.78rem}
-.stage-status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-.stage-status-grid>div{min-width:0;border:1px solid #30363d;border-radius:9px;background:#161b22;padding:8px}
-.stage-status-grid b{display:block;margin-bottom:2px;color:#f0f6fc;font-size:.72rem}
-.stage-status-grid span{color:#8b949e;font-size:.68rem}
-.stage-status-grid .state-on{border-color:rgba(63,185,80,.4)}.stage-status-grid .state-off{border-color:rgba(248,81,73,.35)}
-.stage-status-grid .state-current{border-color:rgba(88,166,255,.4)}.stage-status-grid .state-idle{border-color:rgba(188,140,255,.35)}
-.stage-note{margin:10px 0 0;color:#b1bac4;font-size:.82rem;line-height:1.45}
-.converter-stage-timeline{display:grid;gap:6px}
-.timeline-stage{border:1px solid #30363d;border-radius:9px;background:#0d1117;padding:7px 6px;text-align:center;opacity:.58}
-.timeline-stage b{display:block;color:#c9d1d9;font-size:.72rem}.timeline-stage span{display:block;margin-top:2px;color:#8b949e;font-size:.62rem;line-height:1.25}
-.timeline-stage.active{opacity:1;border-color:#58a6ff;box-shadow:inset 0 0 0 1px rgba(88,166,255,.1)}
-.timeline-stage.on.active{background:rgba(63,185,80,.08)}.timeline-stage.off.active{background:rgba(88,166,255,.08)}.timeline-stage.idle.active{background:rgba(188,140,255,.08)}
-.converter-dashboard-formula span{display:block;color:#8b949e;font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em}
-.converter-dashboard-formula strong{display:block;margin-top:5px;color:#e3b341;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.98rem;line-height:1.4}
-@media(max-width:920px){.converter-dashboard-layout{grid-template-columns:1fr}.converter-dashboard-head{flex-direction:column}.converter-dashboard-tags{justify-content:flex-start}}
-@media(max-width:620px){.converter-dashboard-layout{padding:10px}.stage-status-grid{grid-template-columns:1fr}.converter-stage-buttons{flex-wrap:wrap}.converter-stage-buttons .dashboard-auto{margin-left:0}}
+.converter-dashboard {
+  margin: 22px 0 32px;
+  border: 1px solid #30363d;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #0d1117, #111827);
+  overflow: hidden;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+}
+
+.converter-dashboard-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid #21262d;
+  background: rgba(13, 17, 23, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+.converter-dashboard-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  color: #58a6ff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.converter-dashboard-kicker::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #3fb950;
+  box-shadow: 0 0 8px #3fb950;
+}
+
+.converter-dashboard-head h4 {
+  margin: 0 0 3px;
+  color: #f0f6fc;
+  font-size: 1.15rem;
+}
+
+.converter-dashboard-head p {
+  margin: 0;
+  color: #8b949e;
+  font-size: 0.85rem;
+}
+
+.converter-dashboard-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  justify-content: flex-end;
+}
+
+.converter-dashboard-tags span {
+  border: 1px solid #30363d;
+  border-radius: 999px;
+  background: #161b22;
+  padding: 4px 10px;
+  color: #c9d1d9;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.converter-dashboard-tags span.tag-mode {
+  border-color: #388bfd44;
+  color: #58a6ff;
+  background: rgba(56, 139, 253, 0.1);
+}
+
+.converter-dashboard-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+  gap: 16px;
+  padding: 16px;
+}
+
+/* Área Visual: Circuito + Osciloscópio */
+.converter-animator-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.converter-circuit-box,
+.converter-scope-box {
+  min-width: 0;
+  border: 1px solid #21262d;
+  border-radius: 14px;
+  background: #080c12;
+  padding: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.converter-box-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #8b949e;
+}
+
+.converter-box-title span.active-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #3fb950;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.converter-dashboard-svg svg,
+.converter-scope-svg svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Animações de Linhas de Corrente (Dash Offset) */
+@keyframes flowDashForward {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes flowDashReverse {
+  from { stroke-dashoffset: 0; }
+  to { stroke-dashoffset: 24; }
+}
+
+.flow-active {
+  stroke: #3fb950;
+  stroke-dasharray: 8 5;
+  animation: flowDashForward 0.8s linear infinite;
+}
+
+.flow-active-reverse {
+  stroke: #3fb950;
+  stroke-dasharray: 8 5;
+  animation: flowDashReverse 0.8s linear infinite;
+}
+
+.flow-active-violet {
+  stroke: #bc8cff;
+  stroke-dasharray: 8 5;
+  animation: flowDashForward 0.8s linear infinite;
+}
+
+.flow-blocked {
+  stroke: #30363d;
+  stroke-dasharray: 4 4;
+  opacity: 0.25;
+}
+
+/* Legenda dos Circuitos */
+.converter-dashboard-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  padding: 6px 4px 2px;
+  color: #8b949e;
+  font-size: 0.75rem;
+  border-top: 1px dashed #21262d;
+}
+
+.converter-dashboard-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.converter-dashboard-legend i {
+  width: 16px;
+  height: 4px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.legend-current { background: #3fb950; box-shadow: 0 0 6px rgba(63, 185, 80, 0.4); }
+.legend-blocked { background: #f85149; }
+.legend-vl { background: #58a6ff; }
+.legend-idle { background: #bc8cff; }
+
+/* Painel de Controles e Telemetria */
+.converter-dashboard-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Barra Multimídia */
+.dashboard-controls-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  background: #0d1117;
+  padding: 12px 14px;
+}
+
+.dashboard-controls-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-ctrl-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 96px;
+  border: 1px solid #388bfd;
+  border-radius: 8px;
+  background: rgba(56, 139, 253, 0.15);
+  color: #58a6ff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-ctrl-play:hover {
+  background: rgba(56, 139, 253, 0.28);
+  border-color: #58a6ff;
+  color: #fff;
+}
+
+.btn-ctrl-speed-group {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.btn-ctrl-speed {
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  background: #161b22;
+  color: #8b949e;
+  font-size: 0.74rem;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.btn-ctrl-speed.active {
+  border-color: #58a6ff;
+  color: #58a6ff;
+  background: rgba(56, 139, 253, 0.12);
+  font-weight: 700;
+}
+
+/* Scrubber de Tempo */
+.dashboard-scrubber-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.timeline-scrubber {
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: #21262d;
+  accent-color: #58a6ff;
+  cursor: pointer;
+  outline: none;
+}
+
+.scrubber-time-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  color: #e3b341;
+  font-weight: 700;
+  min-width: 68px;
+  text-align: right;
+}
+
+/* Botões de Etapas */
+.converter-stage-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.converter-stage-buttons button {
+  flex: 1;
+  min-width: 90px;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #0d1117;
+  padding: 8px 6px;
+  color: #c9d1d9;
+  font: inherit;
+  font-size: 0.76rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.converter-stage-buttons button:hover {
+  border-color: #58a6ff;
+  color: #fff;
+}
+
+.converter-stage-buttons button.active {
+  border-color: #58a6ff;
+  background: rgba(56, 139, 253, 0.15);
+  color: #79c0ff;
+  font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(88, 166, 255, 0.2);
+}
+
+/* Seletor de Canais do Osciloscópio */
+.converter-channel-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 1px solid #21262d;
+  padding-bottom: 6px;
+}
+
+.converter-channel-tabs button {
+  border: none;
+  background: none;
+  color: #8b949e;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.converter-channel-tabs button:hover {
+  color: #c9d1d9;
+}
+
+.converter-channel-tabs button.active {
+  color: #58a6ff;
+  background: rgba(56, 139, 253, 0.12);
+}
+
+/* Card Didático da Etapa */
+.converter-stage-card,
+.converter-dashboard-formula {
+  border: 1px solid #30363d;
+  border-radius: 12px;
+  background: #0d1117;
+  padding: 12px 14px;
+}
+
+.converter-stage-card .stage-number {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #8b949e;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.converter-stage-card h5 {
+  margin: 6px 0 2px;
+  color: #f0f6fc;
+  font-size: 0.98rem;
+}
+
+.converter-stage-card .stage-interval {
+  margin: 0 0 10px;
+  color: #58a6ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+/* Grid de Telemetria Instantânea nos Componentes */
+.stage-telemetry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.telemetry-cell {
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  background: #161b22;
+  padding: 7px 10px;
+}
+
+.telemetry-cell-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.68rem;
+  color: #8b949e;
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.telemetry-cell-val {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #f0f6fc;
+}
+
+.telemetry-cell-val.highlight-v { color: #58a6ff; }
+.telemetry-cell-val.highlight-i { color: #3fb950; }
+.telemetry-cell-val.highlight-warn { color: #f85149; }
+.telemetry-cell-val.highlight-zero { color: #8b949e; }
+
+.stage-note {
+  margin: 10px 0 0;
+  color: #b1bac4;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.converter-dashboard-formula span {
+  display: block;
+  color: #8b949e;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.converter-dashboard-formula strong {
+  display: block;
+  margin-top: 5px;
+  color: #e3b341;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 960px) {
+  .converter-dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+  .converter-dashboard-head {
+    flex-direction: column;
+  }
+  .converter-dashboard-tags {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 620px) {
+  .converter-dashboard-layout {
+    padding: 10px;
+  }
+  .stage-telemetry-grid {
+    grid-template-columns: 1fr;
+  }
+  .converter-stage-buttons {
+    flex-direction: column;
+  }
+}
+

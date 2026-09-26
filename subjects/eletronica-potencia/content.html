@@ -467,56 +467,8 @@
             Ele é composto por uma chave controlada \(S\) (MOSFET/IGBT), um diodo de roda-livre \(D\), um indutor de armazenamento \(L\) e um filtro capacitivo \(C\) em paralelo com a carga \(R\).
           </p>
 
-          <!-- Diagrama SVG do Conversor Buck -->
-          <div class="diagram-container">
-            <svg viewBox="0 0 540 180" class="diagram-svg" style="max-width: 500px;">
-              <!-- Fonte Vin -->
-              <circle cx="50" cy="90" r="22" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
-              <text x="50" y="86" fill="#58a6ff" font-size="12" font-weight="bold" text-anchor="middle">Vin</text>
-              <text x="50" y="102" fill="#8b949e" font-size="10" text-anchor="middle">+  -</text>
-              <!-- Fio Superior -->
-              <line x1="50" y1="68" x2="50" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="50" y1="40" x2="130" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <!-- Chave S -->
-              <circle cx="130" cy="40" r="3" fill="#39c5cf"/>
-              <line x1="130" y1="40" x2="175" y2="25" stroke="#39c5cf" stroke-width="2.5"/>
-              <circle cx="180" cy="40" r="3" fill="#39c5cf"/>
-              <text x="155" y="18" fill="#39c5cf" font-size="12" font-weight="bold" text-anchor="middle">S (Chave)</text>
-              <!-- Nó de Comutação -->
-              <line x1="180" y1="40" x2="220" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="220" cy="40" r="3" fill="#e6edf3"/>
-              <!-- Diodo D (Roda-Livre) -->
-              <line x1="220" y1="40" x2="220" y2="70" stroke="#e6edf3" stroke-width="2"/>
-              <polygon points="210,105 230,105 220,80" fill="#f85149" stroke="#f85149" stroke-width="1.5"/>
-              <line x1="210" y1="80" x2="230" y2="80" stroke="#f85149" stroke-width="2"/>
-              <line x1="220" y1="105" x2="220" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="242" y="95" fill="#f85149" font-size="12" font-weight="bold">D</text>
-              <!-- Indutor L -->
-              <path d="M 220,40 Q 235,22 250,40 Q 265,22 280,40 Q 295,22 310,40 Q 325,22 340,40" fill="none" stroke="#3fb950" stroke-width="2.5"/>
-              <text x="280" y="16" fill="#3fb950" font-size="12" font-weight="bold" text-anchor="middle">L (Indutor)</text>
-              <!-- Nó pós L -->
-              <line x1="340" y1="40" x2="400" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="400" cy="40" r="3" fill="#e6edf3"/>
-              <!-- Capacitor C -->
-              <line x1="400" y1="40" x2="400" y2="75" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="385" y1="75" x2="415" y2="75" stroke="#bc8cff" stroke-width="2.5"/>
-              <line x1="385" y1="83" x2="415" y2="83" stroke="#bc8cff" stroke-width="2.5"/>
-              <line x1="400" y1="83" x2="400" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="424" y="82" fill="#bc8cff" font-size="12" font-weight="bold">C</text>
-              <!-- Fio para Carga R -->
-              <line x1="400" y1="40" x2="480" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="480" y1="40" x2="480" y2="65" stroke="#e6edf3" stroke-width="2"/>
-              <rect x="470" y="65" width="20" height="40" fill="#161b22" stroke="#d29922" stroke-width="2"/>
-              <line x1="480" y1="105" x2="480" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="502" y="88" fill="#d29922" font-size="12" font-weight="bold">R (Carga)</text>
-              <!-- Tensão de Saída Vo -->
-              <text x="480" y="24" fill="#39c5cf" font-size="11" text-anchor="middle">+ Vo -</text>
-              <!-- Retorno de Terra Comum -->
-              <line x1="50" y1="112" x2="50" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="50" y1="140" x2="480" y2="140" stroke="#e6edf3" stroke-width="2"/>
-            </svg>
-            <span class="diagram-caption">Figura 4.1: Diagrama esquemático do conversor CC-CC Buck.</span>
-          </div>
+          <!-- Simulador Dinâmico & Osciloscópio do Conversor Buck -->
+          <div id="dashboard-host-mod4" class="converter-dashboard-slot"></div>
 
           <h3>4.2 As Duas Etapas de Operação em CCM</h3>
           <p>
@@ -662,54 +614,8 @@
             Ao contrário do Buck, o indutor \(L\) fica posicionado em série com a fonte de entrada \(V_{in}\), o que proporciona uma corrente de entrada contínua e suave, de baixo ruído eletromagnético.
           </p>
 
-          <!-- Diagrama SVG do Conversor Boost -->
-          <div class="diagram-container">
-            <svg viewBox="0 0 540 180" class="diagram-svg" style="max-width: 500px;">
-              <!-- Fonte Vin -->
-              <circle cx="50" cy="90" r="22" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
-              <text x="50" y="86" fill="#58a6ff" font-size="12" font-weight="bold" text-anchor="middle">Vin</text>
-              <text x="50" y="102" fill="#8b949e" font-size="10" text-anchor="middle">+  -</text>
-              <line x1="50" y1="68" x2="50" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="50" y1="40" x2="90" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <!-- Indutor L na entrada -->
-              <path d="M 90,40 Q 105,22 120,40 Q 135,22 150,40 Q 165,22 180,40 Q 195,22 210,40" fill="none" stroke="#3fb950" stroke-width="2.5"/>
-              <text x="150" y="16" fill="#3fb950" font-size="12" font-weight="bold" text-anchor="middle">L (Indutor)</text>
-              <!-- Nó de comutação intermediário -->
-              <line x1="210" y1="40" x2="250" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="250" cy="40" r="3" fill="#e6edf3"/>
-              <!-- Chave S para o terra -->
-              <line x1="250" y1="40" x2="250" y2="70" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="250" cy="70" r="3" fill="#39c5cf"/>
-              <line x1="250" y1="70" x2="268" y2="105" stroke="#39c5cf" stroke-width="2.5"/>
-              <circle cx="250" cy="110" r="3" fill="#39c5cf"/>
-              <line x1="250" y1="110" x2="250" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="280" y="92" fill="#39c5cf" font-size="12" font-weight="bold">S</text>
-              <!-- Diodo D em série com a saída -->
-              <line x1="250" y1="40" x2="295" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <polygon points="295,30 295,50 320,40" fill="#f85149" stroke="#f85149" stroke-width="1.5"/>
-              <line x1="320" y1="30" x2="320" y2="50" stroke="#f85149" stroke-width="2"/>
-              <text x="307" y="24" fill="#f85149" font-size="12" font-weight="bold" text-anchor="middle">D</text>
-              <line x1="320" y1="40" x2="380" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="380" cy="40" r="3" fill="#e6edf3"/>
-              <!-- Capacitor C -->
-              <line x1="380" y1="40" x2="380" y2="75" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="365" y1="75" x2="395" y2="75" stroke="#bc8cff" stroke-width="2.5"/>
-              <line x1="365" y1="83" x2="395" y2="83" stroke="#bc8cff" stroke-width="2.5"/>
-              <line x1="380" y1="83" x2="380" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="404" y="82" fill="#bc8cff" font-size="12" font-weight="bold">C</text>
-              <!-- Carga R -->
-              <line x1="380" y1="40" x2="470" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="470" y1="40" x2="470" y2="65" stroke="#e6edf3" stroke-width="2"/>
-              <rect x="460" y="65" width="20" height="40" fill="#161b22" stroke="#d29922" stroke-width="2"/>
-              <line x1="470" y1="105" x2="470" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="492" y="88" fill="#d29922" font-size="12" font-weight="bold">R</text>
-              <text x="470" y="24" fill="#39c5cf" font-size="11" text-anchor="middle">+ Vo -</text>
-              <!-- Linha de Terra -->
-              <line x1="50" y1="112" x2="50" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="50" y1="140" x2="470" y2="140" stroke="#e6edf3" stroke-width="2"/>
-            </svg>
-            <span class="diagram-caption">Figura 5.1: Diagrama esquemático do conversor CC-CC Boost.</span>
-          </div>
+          <!-- Simulador Dinâmico & Osciloscópio do Conversor Boost -->
+          <div id="dashboard-host-mod5" class="converter-dashboard-slot"></div>
 
           <h3>5.2 As Etapas e Dedução de \(M(D)\)</h3>
           <p><strong>1ª Etapa (\(0 \le t \le D T_s\) — Chave \(S\) LIGADA, Diodo \(D\) REVERSO):</strong></p>
@@ -824,51 +730,8 @@
             da saída e a tensão elétrica no terminal de saída é \(v_{out}=-V_o\), pois a topologia é inversora.
           </p>
 
-          <!-- Diagrama SVG do Conversor Buck-Boost -->
-          <div class="diagram-container">
-            <svg viewBox="0 0 540 180" class="diagram-svg" style="max-width: 500px;">
-              <!-- Fonte Vin -->
-              <circle cx="50" cy="90" r="22" fill="#161b22" stroke="#58a6ff" stroke-width="2"/>
-              <text x="50" y="86" fill="#58a6ff" font-size="12" font-weight="bold" text-anchor="middle">Vin</text>
-              <text x="50" y="102" fill="#8b949e" font-size="10" text-anchor="middle">+  -</text>
-              <line x1="50" y1="68" x2="50" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="50" y1="40" x2="110" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <!-- Chave S na entrada -->
-              <circle cx="110" cy="40" r="3" fill="#39c5cf"/>
-              <line x1="110" y1="40" x2="155" y2="25" stroke="#39c5cf" stroke-width="2.5"/>
-              <circle cx="160" cy="40" r="3" fill="#39c5cf"/>
-              <text x="135" y="18" fill="#39c5cf" font-size="12" font-weight="bold" text-anchor="middle">S</text>
-              <line x1="160" y1="40" x2="210" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="210" cy="40" r="3" fill="#e6edf3"/>
-              <!-- Indutor L em paralelo para o terra -->
-              <path d="M 210,40 Q 192,55 210,70 Q 192,85 210,100 Q 192,115 210,130 Q 192,135 210,140" fill="none" stroke="#3fb950" stroke-width="2.5"/>
-              <text x="175" y="95" fill="#3fb950" font-size="12" font-weight="bold" text-anchor="middle">L</text>
-              <!-- Diodo D invertido apontando para a esquerda -->
-              <line x1="210" y1="40" x2="270" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <polygon points="295,40 320,30 320,50" fill="#f85149" stroke="#f85149" stroke-width="1.5"/>
-              <line x1="295" y1="30" x2="295" y2="50" stroke="#f85149" stroke-width="2"/>
-              <text x="307" y="24" fill="#f85149" font-size="12" font-weight="bold" text-anchor="middle">D (Invertido)</text>
-              <line x1="320" y1="40" x2="380" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <circle cx="380" cy="40" r="3" fill="#e6edf3"/>
-              <!-- Capacitor C -->
-              <line x1="380" y1="40" x2="380" y2="75" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="365" y1="75" x2="395" y2="75" stroke="#bc8cff" stroke-width="2.5"/>
-              <line x1="365" y1="83" x2="395" y2="83" stroke="#bc8cff" stroke-width="2.5"/>
-              <line x1="380" y1="83" x2="380" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="404" y="82" fill="#bc8cff" font-size="12" font-weight="bold">C</text>
-              <!-- Carga R com polaridade negativa -->
-              <line x1="380" y1="40" x2="470" y2="40" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="470" y1="40" x2="470" y2="65" stroke="#e6edf3" stroke-width="2"/>
-              <rect x="460" y="65" width="20" height="40" fill="#161b22" stroke="#d29922" stroke-width="2"/>
-              <line x1="470" y1="105" x2="470" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <text x="492" y="88" fill="#d29922" font-size="12" font-weight="bold">R</text>
-              <text x="470" y="24" fill="#f85149" font-size="11" text-anchor="middle">- Vo + (Invertida)</text>
-              <!-- Linha de Terra -->
-              <line x1="50" y1="112" x2="50" y2="140" stroke="#e6edf3" stroke-width="2"/>
-              <line x1="50" y1="140" x2="470" y2="140" stroke="#e6edf3" stroke-width="2"/>
-            </svg>
-            <span class="diagram-caption">Figura 6.1: Diagrama esquemático do conversor CC-CC Buck-Boost.</span>
-          </div>
+          <!-- Simulador Dinâmico & Osciloscópio do Conversor Buck-Boost -->
+          <div id="dashboard-host-mod6" class="converter-dashboard-slot"></div>
 
           <h3>6.2 Dedução do Ganho e Relações de Corrente</h3>
           <p><strong>1ª Etapa (\(0 \le t \le D T_s\)):</strong> \(S\) conduz, \(D\) bloqueado. \(v_L(t) = V_{in}\). O indutor armazena energia exclusivamente da entrada.</p>
@@ -983,6 +846,9 @@
           <h3>7.2 As 3 Etapas de Operação em DCM</h3>
           <p>Em DCM, o período \(T_s\) é dividido em três intervalos normalizados: \(D_1 T_s\) (ou \(D T_s\)), \(D_2 T_s\) e \(D_3 T_s\), onde \(D_1 + D_2 + D_3 = 1\):</p>
 
+          <!-- Simulador Dinâmico & Osciloscópio do Conversor Buck em DCM -->
+          <div id="dashboard-host-mod7" class="converter-dashboard-slot"></div>
+
           <ol>
             <li><strong>Etapa 1 (\(0 \le t \le D T_s\)):</strong> Chave \(S\) conduz, \(D\) bloqueado. 
               A corrente \(i_L(t)\) parte de zero e cresce linearmente até o valor de pico:
@@ -1083,6 +949,9 @@
           </div>
 
           <h3>8.2 As 3 Etapas e Dedução do Ganho em DCM</h3>
+
+          <!-- Simulador Dinâmico & Osciloscópio do Conversor Boost em DCM -->
+          <div id="dashboard-host-mod8" class="converter-dashboard-slot"></div>
           <p><strong>1ª Etapa (\(D T_s\)):</strong> \(S\) conduz, \(v_L = V_{in}\). A corrente sobe de 0 a \(I_{pk} = \frac{V_{in} D T_s}{L}\).</p>
           <p><strong>2ª Etapa (\(D_2 T_s\)):</strong> \(S\) abre, \(D\) conduz, \(v_L = V_{in} - V_o\). A corrente cai a zero no tempo \(D_2 T_s\):</p>
           $$V_{in} D + (V_{in} - V_o) D_2 = 0 \implies D_2 = D \cdot \frac{V_{in}}{V_o - V_{in}} = \frac{D}{M - 1}$$
@@ -1166,6 +1035,9 @@
           </div>
 
           <h3>9.2 As 3 Etapas e a Elegância de \(M(D, K)\)</h3>
+
+          <!-- Simulador Dinâmico & Osciloscópio do Conversor Buck-Boost em DCM -->
+          <div id="dashboard-host-mod9" class="converter-dashboard-slot"></div>
           <p><strong>1ª Etapa (\(D T_s\)):</strong> \(S\) conduz, \(v_L = V_{in}\), \(I_{pk} = \frac{V_{in} D T_s}{L}\).</p>
           <p><strong>2ª Etapa (\(D_2 T_s\)):</strong> \(S\) abre, \(D\) conduz, \(v_L = -V_o\). Por volts-segundo:</p>
           $$V_{in} D - V_o D_2 = 0 \implies D_2 = D \cdot \frac{V_{in}}{V_o} = \frac{D}{M}$$

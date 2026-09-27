@@ -10,6 +10,10 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
+  // Header icons live outside #subjectContent, so hydrate the whole shell once.
+  // Without this, the mobile menu button exists but its menu icon is invisible.
+  if (window.UiIcons) window.UiIcons.hydrate(document);
+
   var base = "subjects/" + safeId + "/";
   var manifest;
 
@@ -231,14 +235,31 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
 
+    mobileToggle.setAttribute("aria-expanded", "false");
+
+    function setMobileSidebar(open) {
+      sidebar.classList.toggle("open", open);
+      mobileToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      mobileToggle.setAttribute("aria-label", open ? "Fechar índice de tópicos" : "Abrir índice de tópicos");
+      document.body.classList.toggle("sidebar-open", open && window.innerWidth <= 980);
+    }
+
     mobileToggle.addEventListener("click", function () {
-      sidebar.classList.toggle("open");
+      setMobileSidebar(!sidebar.classList.contains("open"));
     });
 
     navItems.forEach(function (item) {
       item.addEventListener("click", function () {
-        if (window.innerWidth <= 980) sidebar.classList.remove("open");
+        if (window.innerWidth <= 980) setMobileSidebar(false);
       });
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && sidebar.classList.contains("open")) setMobileSidebar(false);
+    });
+
+    window.addEventListener("resize", function () {
+      if (window.innerWidth > 980) setMobileSidebar(false);
     });
 
     var sections = document.querySelectorAll(".module-section, .calculator-section, #cheatSheetSection, #quizSection");

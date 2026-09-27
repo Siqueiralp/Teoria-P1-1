@@ -52,8 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function applyManifest(config) {
     document.title = config.name + (config.badge ? " — " + config.badge : "") + " | Guia de Estudos";
-    document.getElementById("subjectTitle").textContent = config.name;
-    document.getElementById("subjectBadge").textContent = config.badge || "";
+    document.getElementById("subjectTitle").textContent = config.shortName || config.name;
     var iconHost = document.getElementById("subjectIcon");
     iconHost.innerHTML = "";
     iconHost.appendChild(window.UiIcons ? window.UiIcons.create(config.icon || "book") : document.createTextNode(""));

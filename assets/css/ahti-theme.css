@@ -136,3 +136,85 @@ button { font-family: inherit; }
 @media (forced-colors: active) {
   :focus-visible { outline-color: Highlight; }
 }
+
+
+/* Compact study-guide header: one navigation action per purpose. */
+.header-brand {
+  cursor: default;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.header-brand .brand-text {
+  min-width: 0;
+}
+
+.header-brand .brand-text h1 {
+  min-width: 0;
+}
+
+.back-to-subjects {
+  width: 44px;
+  min-width: 44px;
+  padding-inline: 0;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .site-header {
+    padding-inline: 12px;
+    gap: 8px;
+  }
+
+  .header-brand-wrap {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .header-brand {
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    border-radius: 8px;
+  }
+
+  .brand-text {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .brand-text h1 {
+    display: block;
+    font-size: 1rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .brand-text p {
+    display: none;
+  }
+
+  .header-progress-container {
+    flex: 0 0 auto;
+    margin-left: auto;
+    gap: 0;
+  }
+
+  .header-actions {
+    flex: 0 0 auto;
+  }
+
+  .mobile-menu-toggle,
+  .back-to-subjects {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+}

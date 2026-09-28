@@ -21,12 +21,18 @@ for (const config of Object.values(context.CONVERTER_CONFIGS)) {
     const mean = key => segments.reduce((sum, s) => sum + (s.left[key] + s.right[key]) / 2 * (s.end - s.start), 0);
     close(mean('vL'), 0);
     close(mean('iC'), 0);
+    close(context.capacitorVoltageAt(config, 0), context.capacitorVoltageAt(config, 1), 1e-7);
+    assert.ok(context.capacitorRipple(config) > 0);
     close(p.Vin * mean('iIn'), p.Vo * p.Io);
     close(p.D + p.D2 + p.D3, 1);
     for (const s of segments) {
       close((s.right.iL - s.left.iL) / ((s.end - s.start) / p.fs), s.left.vL / p.L, 1e-3);
       for (let i = 0; i < 20; i++) {
-        const state = context.calculateInstantState(config, s.start + (i + 0.5) / 20 * (s.end - s.start));
+        const tau = s.start + (i + 0.5) / 20 * (s.end - s.start);
+        const state = context.calculateInstantState(config, tau);
+        const h = Math.min(1e-5, (s.end - s.start) / 1000);
+        const dvDtau = (context.capacitorVoltageAt(config, tau + h) - context.capacitorVoltageAt(config, tau - h)) / (2 * h);
+        close(dvDtau, state.iC / (p.C * p.fs), 2e-4);
         close(state.iS + state.iD, state.iL);
         close(state.iC + p.Io, config.topology === 'buck' ? state.iL : state.iD);
         assert.ok(state.iL >= 0 && state.iD >= 0 && state.vD <= 1e-10);

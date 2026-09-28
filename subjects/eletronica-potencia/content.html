@@ -235,6 +235,55 @@
             $$i_C(t) = C \frac{dv_C(t)}{dt} \iff v_C(t) = v_C(t_0) + \frac{1}{C} \int_{t_0}^t i_C(\tau) \, d\tau$$
           </div>
 
+          <div class="waveform-canvas-box component-dynamics-figure">
+            <div class="converter-box-title">
+              <span>Como corrente e tensão se relacionam em L e C durante um período</span>
+              <span>RPP</span>
+            </div>
+            <svg viewBox="0 0 760 430" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Formas de onda de corrente no indutor, corrente no capacitor e tensão no capacitor em um período de chaveamento">
+              <g fill="none" stroke="var(--ahti-border)" stroke-width="1">
+                <line x1="82" y1="42" x2="82" y2="382"/>
+                <line x1="82" y1="112" x2="704" y2="112" stroke-dasharray="4 5"/>
+                <line x1="82" y1="230" x2="704" y2="230"/>
+                <line x1="82" y1="350" x2="704" y2="350" stroke-dasharray="4 5"/>
+                <line x1="393" y1="42" x2="393" y2="382" stroke-dasharray="5 5"/>
+                <line x1="704" y1="42" x2="704" y2="382" stroke-dasharray="5 5"/>
+              </g>
+
+              <g fill="var(--ahti-text)" font-family="sans-serif" font-size="16">
+                <text x="24" y="82">iL</text>
+                <text x="24" y="234">iC</text>
+                <text x="24" y="354">vC</text>
+                <text x="376" y="408">D·Ts</text>
+                <text x="687" y="408">Ts</text>
+              </g>
+
+              <path d="M82 112 L393 62 L704 112" fill="none" stroke="var(--ahti-success)" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M82 270 L393 190 L704 270" fill="none" stroke="var(--ahti-capacitor)" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M82 350 C150 386 218 386 289 350 C360 314 429 314 500 350 C570 386 638 386 704 350"
+                    fill="none" stroke="var(--ahti-info)" stroke-width="4" stroke-linecap="round"/>
+
+              <g fill="var(--ahti-subtle)" font-family="sans-serif" font-size="13">
+                <text x="88" y="103">corrente média IL</text>
+                <text x="88" y="222">iC = 0</text>
+                <text x="88" y="342">vC(t₀)</text>
+                <text x="470" y="177">iC &gt; 0 → vC sobe</text>
+                <text x="118" y="292">iC &lt; 0 → vC desce</text>
+                <text x="508" y="331">extremo de vC quando iC = 0</text>
+              </g>
+            </svg>
+            <p class="converter-conventions">
+              O capacitor não transforma uma corrente triangular em uma tensão triangular. Como a tensão é a integral da corrente,
+              trechos lineares de <strong>iC</strong> produzem trechos parabólicos em <strong>vC</strong>. O sinal de iC determina a inclinação de vC.
+            </p>
+          </div>
+
+          <div class="formula-block">
+            <span class="formula-tag">Tensão no capacitor a partir da corrente</span>
+            $v_C(t)=v_C(t_0)+\frac{1}{C}\int_{t_0}^{t} i_C(\tau)\,d\tau$
+            <p>Consequência direta: \(dv_C/dt=i_C/C\). Portanto, \(i_C=0\) nos máximos e mínimos de \(v_C\), exatamente como indicado no gráfico.</p>
+          </div>
+
           <h3>2.2 O Princípio do Balanço de Volts-Segundo no Indutor</h3>
           <p>
             No Regime Permanente Periódico com período \(T_s\), o estado magnético do indutor deve se repetir rigorosamente ao final de cada ciclo: 

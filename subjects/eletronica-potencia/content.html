@@ -432,6 +432,46 @@
             esse efeito favorece o uso de diodos <em>Ultra-Fast Recovery</em>, Schottky ou dispositivos SiC, conforme a aplicação.
           </p>
 
+          <div class="waveform-canvas-box component-dynamics-figure">
+            <div class="converter-box-title">
+              <span>Diodo de potência: tensão e corrente durante a comutação</span>
+              <span>vD(t) × iD(t)</span>
+            </div>
+            <svg viewBox="0 0 760 350" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Formas de onda qualitativas da corrente e tensão do diodo durante condução, recuperação reversa e bloqueio">
+              <g fill="none" stroke="var(--ahti-border)" stroke-width="1">
+                <line x1="82" y1="35" x2="82" y2="300"/>
+                <line x1="82" y1="135" x2="708" y2="135"/>
+                <line x1="82" y1="265" x2="708" y2="265"/>
+                <line x1="420" y1="35" x2="420" y2="300" stroke-dasharray="5 5"/>
+                <line x1="520" y1="35" x2="520" y2="300" stroke-dasharray="5 5"/>
+              </g>
+              <g fill="var(--ahti-text)" font-family="sans-serif" font-size="15">
+                <text x="24" y="90">iD</text>
+                <text x="24" y="235">vD</text>
+                <text x="392" y="326">início da recuperação</text>
+                <text x="496" y="326">fim de trr</text>
+              </g>
+
+              <path d="M82 76 L420 76 L455 135 L482 184 L520 135 L708 135"
+                    fill="none" stroke="var(--ahti-success)" stroke-width="4" stroke-linejoin="round"/>
+              <path d="M82 245 L420 245 L475 242 L520 286 L708 286"
+                    fill="none" stroke="var(--ahti-info)" stroke-width="4" stroke-linejoin="round"/>
+
+              <g fill="var(--ahti-subtle)" font-family="sans-serif" font-size="13">
+                <text x="92" y="65">condução: iD &gt; 0</text>
+                <text x="442" y="202">IRRM</text>
+                <text x="545" y="125">iD ≈ 0</text>
+                <text x="92" y="233">vD ≈ VT0 + rD·iD</text>
+                <text x="548" y="304">vD ≈ −VR</text>
+                <text x="432" y="45">Qrr = área de |iD| durante a recuperação</text>
+              </g>
+            </svg>
+            <p class="converter-conventions">
+              Na recuperação reversa, a corrente muda de sinal antes de o diodo recuperar a capacidade de bloqueio.
+              É justamente a sobreposição entre corrente reversa e tensão reversa que produz energia de comutação.
+            </p>
+          </div>
+
           <!-- Exercício Resolvido Módulo 3 -->
           <div class="exercise-box">
             <div class="exercise-header">

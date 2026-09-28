@@ -425,9 +425,11 @@ body {
    ÁREA DE CONTEÚDO DIDÁTICO (TEXTBOOK / DASHBOARD)
    ========================================================================== */
 .content-area {
-  flex: 1;
-  max-width: 1040px;
-  margin: 0 auto;
+  flex: 1 1 0;
+  width: calc(100vw - var(--sidebar-width));
+  max-width: none;
+  min-width: 0;
+  margin: 0;
   padding: 36px 32px 80px 32px;
   overflow-x: hidden;
 }
@@ -1156,6 +1158,11 @@ body {
 }
 
 @media (max-width: 980px) {
+  .content-area {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
   .mobile-menu-toggle {
     display: flex;
   }
@@ -1309,9 +1316,9 @@ body {
 
 .converter-dashboard-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 350px;
+  grid-template-columns: minmax(0, 1.65fr) minmax(380px, 0.85fr);
   align-items: start;
-  gap: 16px;
+  gap: 18px;
   padding: 16px;
 }
 
@@ -1692,13 +1699,13 @@ body {
   border-radius: 12px;
   background: var(--ahti-bg);
   padding: 12px 14px;
-  height: 172px;
   min-height: 172px;
-  max-height: 172px;
+  height: auto;
+  max-height: none;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow: visible;
 }
 
 .converter-stage-card .stage-number {
@@ -1725,9 +1732,10 @@ body {
   color: var(--ahti-info);
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 0.76rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
   flex-shrink: 0;
 }
 
@@ -1750,10 +1758,11 @@ body {
   border: 1px solid var(--ahti-border);
   border-radius: 8px;
   background: var(--ahti-surface);
-  padding: 6px 10px;
-  height: 50px;
+  padding: 8px 10px;
   min-height: 50px;
-  max-height: 50px;
+  height: auto;
+  max-height: none;
+  min-width: 0;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -1777,10 +1786,11 @@ body {
   font-size: 0.88rem;
   font-weight: 700;
   color: var(--ahti-text);
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.3;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
 }
 
 .telemetry-cell-val.highlight-v { color: var(--ahti-info); }

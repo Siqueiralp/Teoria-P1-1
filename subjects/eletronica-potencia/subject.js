@@ -372,7 +372,7 @@ var CONVERTER_CONFIGS = {};
     id: id, topology: topology, mode: mode, title: names[topology] + ' em ' + mode,
     params: { Vin: Vin, Vo: Vo, D: D, D2: D2, D3: Math.max(0, 1 - D - D2),
       Imin: Imin, Imax: Imax, Ipk: Imax, deltaIL: Imax - Imin, ILavg: ILavg,
-      Io: Io, fs: fs, L: L, R: Vo / Io },
+      Io: Io, fs: fs, L: L, C: 100e-6, R: Vo / Io },
     stages: stages,
     formula: mode === 'CCM'
       ? ({ buck: 'Vo/Vin = D', boost: 'Vo/Vin = 1/(1 − D)', buckboost: 'vout/Vin = −D/(1 − D)' })[topology]
@@ -424,6 +424,56 @@ function calculateInstantState(config, tau) {
     iCDown: ((buck ? iL : iD) - p.Io) * (config.topology === 'buckboost' ? -1 : 1),
     iOutDown: p.Io * (config.topology === 'buckboost' ? -1 : 1)
   };
+}
+
+function integrateCapacitorVoltageRise(config, tau) {
+  var p = config.params;
+  tau = Math.max(0, Math.min(1, tau));
+  if (!p.C || !p.fs || tau <= 0) return 0;
+
+  var breaks = [0, p.D, p.D + p.D2, 1]
+    .filter(function (value, index, array) {
+      return value >= 0 && value <= 1 && array.indexOf(value) === index;
+    })
+    .sort(function (a, b) { return a - b; });
+
+  var normalizedCharge = 0;
+  for (var i = 0; i < breaks.length - 1; i++) {
+    var a = breaks[i], b = breaks[i + 1];
+    if (a >= tau) break;
+    var end = Math.min(b, tau);
+    if (end <= a) continue;
+    var epsilon = Math.min(1e-9, (end - a) * 1e-5);
+    var leftTau = Math.min(end, a + epsilon);
+    var rightTau = Math.max(a, end - epsilon);
+    var iLeft = calculateInstantState(config, leftTau).iC;
+    var iRight = calculateInstantState(config, rightTau).iC;
+    normalizedCharge += (iLeft + iRight) * 0.5 * (end - a);
+    if (end === tau) break;
+  }
+  return normalizedCharge / (p.C * p.fs);
+}
+
+function capacitorVoltageAt(config, tau) {
+  var p = config.params;
+  if (!Number.isFinite(config._capVoltageMeanRise)) {
+    var samples = 256, sum = 0;
+    for (var i = 0; i < samples; i++) {
+      sum += integrateCapacitorVoltageRise(config, (i + 0.5) / samples);
+    }
+    config._capVoltageMeanRise = sum / samples;
+  }
+  return p.Vo + integrateCapacitorVoltageRise(config, tau) - config._capVoltageMeanRise;
+}
+
+function capacitorRipple(config) {
+  var lo = Infinity, hi = -Infinity;
+  for (var i = 0; i <= 256; i++) {
+    var v = capacitorVoltageAt(config, i / 256);
+    lo = Math.min(lo, v);
+    hi = Math.max(hi, v);
+  }
+  return hi - lo;
 }
 
 function converterEvents(config) {
@@ -585,7 +635,7 @@ function createAnimatedConverterSimulator(host, config) {
             '<div class="converter-channel-tabs" data-role="simChannelTabs">' +
               '<button type="button" data-chan="indutor" class="active">Indutor (vL, iL)</button>' +
               '<button type="button" data-chan="semicondutores">Semicondutores (S, D)</button>' +
-              '<button type="button" data-chan="filtro">Capacitor (iC)</button>' +
+              '<button type="button" data-chan="filtro">Capacitor (vC, iC)</button>' +
             '</div>' +
           '</div>' +
           '<div class="converter-scope-svg" data-role="simScopeSvg"></div>' +
@@ -593,7 +643,7 @@ function createAnimatedConverterSimulator(host, config) {
             '<span><i class="legend-vl"></i> vL(t) Tensão</span>' +
             '<span><i class="legend-current"></i> iL(t) Corrente</span>' +
             '<span><i class="legend-sw"></i> iS Chave</span>' +
-            '<span><i class="legend-idle"></i> iD / iC</span>' +
+            '<span><i class="legend-idle"></i> vC / iD / iC</span>' +
           '</div>' +
         '</div>' +
       '</div>' +
@@ -623,6 +673,7 @@ function createAnimatedConverterSimulator(host, config) {
           '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iS (Chave)</span><span>S</span></div><div class="telemetry-cell-val" data-role="telIS">2.10 A</div></div>' +
           '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>vD (Diodo)</span><span>D</span></div><div class="telemetry-cell-val highlight-warn" data-role="telVD">-24.0 V</div></div>' +
           '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iD (Diodo)</span><span>D</span></div><div class="telemetry-cell-val" data-role="telID">0.0 A</div></div>' +
+          '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>vC (Capacitor)</span><span>C</span></div><div class="telemetry-cell-val highlight-v" data-role="telVC">' + config.params.Vo.toFixed(2) + ' V</div></div>' +
           '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>iC (Capacitor)</span><span>C</span></div><div class="telemetry-cell-val" data-role="telIC">+0.10 A</div></div>' +
           '<div class="telemetry-cell"><div class="telemetry-cell-label"><span>Saída (vout, |Io|)</span><span>R</span></div><div class="telemetry-cell-val" data-role="telVo">' + (config.topology === 'buckboost' ? '−' : '') + config.params.Vo + 'V / ' + config.params.Io.toFixed(2) + 'A</div></div>' +
         '</div>' +
@@ -630,7 +681,12 @@ function createAnimatedConverterSimulator(host, config) {
           '<span>Relação Teórica de Ganho</span>' +
           '<strong>' + config.formula + '</strong>' +
         '</div>' +
-        '<p class="converter-conventions">Modelo ideal periódico, saída com pequena ondulação. fs = 50 kHz; L = ' + (config.params.L * 1e6).toFixed(1) + ' µH; R = ' + config.params.R.toFixed(2) + ' Ω. Tempo ampliado para estudo; pontos indicam o sentido, não a velocidade dos elétrons.</p>' +
+        '<div class="converter-dashboard-formula">' +
+          '<span>Tensão no Capacitor</span>' +
+          '<strong>vC(t) = vC(t₀) + (1/C) ∫[t₀→t] iC(τ) dτ</strong>' +
+          '<small>Em RPP: vC(Ts) = vC(0) e ⟨iC⟩ = 0. A inclinação de vC é iC/C; os extremos de vC ocorrem quando iC = 0.</small>' +
+        '</div>' +
+        '<p class="converter-conventions">Modelo ideal periódico, saída com pequena ondulação. fs = 50 kHz; L = ' + (config.params.L * 1e6).toFixed(1) + ' µH; C = ' + (config.params.C * 1e6).toFixed(0) + ' µF; R = ' + config.params.R.toFixed(2) + ' Ω. Tempo ampliado para estudo; pontos indicam o sentido, não a velocidade dos elétrons.</p>' +
       '</div>' +
     '</div>';
 
@@ -654,6 +710,7 @@ function createAnimatedConverterSimulator(host, config) {
   var telIS = container.querySelector('[data-role="telIS"]');
   var telVD = container.querySelector('[data-role="telVD"]');
   var telID = container.querySelector('[data-role="telID"]');
+  var telVC = container.querySelector('[data-role="telVC"]');
   var telIC = container.querySelector('[data-role="telIC"]');
   var eventDetail = container.querySelector('[data-role="simEventDetail"]');
   var capStatus = container.querySelector('[data-role="simCapStatus"]');
@@ -732,6 +789,7 @@ function createAnimatedConverterSimulator(host, config) {
 
   function render() {
     var state = calculateInstantState(config, tau);
+    state.vC = capacitorVoltageAt(config, tau);
     scrubber.value = Math.round(tau * 1000);
     var currentEvent = 0;
     events.forEach(function (event, i) { if (tau + 1e-10 >= event.tau) currentEvent = i; });
@@ -773,6 +831,9 @@ function createAnimatedConverterSimulator(host, config) {
 
     telID.textContent = state.iD.toFixed(2) + ' A';
     telID.className = 'telemetry-cell-val ' + (state.iD > 0 ? 'highlight-i' : 'highlight-zero');
+
+    telVC.textContent = state.vC.toFixed(3) + ' V';
+    telVC.className = 'telemetry-cell-val ' + (state.vC >= config.params.Vo ? 'highlight-v' : 'highlight-warn');
 
     telIC.textContent = (state.iC > 0 ? '+' : '') + state.iC.toFixed(2) + ' A';
     telIC.className = 'telemetry-cell-val ' + (state.iC >= 0 ? 'highlight-i' : 'highlight-v');
@@ -902,6 +963,8 @@ function generateCircuitSvgContent(config) {
   wire('M460 70 V126 M460 144 V200', 'iCDown');
   html += path('M442 126 H478 M442 144 H478', 'var(--ahti-capacitor)');
   html += text(429, 139, 'C', 'var(--ahti-capacitor)');
+  html += text(426, 116, inverted ? '− vC' : '+ vC', 'var(--ahti-capacitor)', 10);
+  html += text(426, 162, inverted ? '+' : '−', 'var(--ahti-capacitor)', 10);
   arrow('M498 112 V160', 'iCDown'); html += text(504, 139, 'iC', 'var(--ahti-capacitor)');
   wire('M460 70 H560 V112 M560 158 V200 H460', 'iOutDown');
   html += '<rect x="550" y="112" width="20" height="46" fill="var(--ahti-surface)" stroke="var(--ahti-warning)" stroke-width="2.5"/>';
@@ -933,7 +996,7 @@ function updateCircuitSvg(box, state, flowPhase) {
   box.querySelector('[data-switch="closed"]').style.display = state.stageIdx === 0 ? '' : 'none';
   box.querySelector('[data-switch="open"]').style.display = state.stageIdx === 0 ? 'none' : '';
   box.querySelector('[data-diode]').style.color = state.stageIdx === 1 ? 'var(--ahti-success)' : 'var(--ahti-danger)';
-  box.querySelector('[data-circuit-status]').textContent = 'vL = ' + state.vL.toFixed(1) + ' V  •  iL = ' + state.iL.toFixed(2) + ' A  •  iC = ' + state.iC.toFixed(2) + ' A';
+  box.querySelector('[data-circuit-status]').textContent = 'vL = ' + state.vL.toFixed(1) + ' V  •  iL = ' + state.iL.toFixed(2) + ' A  •  vC = ' + state.vC.toFixed(3) + ' V  •  iC = ' + state.iC.toFixed(2) + ' A';
 }
 
 function waveformSegments(config) {
@@ -950,9 +1013,13 @@ function waveformSegments(config) {
 function generateOscilloscopeSvgContent(config, state, channel) {
   var x = function (t) { return 62 + 588 * t; };
   var segments = waveformSegments(config);
-  var voltages = channel === 'semicondutores' ? ['vS', 'vD'] : ['vL'];
+  var voltages = channel === 'semicondutores' ? ['vS', 'vD'] : channel === 'filtro' ? ['vC'] : ['vL'];
   var currents = channel === 'filtro' ? ['iC'] : channel === 'semicondutores' ? ['iL', 'iS', 'iD'] : ['iL'];
-  var colors = { vL: 'var(--ahti-info)', vS: 'var(--ahti-warning)', vD: 'var(--ahti-capacitor)', iL: 'var(--ahti-success)', iS: 'var(--ahti-warning)', iD: 'var(--ahti-capacitor)', iC: 'var(--ahti-capacitor)' };
+  var colors = {
+    vL: 'var(--ahti-info)', vS: 'var(--ahti-warning)', vD: 'var(--ahti-capacitor)',
+    vC: 'var(--ahti-capacitor)', iL: 'var(--ahti-success)', iS: 'var(--ahti-warning)',
+    iD: 'var(--ahti-capacitor)', iC: 'var(--ahti-capacitor)'
+  };
   var html = '<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Formas de onda sincronizadas: ' + voltages.concat(currents).join(', ') + '">';
   function text(xp, yp, label, color, anchor) {
     return '<text x="' + xp + '" y="' + yp + '" fill="' + (color || 'var(--ahti-subtle)') + '" font-size="11" font-family="sans-serif" text-anchor="' + (anchor || 'start') + '">' + label + '</text>';
@@ -960,28 +1027,49 @@ function generateOscilloscopeSvgContent(config, state, channel) {
   function line(x1, y1, x2, y2, color, extra) {
     return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + color + '" ' + (extra || '') + '/>';
   }
+  function valueAt(key, tau, fallbackState) {
+    return key === 'vC' ? capacitorVoltageAt(config, tau) : fallbackState[key];
+  }
   converterEvents(config).forEach(function (event) {
     html += line(x(event.tau), 26, x(event.tau), 267, 'var(--ahti-border)', 'stroke-dasharray="3 5"');
   });
   function panel(keys, top, bottom, unit) {
     var values = [0];
-    segments.forEach(function (s) { keys.forEach(function (k) { values.push(s.left[k], s.right[k]); }); });
+    keys.forEach(function (key) {
+      if (key === 'vC') {
+        for (var sample = 0; sample <= 96; sample++) values.push(capacitorVoltageAt(config, sample / 96));
+      } else {
+        segments.forEach(function (s) { values.push(s.left[key], s.right[key]); });
+      }
+    });
     var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
-    var margin = Math.max((hi - lo) * 0.15, 0.05);
+    if (keys.length === 1 && keys[0] === 'vC') {
+      values = values.filter(function (v) { return v !== 0; });
+      lo = Math.min.apply(null, values);
+      hi = Math.max.apply(null, values);
+    }
+    var margin = Math.max((hi - lo) * 0.15, keys[0] === 'vC' ? 0.002 : 0.05);
     var scale = (bottom - top) / (hi - lo + 2 * margin);
     var zero = top + (hi + margin) * scale;
     var y = function (v) { return zero - v * scale; };
     html += text(62, top - 7, keys.join(' / ') + ' [' + unit + ']', 'var(--ahti-text)');
-    html += line(62, zero, 650, zero, 'var(--ahti-control)', 'stroke-dasharray="3 3"');
+    if (lo <= 0 && hi >= 0) html += line(62, zero, 650, zero, 'var(--ahti-control)', 'stroke-dasharray="3 3"');
     [lo, hi].filter(function (v, i, a) { return a.indexOf(v) === i; }).forEach(function (v) {
-      html += text(54, y(v) + 4, v.toFixed(2), 'var(--ahti-subtle)', 'end');
+      html += text(54, y(v) + 4, v.toFixed(keys[0] === 'vC' ? 3 : 2), 'var(--ahti-subtle)', 'end');
     });
-    if (lo !== 0 && hi !== 0) html += text(54, zero + 4, '0', 'var(--ahti-subtle)', 'end');
+    if (lo !== 0 && hi !== 0 && lo < 0 && hi > 0) html += text(54, zero + 4, '0', 'var(--ahti-subtle)', 'end');
     keys.forEach(function (key, index) {
       var d = '';
-      segments.forEach(function (s, i) {
-        d += (i ? ' L' : 'M') + x(s.start) + ' ' + y(s.left[key]) + ' L' + x(s.end) + ' ' + y(s.right[key]);
-      });
+      if (key === 'vC') {
+        for (var sample = 0; sample <= 96; sample++) {
+          var tauSample = sample / 96;
+          d += (sample ? ' L' : 'M') + x(tauSample) + ' ' + y(capacitorVoltageAt(config, tauSample));
+        }
+      } else {
+        segments.forEach(function (s, i) {
+          d += (i ? ' L' : 'M') + x(s.start) + ' ' + y(s.left[key]) + ' L' + x(s.end) + ' ' + y(s.right[key]);
+        });
+      }
       html += '<path data-trace="' + key + '" d="' + d + '" fill="none" stroke="' + colors[key] + '" stroke-width="2.3"' + (index ? ' stroke-dasharray="' + (index === 1 ? '7 4' : '2 4') + '"' : '') + '/>';
       html += text(460 + index * 62, top - 7, key, colors[key]);
       html += '<circle data-scope-dot="' + key + '" data-zero="' + zero + '" data-scale="' + scale + '" r="4" fill="' + colors[key] + '" stroke="#fff"/>';
@@ -989,8 +1077,12 @@ function generateOscilloscopeSvgContent(config, state, channel) {
   }
   panel(voltages, 30, 119, 'V');
   panel(currents, 167, 263, 'A');
-  html += text(62, 143, channel === 'filtro' ? 'iC > 0: carga de C • iC < 0: descarga • média = 0 em regime periódico' :
-    'iL é contínua na comutação; vL muda de sinal e altera a inclinação de iL.', 'var(--ahti-muted)');
+  html += text(62, 143, channel === 'filtro'
+    ? 'dvC/dt = iC/C • iC > 0: vC sobe • iC < 0: vC desce • iC = 0: extremo de vC'
+    : 'iL é contínua na comutação; vL muda de sinal e altera a inclinação de iL.', 'var(--ahti-muted)');
+  if (channel === 'filtro') {
+    html += text(650, 143, 'ΔvC ≈ ' + (capacitorRipple(config) * 1000).toFixed(1) + ' mV', 'var(--ahti-capacitor)', 'end');
+  }
   html += text(62, 283, '0');
   html += text(x(config.params.D), 283, 'D·Ts', 'var(--ahti-subtle)', 'middle');
   if (config.mode === 'DCM') html += text(x(config.params.D + config.params.D2), 283, '(D+D₂)·Ts', 'var(--ahti-capacitor)', 'middle');

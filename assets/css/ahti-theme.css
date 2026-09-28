@@ -218,3 +218,34 @@ button { font-family: inherit; }
     flex: 0 0 44px;
   }
 }
+
+
+/* Desktop: reserve the largest dynamic text state to prevent layout shift during animation. */
+@media (min-width: 601px) {
+  .converter-dashboard {
+    --converter-stage-card-height: 12rem;
+    --converter-event-detail-height: 5.8em;
+    --converter-cap-status-height: 3em;
+  }
+
+  .converter-stage-card {
+    height: var(--converter-stage-card-height);
+    min-height: var(--converter-stage-card-height);
+    max-height: var(--converter-stage-card-height);
+    overflow: visible;
+  }
+
+  .converter-events p {
+    height: var(--converter-event-detail-height);
+    min-height: var(--converter-event-detail-height);
+    max-height: var(--converter-event-detail-height);
+    overflow: visible;
+  }
+
+  .converter-cap-status {
+    height: var(--converter-cap-status-height);
+    min-height: var(--converter-cap-status-height);
+    max-height: var(--converter-cap-status-height);
+    overflow: visible;
+  }
+}

@@ -443,6 +443,97 @@ function converterEvents(config) {
   return events.sort(function (a, b) { return a.tau - b.tau; });
 }
 
+
+function converterStageCardHtml(config, stageIdx) {
+  var stage = config.stages[stageIdx];
+  return '<div class="stage-number"><span>Etapa ' + (stageIdx + 1) + ' de ' + config.stages.length + '</span><span>' + stage.interval + '</span></div>' +
+    '<h5>' + stage.name + '</h5>' +
+    '<div class="stage-interval">Chave: ' + stage.sw + ' • Diodo: ' + stage.diode + '</div>' +
+    '<p class="stage-note">' + stage.note + '</p>';
+}
+
+function stabilizeConverterDashboardHeights(container, config, events) {
+  var panel = container.querySelector('.converter-dashboard-panel');
+  var stageCard = container.querySelector('[data-role="simStageCard"]');
+  var eventDetail = container.querySelector('[data-role="simEventDetail"]');
+  var capStatus = container.querySelector('[data-role="simCapStatus"]');
+  if (!panel || !stageCard || !eventDetail || !capStatus) return;
+
+  var capVariants = [
+    'iC = 0: instante de extremo da tensão de C.',
+    'C carrega: a corrente entregue à saída supera Io; |vout| cresce.',
+    'C descarrega: fornece a corrente que falta à carga; |vout| diminui.'
+  ];
+
+  function measure(reference, variants, htmlMode) {
+    var rect = reference.getBoundingClientRect();
+    if (!rect.width) return 0;
+    var parent = reference.parentElement;
+    var probe = reference.cloneNode(false);
+    probe.removeAttribute('data-role');
+    probe.removeAttribute('id');
+    probe.style.position = 'absolute';
+    probe.style.visibility = 'hidden';
+    probe.style.pointerEvents = 'none';
+    probe.style.left = '-10000px';
+    probe.style.top = '0';
+    probe.style.width = rect.width + 'px';
+    probe.style.height = 'auto';
+    probe.style.minHeight = '0';
+    probe.style.maxHeight = 'none';
+    probe.style.overflow = 'visible';
+    probe.style.marginTop = getComputedStyle(reference).marginTop;
+    probe.style.marginBottom = getComputedStyle(reference).marginBottom;
+    parent.appendChild(probe);
+
+    var max = 0;
+    variants.forEach(function (value) {
+      if (htmlMode) probe.innerHTML = value;
+      else probe.textContent = value;
+      max = Math.max(max, Math.ceil(probe.getBoundingClientRect().height));
+    });
+    probe.remove();
+    return max + 4;
+  }
+
+  function calibrate() {
+    if (window.innerWidth <= 600) {
+      container.style.removeProperty('--converter-stage-card-height');
+      container.style.removeProperty('--converter-event-detail-height');
+      container.style.removeProperty('--converter-cap-status-height');
+      return;
+    }
+    var stageHeight = measure(stageCard, config.stages.map(function (_, idx) {
+      return converterStageCardHtml(config, idx);
+    }), true);
+    var eventHeight = measure(eventDetail, events.map(function (event) { return event.detail; }), false);
+    var capHeight = measure(capStatus, capVariants, false);
+
+    if (stageHeight) container.style.setProperty('--converter-stage-card-height', stageHeight + 'px');
+    if (eventHeight) container.style.setProperty('--converter-event-detail-height', eventHeight + 'px');
+    if (capHeight) container.style.setProperty('--converter-cap-status-height', capHeight + 'px');
+  }
+
+  var lastWidth = -1;
+  var resizeTimer = null;
+  var observer = new ResizeObserver(function (entries) {
+    var width = Math.round(entries[0].contentRect.width);
+    if (Math.abs(width - lastWidth) < 2) return;
+    lastWidth = width;
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(calibrate, 80);
+  });
+  observer.observe(panel);
+
+  requestAnimationFrame(function () {
+    requestAnimationFrame(function () {
+      lastWidth = Math.round(panel.getBoundingClientRect().width);
+      calibrate();
+    });
+  });
+}
+
+
 function createAnimatedConverterSimulator(host, config) {
   var tau = 0.15;
   var isPlaying = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -596,6 +687,8 @@ function createAnimatedConverterSimulator(host, config) {
     stageButtons.appendChild(btn);
   });
 
+  stabilizeConverterDashboardHeights(container, config, events);
+
   playBtn.addEventListener('click', function () {
     isPlaying = !isPlaying;
     updatePlayBtnUI();
@@ -661,11 +754,7 @@ function createAnimatedConverterSimulator(host, config) {
       else btn.classList.remove('active');
     });
 
-    if (renderedStage !== state.stageIdx) stageCard.innerHTML =
-      '<div class="stage-number"><span>Etapa ' + (state.stageIdx + 1) + ' de ' + config.stages.length + '</span><span>' + state.stage.interval + '</span></div>' +
-      '<h5>' + state.stage.name + '</h5>' +
-      '<div class="stage-interval">Chave: ' + state.stage.sw + ' • Diodo: ' + state.stage.diode + '</div>' +
-      '<p class="stage-note">' + state.stage.note + '</p>';
+    if (renderedStage !== state.stageIdx) stageCard.innerHTML = converterStageCardHtml(config, state.stageIdx);
 
     telVL.textContent = (state.vL > 0 ? '+' : '') + state.vL.toFixed(1) + ' V';
     telVL.className = 'telemetry-cell-val ' + (state.vL > 0 ? 'highlight-v' : (state.vL < 0 ? 'highlight-warn' : 'highlight-zero'));

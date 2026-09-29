@@ -1106,6 +1106,143 @@ function updateOscilloscopeSvg(box, state) {
 /* ==========================================================================
    4. MODO DE PROVA: formulário flutuante, impressão e PDF via navegador
    ========================================================================== */
+
+function examWaveSvg(def) {
+  var W=720,left=72,right=20,top=28,panelH=96,gap=16,signals=def.signals||[];
+  var H=top+signals.length*(panelH+gap)+40,h=[];
+  function x(t){return left+(W-left-right)*t;}
+  function txt(xp,yp,t,cls,anchor){h.push('<text x="'+xp+'" y="'+yp+'" class="'+(cls||'exam-svg-text')+'" text-anchor="'+(anchor||'start')+'">'+t+'</text>');}
+  function line(x1,y1,x2,y2,cls){h.push('<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" class="'+(cls||'exam-grid')+'"/>');}
+  h.push('<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Formas de onda '+def.title+'">');
+  (def.markers||[]).forEach(function(m){line(x(m.t),16,x(m.t),H-28,'exam-marker-line');txt(x(m.t),H-10,m.label,'exam-svg-subtle','middle');});
+  signals.forEach(function(sig,idx){
+    var yTop=top+idx*(panelH+gap),yBottom=yTop+panelH;
+    var vals=sig.points.map(function(p){return p[1];});
+    var lo=sig.min!=null?sig.min:Math.min.apply(null,vals.concat([0]));
+    var hi=sig.max!=null?sig.max:Math.max.apply(null,vals.concat([0]));
+    if(Math.abs(hi-lo)<1e-9){hi+=1;lo-=1;}
+    var pad=(hi-lo)*0.14||1;hi+=pad;lo-=pad;
+    function y(v){return yTop+(hi-v)/(hi-lo)*panelH;}
+    line(left,yBottom,W-right,yBottom,'exam-grid');line(left,yTop,left,yBottom,'exam-grid');
+    if(lo<=0&&hi>=0)line(left,y(0),W-right,y(0),'exam-zero-line');
+    txt(12,yTop+20,sig.label,'exam-svg-title');txt(12,yTop+38,'['+sig.unit+']','exam-svg-subtle');
+    var d='';sig.points.forEach(function(p,i){d+=(i?' L':'M')+x(p[0])+' '+y(p[1]);});
+    h.push('<path d="'+d+'" class="exam-trace" fill="none"/>');
+    (sig.annotations||[]).forEach(function(a){var ax=x(a.t),ay=y(a.v);h.push('<circle cx="'+ax+'" cy="'+ay+'" r="3.5" class="exam-point"/>');txt(ax+(a.dx||7),ay+(a.dy||-8),a.text,'exam-svg-value',a.anchor||'start');});
+    (sig.brackets||[]).forEach(function(b){var bx=x(b.t),y1=y(b.v1),y2=y(b.v2);line(bx,y1,bx,y2,'exam-bracket');line(bx-6,y1,bx+6,y1,'exam-bracket');line(bx-6,y2,bx+6,y2,'exam-bracket');txt(bx+10,(y1+y2)/2+4,b.label,'exam-svg-value');});
+  });
+  txt(left,H-10,'0','exam-svg-subtle','middle');txt(W-right,H-10,def.periodLabel||'Tₛ','exam-svg-subtle','end');
+  h.push('</svg>');return h.join('');
+}
+
+function examStaticCircuit(def) {
+  if(def.topology==='capacitor') return '<div class="exam-cap-symbol"><div class="exam-cap-symbol-plates"></div><strong>C</strong><span>iC = C·dvC/dt</span><span>vC = vC(t₀) + (1/C)∫iC dt</span></div>';
+  var cfg={id:'exam-'+def.topology,title:def.topology==='buck'?'Buck':def.topology==='boost'?'Boost':'Buck-Boost',topology:def.topology,mode:def.mode||'CCM',params:{Vin:def.Vin||100,Vo:def.Vo||60,D:def.D==null?.6:def.D,D2:def.D2==null?.4:def.D2}};
+  var wrap=document.createElement('div');wrap.innerHTML=generateCircuitSvgContent(cfg);
+  var svg=wrap.firstElementChild;
+  var closed=svg.querySelector('[data-switch="closed"]'),open=svg.querySelector('[data-switch="open"]');
+  if(closed)closed.style.display='';if(open)open.style.display='none';
+  var status=svg.querySelector('[data-circuit-status]');if(status)status.textContent='Topologia e referências de corrente/tensão';
+  svg.querySelectorAll('[data-flow],[data-arrow]').forEach(function(el){el.style.visibility='visible';});
+  return wrap.innerHTML;
+}
+
+function getExamFigureDefinitions() {
+  return {
+    "solHist2024Q1":{title:"2024 Q1 — Buck-Boost DCM / crítica",topology:"buckboost",Vin:100,Vo:66.67,D:.4,audit:"Dados impressos: E=100 V, Ts=20 µs, D=0,4 e L=0,3 mH. O gráfico abaixo mostra a fronteira crítica, em que D₃=0.",markers:[{t:.4,label:"8 µs"},{t:1,label:"20 µs"}],signals:[
+      {label:"vL",unit:"V",points:[[0,100],[.4,100],[.4,-66.67],[1,-66.67]],annotations:[{t:.18,v:100,text:"+100 V"},{t:.72,v:-66.67,text:"−66,7 V"}]},
+      {label:"iL",unit:"A",points:[[0,0],[.4,2.667],[1,0]],annotations:[{t:.4,v:2.667,text:"Ipk=2,667 A"}]}
+    ]},
+    "solHist2024Q2":{title:"2024 Q2 — Boost: iD, iC e vC",topology:"boost",Vin:1,Vo:1.667,D:.4,audit:"O gráfico impresso é iD. Preservados 6 A → 2 A de 4 a 10 µs; iC e vC são derivados de iC=iD−Io e dvC/dt=iC/C.",markers:[{t:.4,label:"4 µs"},{t:1,label:"10 µs"}],signals:[
+      {label:"iD",unit:"A",points:[[0,0],[.4,0],[.4,6],[1,2]],annotations:[{t:.4,v:6,text:"6 A"},{t:1,v:2,text:"2 A",dx:-7,anchor:"end"}]},
+      {label:"iC",unit:"A",points:[[0,-2.4],[.4,-2.4],[.4,3.6],[1,-.4]],annotations:[{t:.18,v:-2.4,text:"−2,4 A"},{t:.4,v:3.6,text:"+3,6 A"}]},
+      {label:"vC",unit:"qual.",points:[[0,1.04],[.4,.88],[.55,.94],[.9,1.10],[1,1.09]],min:.8,max:1.14,annotations:[{t:.4,v:.88,text:"mín."},{t:.9,v:1.10,text:"máx."}]}
+    ]},
+    "solHist2024Q3":{title:"2024 Q3 — Buck: S, vL e iL",topology:"buck",Vin:60,Vo:48,D:.8,audit:"Leitura conferida: tON=80 µs, Ts=100 µs, vL,on=+12 V, IL,médio=4 A e ΔIL=2 A.",markers:[{t:.8,label:"80 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"S",unit:"0/1",points:[[0,1],[.8,1],[.8,0],[1,0]],min:0,max:1},
+      {label:"vL",unit:"V",points:[[0,12],[.8,12],[.8,-48],[1,-48]]},
+      {label:"iL",unit:"A",points:[[0,3],[.8,5],[1,3]],brackets:[{t:.93,v1:3,v2:5,label:"ΔI=2 A"}]}
+    ]},
+    "solHistMay25Q1":{title:"2025-05 Q1 — Buck-Boost crítica",topology:"buckboost",Vin:200,Vo:200,D:.5,audit:"E=200 V, Ts=10 µs, D=0,5 e L=100 µH. Na fronteira crítica, |Vo|=200 V e iL toca zero ao fim do período.",markers:[{t:.5,label:"5 µs"},{t:1,label:"10 µs"}],signals:[
+      {label:"vL",unit:"V",points:[[0,200],[.5,200],[.5,-200],[1,-200]]},{label:"iL",unit:"A",points:[[0,0],[.5,10],[1,0]],annotations:[{t:.5,v:10,text:"10 A"}]}
+    ]},
+    "solHistMay25Q2":{title:"2025-05 Q2 — Boost: S, vL e iC",topology:"boost",Vin:42.857,Vo:142.857,D:.7,audit:"Usados apenas níveis legíveis da prova: 70/30 µs, vL,off=−100 V, iC=−1 A e ΔiC=2 A. Os níveis absolutos no OFF são derivados pelo balanço de carga.",markers:[{t:.7,label:"70 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"S",unit:"0/1",points:[[0,1],[.7,1],[.7,0],[1,0]],min:0,max:1},
+      {label:"vL",unit:"V",points:[[0,42.857],[.7,42.857],[.7,-100],[1,-100]]},
+      {label:"iC",unit:"A",points:[[0,-1],[.7,-1],[.7,3.333],[1,1.333]],brackets:[{t:.94,v1:1.333,v2:3.333,label:"Δi=2 A"}]}
+    ]},
+    "solHistMay25Q3":{title:"2025-05 Q3 — Buck por iS",topology:"buck",Vin:100,Vo:30,D:.3,audit:"iS existe de 70 a 100 µs; por ser corrente da chave do Buck, esse trecho é ON. O deslocamento horizontal não altera D=0,30.",markers:[{t:.7,label:"70 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"iS",unit:"A",points:[[0,0],[.7,0],[.7,6],[1,8],[1,0]]},{label:"vL",unit:"V",points:[[0,-30],[.7,-30],[.7,70],[1,70]]},{label:"iL",unit:"A",points:[[0,8],[.7,6],[1,8]]}
+    ]},
+    "solHistSep25Q1":{title:"2025-09 Q1 — Boost crítica",topology:"boost",Vin:200,Vo:400,D:.5,audit:"A topologia da foto é Boost. Com D=0,5, E=200 V e L=100 µH, a fronteira crítica tem Vo=400 V e iL 0→10→0 A.",markers:[{t:.5,label:"5 µs"},{t:1,label:"10 µs"}],signals:[
+      {label:"vL",unit:"V",points:[[0,200],[.5,200],[.5,-200],[1,-200]]},{label:"iL",unit:"A",points:[[0,0],[.5,10],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.5,0],[.5,10],[1,0]]}
+    ]},
+    "solHistSep25Q2":{title:"2025-09 Q2 — Buck-Boost inversor",topology:"buckboost",Vin:60,Vo:100,D:.625,audit:"Orientação do diodo e polaridade de saída confirmam Buck-Boost inversor. |Vo|=100 V; E=60 V pelo balanço volt-segundo.",markers:[{t:.625,label:"50 µs"},{t:1,label:"80 µs"}],signals:[
+      {label:"S",unit:"0/1",points:[[0,1],[.625,1],[.625,0],[1,0]],min:0,max:1},{label:"vL",unit:"V",points:[[0,60],[.625,60],[.625,-100],[1,-100]]},
+      {label:"iC",unit:"A",points:[[0,-1],[.625,-1],[.625,2.667],[1,.667]],brackets:[{t:.94,v1:.667,v2:2.667,label:"Δi=2 A"}]}
+    ]},
+    "solHistSep25Q3":{title:"2025-09 Q3 — Buck por iD",topology:"buck",Vin:100,Vo:70,D:.7,audit:"iD não nula nos últimos 30 µs significa OFF do Buck. Assim, 1−D=0,30 e D=0,70.",markers:[{t:.7,label:"70 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"iD",unit:"A",points:[[0,0],[.7,0],[.7,8],[1,6],[1,0]]},{label:"vL",unit:"V",points:[[0,30],[.7,30],[.7,-70],[1,-70]]},{label:"iL",unit:"A",points:[[0,6],[.7,8],[1,6]]}
+    ]},
+    "solHistApr26Q1":{title:"2026 Q1 — Buck-Boost: Δi=5 A",topology:"buckboost",Vin:80.77,Vo:150,D:.65,audit:"Correção crítica da foto: 5 A é a ALTURA da ondulação entre 11 A e 6 A, não a corrente final. No OFF, iD/iL cai 11→6 A.",markers:[{t:.65,label:"65 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"S",unit:"0/1",points:[[0,1],[.65,1],[.65,0],[1,0]],min:0,max:1},
+      {label:"vL",unit:"V",points:[[0,80.77],[.65,80.77],[.65,-150],[1,-150]]},
+      {label:"iL",unit:"A",points:[[0,6],[.65,11],[1,6]],annotations:[{t:.65,v:11,text:"11 A"},{t:1,v:6,text:"6 A",dx:-7,anchor:"end"}],brackets:[{t:.94,v1:6,v2:11,label:"Δi=5 A"}]},
+      {label:"iD",unit:"A",points:[[0,0],[.65,0],[.65,11],[1,6],[1,0]],brackets:[{t:.94,v1:6,v2:11,label:"5 A"}]}
+    ]},
+    "solHistApr26Q2":{title:"2026 Q2 — Boost DCM",topology:"boost",mode:"DCM",Vin:100,Vo:250,D:.3,D2:.2,audit:"O gráfico inferior é iD, não iC. São 30 µs ON, 20 µs de diodo e 50 µs com iL=0: DCM inequívoco.",markers:[{t:.3,label:"30 µs"},{t:.5,label:"50 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"S",unit:"0/1",points:[[0,1],[.3,1],[.3,0],[1,0]],min:0,max:1},
+      {label:"vL",unit:"V",points:[[0,100],[.3,100],[.3,-150],[.5,-150],[.5,0],[1,0]]},
+      {label:"iL",unit:"A",points:[[0,0],[.3,4],[.5,0],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.3,0],[.3,4],[.5,0],[1,0]]},{label:"iC",unit:"A",points:[[0,-.4],[.3,-.4],[.3,3.6],[.5,-.4],[1,-.4]]}
+    ]},
+    "solHistApr26Q3":{title:"2026 Q3 — Buck: iS, iC e vC",topology:"buck",Vin:100,Vo:60,D:.6,audit:"Imin=2 A é dado no texto; 2 A no gráfico é ΔIL. Logo Imax=4 A e Io=3 A. A forma de vC vem do sinal de iC.",markers:[{t:.6,label:"60 µs"},{t:1,label:"100 µs"}],signals:[
+      {label:"iS",unit:"A",points:[[0,2],[.6,4],[.6,0],[1,0]],brackets:[{t:.55,v1:2,v2:4,label:"ΔI=2 A"}]},
+      {label:"vL",unit:"V",points:[[0,40],[.6,40],[.6,-60],[1,-60]]},
+      {label:"iC",unit:"A",points:[[0,-1],[.6,1],[1,-1]],annotations:[{t:.3,v:0,text:"vC mín."},{t:.8,v:0,text:"vC máx."}]},
+      {label:"vC",unit:"qual.",points:[[0,1.04],[.3,.92],[.6,1.02],[.8,1.10],[1,1.04]],min:.88,max:1.13}
+    ]},
+    "solMockA1":{title:"Simulado A1 — Buck-Boost crítica",topology:"buckboost",Vin:120,Vo:80,D:.4,audit:"Conjunto consistente: D=0,40, |Vo|=80 V e Ipk=4,8 A na fronteira.",markers:[{t:.4,label:"8 µs"},{t:1,label:"20 µs"}],signals:[{label:"vL",unit:"V",points:[[0,120],[.4,120],[.4,-80],[1,-80]]},{label:"iL",unit:"A",points:[[0,0],[.4,4.8],[1,0]]}]},
+    "solMockA2":{title:"Simulado A2 — Buck-Boost / capacitor",topology:"buckboost",Vin:45,Vo:90,D:.667,audit:"Balanço de carga fecha: −1,5 A por 40 µs; OFF 4,5→1,5 A por 20 µs.",markers:[{t:.667,label:"40 µs"},{t:1,label:"60 µs"}],signals:[{label:"S",unit:"0/1",points:[[0,1],[.667,1],[.667,0],[1,0]],min:0,max:1},{label:"vL",unit:"V",points:[[0,45],[.667,45],[.667,-90],[1,-90]]},{label:"iC",unit:"A",points:[[0,-1.5],[.667,-1.5],[.667,4.5],[1,1.5]],brackets:[{t:.95,v1:1.5,v2:4.5,label:"Δi=3 A"}]},{label:"vC",unit:"qual.",points:[[0,1.05],[.667,.9],[.82,1],[1,1.05]],min:.86,max:1.09}]},
+    "solMockA3":{title:"Simulado A3 — Buck por iD",topology:"buck",Vin:120,Vo:84,D:.7,audit:"iD nos 30 µs finais é OFF; iL é 7→9 A em ON e 9→7 A em OFF.",markers:[{t:.7,label:"70 µs"},{t:1,label:"100 µs"}],signals:[{label:"iD",unit:"A",points:[[0,0],[.7,0],[.7,9],[1,7],[1,0]]},{label:"vL",unit:"V",points:[[0,36],[.7,36],[.7,-84],[1,-84]]},{label:"iL",unit:"A",points:[[0,7],[.7,9],[1,7]]}]},
+    "solMockB1":{title:"Simulado B1 — Boost DCM",topology:"boost",mode:"DCM",Vin:80,Vo:213.33,D:.25,D2:.15,audit:"Conjunto consistente: D=0,25, D₂=0,15, D₃=0,60 e Vo=213,33 V.",markers:[{t:.25,label:"25 µs"},{t:.4,label:"40 µs"},{t:1,label:"100 µs"}],signals:[{label:"vL",unit:"V",points:[[0,80],[.25,80],[.25,-133.33],[.4,-133.33],[.4,0],[1,0]]},{label:"iL",unit:"A",points:[[0,0],[.25,5],[.4,0],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.25,0],[.25,5],[.4,0],[1,0]]},{label:"iC",unit:"A",points:[[0,-.375],[.25,-.375],[.25,4.625],[.4,-.375],[1,-.375]]}]},
+    "solMockB2":{title:"Simulado B2 — iC ↔ vC",topology:"capacitor",audit:"O enunciado é propositalmente incompatível com RPP: área líquida de iC = +10 A·µs, então vC(Ts)≠vC(0).",markers:[{t:.3,label:"30 µs"},{t:.767,label:"iC=0"},{t:1,label:"100 µs"}],signals:[{label:"iC",unit:"A",points:[[0,-2],[.3,-2],[.3,4],[1,-2]]},{label:"vC",unit:"qual.",points:[[0,1.02],[.3,.88],[.767,1.10],[1,1.04]],min:.84,max:1.14}]},
+    "solMockB3":{title:"Simulado B3 — Buck / pulso deslocado",topology:"buck",Vin:90,Vo:45,D:.5,audit:"iS dura 40 de 80 µs: D=0,50. A origem temporal do desenho não muda o duty.",markers:[{t:.5,label:"40 µs"},{t:1,label:"80 µs"}],signals:[{label:"iS",unit:"A",points:[[0,0],[.5,0],[.5,3],[1,7],[1,0]]},{label:"vL",unit:"V",points:[[0,-45],[.5,-45],[.5,45],[1,45]]},{label:"iL",unit:"A",points:[[0,7],[.5,3],[1,7]]}]},
+    "solP1_1":{title:"Simulado resolvido 1 — Buck CCM",topology:"buck",Vin:60,Vo:24,D:.4,audit:"Vin=60 V, Vo=24 V, D=0,40, Io=5 A e ΔIL=1 A.",markers:[{t:.4,label:"D·Tₛ"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"V",points:[[0,36],[.4,36],[.4,-24],[1,-24]]},{label:"iL",unit:"A",points:[[0,4.5],[.4,5.5],[1,4.5]],brackets:[{t:.92,v1:4.5,v2:5.5,label:"ΔI=1 A"}]},{label:"iC",unit:"A",points:[[0,-.5],[.4,.5],[1,-.5]]}]},
+    "solP1_2":{title:"Simulado resolvido 2 — Boost DCM",topology:"boost",mode:"DCM",Vin:12,Vo:57.26,D:.6,D2:.159,audit:"Para R=100 Ω: K=0,020, M≈4,772, D₂≈0,159, D₃≈0,241 e Ipk=7,2 A.",markers:[{t:.6,label:"D"},{t:.759,label:"D+D₂"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"V",points:[[0,12],[.6,12],[.6,-45.26],[.759,-45.26],[.759,0],[1,0]]},{label:"iL",unit:"A",points:[[0,0],[.6,7.2],[.759,0],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.6,0],[.6,7.2],[.759,0],[1,0]]}]},
+    "solP1_3":{title:"Simulado resolvido 3 — Buck-Boost DCM",topology:"buckboost",mode:"DCM",Vin:30,Vo:15,D:.258,D2:.516,audit:"D≈0,258, D₂≈0,516, D₃≈0,225 e Ipk≈3,87 A.",markers:[{t:.258,label:"D"},{t:.774,label:"D+D₂"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"V",points:[[0,30],[.258,30],[.258,-15],[.774,-15],[.774,0],[1,0]]},{label:"iL",unit:"A",points:[[0,0],[.258,3.87],[.774,0],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.258,0],[.258,3.87],[.774,0],[1,0]]}]}
+  };
+}
+
+function examFigureMarkup(def) {
+  return '<div class="exam-visual-block"><div class="exam-visual-title"><strong>'+def.title+'</strong><span>SVG vetorial • reconstrução auditada</span></div><div class="exam-visual-grid"><div class="exam-circuit-pane">'+examStaticCircuit(def)+'</div><div class="exam-wave-pane">'+examWaveSvg(def)+'</div></div><div class="exam-audit-note"><strong>Revisão crítica:</strong> '+def.audit+'</div></div>';
+}
+
+function formulaOverviewMarkup() {
+  var defs=[
+    {title:"Buck — referência",topology:"buck",Vin:100,Vo:60,D:.6,audit:"S conduz em D·Ts; diodo no OFF. vL=E−Vo em ON e −Vo em OFF.",markers:[{t:.6,label:"D·Tₛ"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"norm.",points:[[0,.4],[.6,.4],[.6,-.6],[1,-.6]]},{label:"iL",unit:"norm.",points:[[0,2],[.6,4],[1,2]]},{label:"iC",unit:"norm.",points:[[0,-1],[.6,1],[1,-1]]},{label:"vC",unit:"qual.",points:[[0,1.02],[.3,.94],[.6,1.01],[.8,1.07],[1,1.02]],min:.9,max:1.1}]},
+    {title:"Boost — referência",topology:"boost",Vin:100,Vo:200,D:.5,audit:"ON: D bloqueado e C alimenta R. OFF: fonte + L alimentam a saída.",markers:[{t:.5,label:"D·Tₛ"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"norm.",points:[[0,1],[.5,1],[.5,-1],[1,-1]]},{label:"iL",unit:"norm.",points:[[0,2],[.5,4],[1,2]]},{label:"iD",unit:"norm.",points:[[0,0],[.5,0],[.5,4],[1,2],[1,0]]},{label:"iC",unit:"norm.",points:[[0,-1],[.5,-1],[.5,3],[1,1]]}]},
+    {title:"Buck-Boost — referência",topology:"buckboost",Vin:100,Vo:66.7,D:.4,audit:"Saída invertida. ON armazena energia em L; OFF transfere energia por D para C/R.",markers:[{t:.4,label:"D·Tₛ"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"norm.",points:[[0,1],[.4,1],[.4,-.667],[1,-.667]]},{label:"iL",unit:"norm.",points:[[0,2],[.4,4],[1,2]]},{label:"iD",unit:"norm.",points:[[0,0],[.4,0],[.4,4],[1,2],[1,0]]},{label:"iC",unit:"norm.",points:[[0,-1],[.4,-1],[.4,3],[1,1]]}]},
+    {title:"DCM — 3 intervalos",topology:"boost",mode:"DCM",Vin:100,Vo:220,D:.3,D2:.25,audit:"D + D₂ + D₃ = 1. Em D₃: iL=0 e vL=0 no modelo ideal.",markers:[{t:.3,label:"D"},{t:.55,label:"D+D₂"},{t:1,label:"Tₛ"}],signals:[{label:"vL",unit:"norm.",points:[[0,1],[.3,1],[.3,-1.2],[.55,-1.2],[.55,0],[1,0]]},{label:"iL",unit:"norm.",points:[[0,0],[.3,4],[.55,0],[1,0]]},{label:"iD",unit:"norm.",points:[[0,0],[.3,0],[.3,4],[.55,0],[1,0]]}]}
+  ];
+  return '<div class="formula-visual-overview"><h4>Topologias e formas de onda essenciais</h4><p class="formula-visual-lead">Identifique ON/OFF, chave, diodo, polaridades e o sinal de vL/iC antes de escolher a fórmula.</p>'+defs.map(examFigureMarkup).join('')+'</div>';
+}
+
+function initExamFigures() {
+  var defs=getExamFigureDefinitions();
+  Object.keys(defs).forEach(function(targetId){
+    var button=document.querySelector('.solution-toggle[data-target="'+targetId+'"]');
+    if(!button)return;
+    var body=button.closest('.exercise-body');
+    if(!body||body.querySelector('[data-exam-visual="'+targetId+'"]'))return;
+    var host=document.createElement('div');host.setAttribute('data-exam-visual',targetId);host.innerHTML=examFigureMarkup(defs[targetId]);button.parentNode.insertBefore(host,button);
+  });
+  var formula=document.getElementById('examFormulaSource');
+  if(formula&&!formula.querySelector('.formula-visual-overview')){
+    var head=formula.querySelector('.formula-sheet-head'),tmp=document.createElement('div');tmp.innerHTML=formulaOverviewMarkup(),overview=tmp.firstElementChild;
+    if(head&&head.nextSibling)formula.insertBefore(overview,head.nextSibling);else formula.appendChild(overview);
+  }
+}
+
 function initExamMode() {
   var modal = document.getElementById('examFormulaModal');
   var source = document.getElementById('examFormulaSource');
@@ -1202,5 +1339,6 @@ function initExamMode() {
 window.initSubjectTools = function () {
   initCalculator();
   initConverterDashboards();
+  initExamFigures();
   initExamMode();
 };

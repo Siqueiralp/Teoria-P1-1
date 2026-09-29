@@ -97,3 +97,12 @@ Modelos ideais, regime periódico e pequena ondulação. Não representam transi
 - [Texas Instruments SLVA061 — Understanding Boost Power Stages](https://www.ti.com/lit/an/slva061/slva061.pdf), análise de regime permanente, CCM/DCM e indutância crítica.
 
 As contas específicas, a classificação e os gráficos históricos foram derivados das fotos e dos balanços físicos nesta revisão.
+
+## Navegação por páginas — 29/09/2026
+
+- Conteúdo dividido em 30 páginas carregadas sob demanda. Teoria, provas, simulados e projetos abrem um tópico ou conjunto por vez.
+- Revisão com abas Buck, Boost e Buck-Boost e subabas CCM/DCM; um circuito ativo por página. O regime é mantido ao trocar a topologia. Descrições completas e tabela por etapa são recolhíveis e se expandem na impressão.
+- Fórmulas consultáveis por modal em qualquer página, carregadas na primeira abertura. Circuitos e gráficos ficam na revisão por topologia, com link na página de fórmulas.
+- Progresso global preservado: 37 itens e nove módulos. Âncoras antigas, atualização e voltar/avançar continuam disponíveis.
+- `python scripts/build-topic-pages.py --check` confere o material gerado a partir de `content.html`. O workflow do deploy gera as páginas e executa os testes.
+- Verificação: 22 testes de física, cobertura do conteúdo, destinos de links/abas, progresso e busca apenas da página selecionada. Navegador local: troca de topologia/regime, teclado, gráficos de capacitor, resoluções, projetos, modal, link antigo, progresso entre páginas e largura de 390 px; Controle 1 também carrega corretamente.

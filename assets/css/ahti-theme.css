@@ -255,6 +255,43 @@ button { font-family: inherit; }
 }
 
 
+.topic-breadcrumb { margin-bottom: 16px; color: var(--ahti-muted); font-size: .85rem; }
+.topic-breadcrumb a, .topic-link { color: var(--ahti-info); }
+.topic-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0 0 12px; border-bottom: 1px solid var(--ahti-border); }
+.topic-tabs a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 18px; border: 1px solid var(--ahti-control); border-radius: 8px; color: var(--ahti-text); background: var(--ahti-surface); text-decoration: none; font-weight: 600; }
+.topic-tabs a:hover { border-color: var(--ahti-focus); background: var(--ahti-raised); }
+.topic-tabs a[aria-selected="true"] { background: var(--ahti-info); color: var(--ahti-bg); border-color: var(--ahti-info); }
+.topic-subtabs { gap: 6px; border: 0; margin-bottom: 20px; padding: 0; }
+.topic-subtabs a { font-size: .88rem; padding-inline: 24px; }
+.topic-overview { margin-block: 24px; }
+.topic-card-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.topic-card-grid a { display: flex; flex-direction: column; gap: 8px; padding: 22px; border: 1px solid var(--ahti-border); border-radius: 12px; background: var(--ahti-surface); color: var(--ahti-text); text-decoration: none; }
+.topic-card-grid a:hover { border-color: var(--ahti-focus); }
+.topic-card-grid span { color: var(--ahti-muted); font-size: .9rem; }
+.topic-pager { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-block: 24px; }
+.topic-pager a { display: inline-flex; align-items: center; min-height: 44px; color: var(--ahti-info); }
+.topic-details { margin-top: 20px; border: 1px solid var(--ahti-border); border-radius: 8px; padding: 12px 16px; }
+.topic-details summary { min-height: 32px; cursor: pointer; font-weight: 600; }
+.topic-details[open] summary { margin-bottom: 12px; }
+.converter-description { margin-top: 12px; }
+.converter-description summary { min-height: 44px; display: list-item; cursor: pointer; color: var(--ahti-info); font-size: .88rem; }
+.converter-description[open] summary { margin-bottom: 8px; }
+.topology-review .module-header { padding: 16px 24px; }
+.topology-review .module-header .module-tag, .topology-review .converter-dashboard-kicker,
+.topology-review .converter-dashboard-head h4 { display: none; }
+.topology-review .module-title { margin: 0; font-size: 1.3rem; }
+.topology-review .module-desc { margin-top: 6px; font-size: .88rem; }
+.topology-review .module-body { padding: 16px 24px; }
+.topology-review .converter-dashboard-head { padding: 16px; }
+@media (max-width: 600px) {
+  .topic-card-grid { grid-template-columns: 1fr; }
+  .topic-tabs a { flex: 1 1 auto; padding-inline: 12px; }
+  .topic-breadcrumb { overflow-wrap: anywhere; }
+}
+@media print {
+  .topic-tabs, .topic-breadcrumb, .topic-pager, .topic-link { display: none !important; }
+}
+
 .topology-description {
   margin: 0;
   padding: 12px 16px;

@@ -52,13 +52,18 @@
     var modules = Array.isArray(manifest.modules) ? manifest.modules.length : 0;
     var checklist = Number(manifest.totalChecklistItems || 0);
     var clean = normalize(data);
-    var completed = Math.min(modules, clean.completedModules.length) + Math.min(checklist, clean.checkedItems.length);
+    var moduleIds = (manifest.modules || []).map(function (mod) { return mod.id; });
+    var modulesCompleted = clean.completedModules.filter(function (id) { return moduleIds.indexOf(id) >= 0; }).length;
+    var itemsCompleted = Array.isArray(manifest.checklistIds) ? clean.checkedItems.filter(function (id) {
+      return manifest.checklistIds.indexOf(id) >= 0;
+    }).length : Math.min(checklist, clean.checkedItems.length);
+    var completed = modulesCompleted + itemsCompleted;
     var total = modules + checklist;
     return {
       completed: completed,
       total: total,
       percent: total ? Math.min(100, Math.round((completed / total) * 100)) : 0,
-      modulesCompleted: Math.min(modules, clean.completedModules.length),
+      modulesCompleted: modulesCompleted,
       modulesTotal: modules
     };
   }

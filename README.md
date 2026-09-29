@@ -35,6 +35,22 @@ guide.html?subject=eletronica-potencia
 
 O shell carrega a configuração e o conteúdo da pasta correspondente. Assim, não existe um `index.html` duplicado por disciplina.
 
+Eletrônica de Potência carrega um tópico por página. Por exemplo:
+
+```text
+guide.html?subject=eletronica-potencia&page=revisao-boost-dcm
+```
+
+A revisão tem abas Buck, Boost e Buck-Boost, com subabas CCM/DCM. Provas, simulados e projetos também são separados. Links antigos com `#mod4`, `#historySection` e outras âncoras continuam funcionando.
+
+Após editar `subjects/eletronica-potencia/content.html`, atualize e confira as páginas:
+
+```sh
+python scripts/build-topic-pages.py
+python scripts/build-topic-pages.py --check
+node --test tests/*.test.cjs
+```
+
 ## Adicionando uma nova matéria
 
 1. Copie `subjects/_template/` para `subjects/<slug-da-materia>/`.

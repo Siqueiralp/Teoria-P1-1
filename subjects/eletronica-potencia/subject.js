@@ -612,6 +612,14 @@ function createAnimatedConverterSimulator(host, config) {
   var renderedStage = -1;
   var renderedChannel = null;
   var events = converterEvents(config);
+  var reviewPage = window.StudyGuide && window.StudyGuide.page && /^revisao/.test(window.StudyGuide.page.id);
+  var description = '<p>' + topologyDescription(config.topology, config.mode) + '</p>';
+  if (reviewPage) {
+    var purpose = { buck: 'Abaixa a tensão sem inverter a polaridade.', boost: 'Eleva a tensão mantendo a polaridade.', buckboost: 'Inverte a polaridade e pode elevar ou reduzir o módulo da tensão.' };
+    var conduction = config.mode === 'DCM' ? 'DCM: a corrente de L zera e há um terceiro intervalo sem condução.' : 'CCM: a corrente de L permanece positiva durante todo o ciclo.';
+    description = '<p>' + purpose[config.topology] + ' ' + conduction + '</p>' +
+      '<details class="converter-description"><summary>Funcionamento, usos, componentes e pontos chave</summary>' + description + '</details>';
+  }
 
   var container = document.createElement('section');
   container.className = 'converter-dashboard';
@@ -622,7 +630,7 @@ function createAnimatedConverterSimulator(host, config) {
       '<div>' +
         '<span class="converter-dashboard-kicker">Simulador Interativo • Circuito & Osciloscópio</span>' +
         '<h4>' + config.title + '</h4>' +
-        '<p>' + topologyDescription(config.topology, config.mode) + '</p>' +
+        description +
       '</div>' +
       '<div class="converter-dashboard-tags">' +
         '<span class="tag-mode">' + config.mode + '</span>' +
@@ -1382,7 +1390,7 @@ function initExamFigures() {
     if(solution)solution.insertBefore(host,solution.firstChild);
   });
   var formula=document.getElementById('examFormulaSource');
-  if(formula&&!formula.querySelector('.formula-visual-overview')){
+  if(formula&&!(window.StudyGuide&&window.StudyGuide.page)&&!formula.querySelector('.formula-visual-overview')){
     var head=formula.querySelector('.formula-sheet-head'),tmp=document.createElement('div');tmp.innerHTML=formulaOverviewMarkup(),overview=tmp.firstElementChild;
     if(head&&head.nextSibling)formula.insertBefore(overview,head.nextSibling);else formula.appendChild(overview);
   }
@@ -1396,11 +1404,31 @@ function initExamMode() {
   var printBtn = document.getElementById('examFormulaPrint');
   var pdfBtn = document.getElementById('examFormulaPdf');
   var content = document.getElementById('examFormulaModalContent');
-  if (!modal || !source || !content || modal.dataset.initialized === 'true') return;
+  if (!modal || !content || modal.dataset.initialized === 'true') return;
 
   modal.dataset.initialized = 'true';
   var lastFocus = null;
   var originalTitle = document.title;
+  var sourceRequest = null;
+
+  function ensureFormulaSource() {
+    if (source) return Promise.resolve(source);
+    if (sourceRequest) return sourceRequest;
+    var guide = window.StudyGuide;
+    var page = guide && (guide.manifest.pages || []).find(function (item) { return item.id === 'formulas'; });
+    if (!page) return Promise.reject(new Error('Página de fórmulas indisponível.'));
+    sourceRequest = fetch(guide.base + page.file).then(function (response) {
+      if (!response.ok) throw new Error('HTTP ' + response.status + ' ao carregar o formulário.');
+      return response.text();
+    }).then(function (html) {
+      var template = document.createElement('template');
+      template.innerHTML = html;
+      source = template.content.querySelector('#examFormulaSource');
+      if (!source) throw new Error('Conteúdo do formulário indisponível.');
+      return source;
+    }).catch(function (error) { sourceRequest = null; throw error; });
+    return sourceRequest;
+  }
 
   function hydrateFormulaCopy() {
     content.innerHTML = '';
@@ -1426,13 +1454,21 @@ function initExamMode() {
 
   function openFormula(trigger) {
     lastFocus = trigger || document.activeElement;
-    hydrateFormulaCopy();
-    modal.hidden = false;
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('exam-formula-open');
-    if (fab) fab.setAttribute('aria-expanded', 'true');
-    requestAnimationFrame(function () {
-      if (closeBtn) closeBtn.focus();
+    if (fab) fab.setAttribute('aria-busy', 'true');
+    return ensureFormulaSource().then(function () {
+      hydrateFormulaCopy();
+      modal.hidden = false;
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('exam-formula-open');
+      if (fab) fab.setAttribute('aria-expanded', 'true');
+      requestAnimationFrame(function () { if (closeBtn) closeBtn.focus(); });
+      return true;
+    }).catch(function (error) {
+      console.error(error);
+      window.alert('Não foi possível carregar o formulário. Tente abrir novamente.');
+      return false;
+    }).finally(function () {
+      if (fab) fab.removeAttribute('aria-busy');
     });
   }
 
@@ -1446,7 +1482,10 @@ function initExamMode() {
   }
 
   function printFormula(asPdf) {
-    if (modal.hidden) openFormula(pdfBtn || printBtn);
+    if (modal.hidden) {
+      openFormula(pdfBtn || printBtn).then(function (opened) { if (opened) printFormula(asPdf); });
+      return;
+    }
     document.body.classList.add('print-formula-only');
     document.title = asPdf ? 'Formulario-P1-Eletronica-de-Potencia' : originalTitle;
 

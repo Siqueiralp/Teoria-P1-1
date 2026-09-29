@@ -16,17 +16,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var base = "subjects/" + safeId + "/";
   var manifest;
+  var currentPage;
 
-  Promise.all([
-    fetch(base + "subject.json").then(requireOk).then(function (r) { return r.json(); }),
-    fetch(base + "content.html").then(requireOk).then(function (r) { return r.text(); })
-  ])
-    .then(function (loaded) {
-      manifest = loaded[0];
+  fetch(base + "subject.json").then(requireOk).then(function (r) { return r.json(); })
+    .then(function (config) {
+      manifest = config;
       if (manifest.id !== safeId) throw new Error("O identificador da matéria não corresponde à pasta.");
-
+      currentPage = window.TopicPages.resolve(manifest, params.get("page"), decodeURIComponent(window.location.hash.slice(1)));
+      window.StudyGuide = { manifest: manifest, base: base, page: currentPage };
+      return fetch(base + (currentPage ? currentPage.file : "content.html")).then(requireOk).then(function (r) { return r.text(); });
+    })
+    .then(function (content) {
       applyManifest(manifest);
-      document.getElementById("subjectContent").innerHTML = loaded[1];
+      document.getElementById("subjectContent").innerHTML = content;
+      if (currentPage) {
+        document.title = currentPage.title + " | " + manifest.name;
+        initTopicPage();
+      }
       if (window.UiIcons) window.UiIcons.hydrate(document.getElementById("subjectContent"));
       buildNavigation(manifest);
       initTracker(manifest);
@@ -37,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (manifest.script) {
         return loadScript(base + manifest.script).then(function () {
           if (typeof window.initSubjectTools === "function") window.initSubjectTools();
+          rewriteTopicLinks();
           scrollToInitialSection();
         });
       }
@@ -53,8 +60,73 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function scrollToInitialSection() {
-    var target = document.getElementById(window.location.hash.slice(1));
+    var target = document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
     if (target) target.scrollIntoView();
+  }
+
+  function rewriteTopicLinks() {
+    if (!currentPage) return;
+    document.querySelectorAll('#subjectContent a[href^="#"]').forEach(function (link) {
+      var anchor = decodeURIComponent(link.getAttribute("href").slice(1));
+      var page = window.TopicPages.owner(manifest, anchor);
+      if (page && page.id !== currentPage.id) link.href = window.TopicPages.href(manifest, page, anchor);
+    });
+  }
+
+  function initTopicPage() {
+    rewriteTopicLinks();
+    var printDetails = [];
+    window.addEventListener("beforeprint", function () {
+      printDetails = Array.from(document.querySelectorAll(".topic-details:not([open]), .converter-description:not([open])"));
+      printDetails.forEach(function (detail) { detail.open = true; });
+    });
+    window.addEventListener("afterprint", function () {
+      printDetails.forEach(function (detail) { detail.open = false; });
+      printDetails = [];
+    });
+    var host = document.getElementById("subjectContent");
+    var trail = document.createElement("div");
+    trail.className = "topic-breadcrumb";
+    var home = document.createElement("a");
+    home.href = window.TopicPages.href(manifest, manifest.pages[0]);
+    home.textContent = "Visão geral";
+    trail.appendChild(home);
+    trail.appendChild(document.createTextNode(" / " + currentPage.title));
+    host.insertBefore(trail, host.firstChild);
+    var moduleIndex = manifest.modules.findIndex(function (mod) { return mod.anchor === currentPage.id; });
+    if (moduleIndex >= 0) {
+      var pager = document.createElement("nav");
+      pager.className = "topic-pager";
+      pager.setAttribute("aria-label", "Sequência dos módulos");
+      [moduleIndex - 1, moduleIndex + 1].forEach(function (index) {
+        var mod = manifest.modules[index];
+        if (!mod) return;
+        var link = document.createElement("a");
+        link.href = window.TopicPages.href(manifest, window.TopicPages.owner(manifest, mod.anchor));
+        link.textContent = (index < moduleIndex ? "← Anterior: " : "Próximo: ") + mod.title + (index > moduleIndex ? " →" : "");
+        pager.appendChild(link);
+      });
+      var footer = host.querySelector("footer");
+      host.insertBefore(pager, footer || null);
+    }
+    document.querySelectorAll('[role="tablist"]').forEach(function (list) {
+      var tabs = Array.from(list.querySelectorAll('[role="tab"]'));
+      list.addEventListener("keydown", function (event) {
+        var index = tabs.indexOf(document.activeElement);
+        if (index < 0) return;
+        if (event.key === " ") {
+          event.preventDefault();
+          tabs[index].click();
+          return;
+        }
+        if (["ArrowLeft", "ArrowRight", "Home", "End"].indexOf(event.key) < 0) return;
+        event.preventDefault();
+        var next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 :
+          (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        tabs.forEach(function (tab, i) { tab.tabIndex = i === next ? 0 : -1; });
+        tabs[next].focus();
+      });
+    });
   }
 
   function applyManifest(config) {
@@ -70,6 +142,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function buildNavigation(config) {
     var host = document.getElementById("moduleNavigation");
     host.innerHTML = "";
+
+    if (currentPage) host.appendChild(navItem("", "IN", "Visão geral", null));
 
     host.appendChild(sectionTitle("Roteiro de Estudos"));
     (config.modules || []).forEach(function (mod) {
@@ -100,8 +174,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function navItem(anchor, code, title, moduleId) {
     var a = document.createElement("a");
-    a.href = "#" + anchor;
     a.className = "nav-item";
+    a.href = "#" + anchor;
+    a.setAttribute("data-nav-anchor", anchor);
+    if (currentPage) {
+      var page = anchor ? window.TopicPages.owner(manifest, anchor) : manifest.pages[0];
+      if (page) a.href = window.TopicPages.href(manifest, page);
+      a.classList.toggle("active", currentPage.navAnchor === anchor);
+      if (currentPage.navAnchor === anchor) a.setAttribute("aria-current", "page");
+    }
     if (moduleId) a.setAttribute("data-nav-mod", moduleId);
 
     var label = document.createElement("div");
@@ -129,6 +210,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function initTracker(config) {
     var data = StudyProgress.read(config);
+    (config.modules || []).forEach(function (mod) { updateNavModuleState(mod.id, data.completedModules.indexOf(mod.id) >= 0); });
     var checkboxes = Array.from(document.querySelectorAll('.checklist-item input[type="checkbox"]'));
     var buttons = Array.from(document.querySelectorAll(".btn-complete-module"));
 
@@ -215,21 +297,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function updateOverallProgress(config) {
-    var itemIds = Array.from(document.querySelectorAll('.checklist-item input[data-check-id]'))
-      .map(function (el) { return el.getAttribute("data-check-id"); });
-    var moduleIds = Array.from(document.querySelectorAll(".btn-complete-module[data-mod-id]"))
-      .map(function (el) { return el.getAttribute("data-mod-id"); });
-
-    var data = StudyProgress.read(config);
-    var checkedCount = data.checkedItems.filter(function (id) { return itemIds.indexOf(id) >= 0; }).length;
-    var moduleCount = data.completedModules.filter(function (id) { return moduleIds.indexOf(id) >= 0; }).length;
-    var total = itemIds.length + moduleIds.length;
-    var completed = checkedCount + moduleCount;
-    var percent = total ? Math.min(100, Math.round((completed / total) * 100)) : 0;
+    var progress = StudyProgress.compute(config, StudyProgress.read(config));
+    var percent = progress.percent;
 
     document.getElementById("globalProgressPercent").textContent = percent + "%";
     document.getElementById("globalProgressCount").textContent =
-      completed + "/" + total + " metas atingidas (" + moduleCount + "/" + moduleIds.length + " módulos)";
+      progress.completed + "/" + progress.total + " metas atingidas (" + progress.modulesCompleted + "/" + progress.modulesTotal + " módulos)";
     document.getElementById("globalProgressBar").style.width = percent + "%";
   }
 
@@ -282,6 +355,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (window.innerWidth > 980) setMobileSidebar(false);
     });
 
+    if (currentPage) return;
     var sections = navItems.map(function (item) {
       return document.getElementById(item.getAttribute("href").slice(1));
     }).filter(Boolean);

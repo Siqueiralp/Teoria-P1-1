@@ -71,7 +71,7 @@
     {
       "anchor": "waveformReviewSection",
       "code": "OND",
-      "title": "Formas de onda e balanços",
+      "title": "Revisão por topologia",
       "group": "Revisão e consulta"
     },
     {
@@ -99,5 +99,363 @@
       "group": "Provas e prática"
     }
   ],
-  "script": "subject.js?v=20260929-organizacao"
+  "script": "subject.js?v=20260929-paginas",
+  "pages": [
+    {
+      "id": "inicio",
+      "file": "pages/inicio.html",
+      "title": "Visão geral",
+      "navAnchor": "",
+      "anchors": []
+    },
+    {
+      "id": "mod1",
+      "file": "pages/mod1.html",
+      "title": "Cálculo de Valores Médio e Eficaz (RMS)",
+      "navAnchor": "mod1",
+      "anchors": [
+        "mod1",
+        "sol1_1"
+      ]
+    },
+    {
+      "id": "mod2",
+      "file": "pages/mod2.html",
+      "title": "Resposta Dinâmica de Indutores e Capacitores (RPP)",
+      "navAnchor": "mod2",
+      "anchors": [
+        "mod2"
+      ]
+    },
+    {
+      "id": "mod3",
+      "file": "pages/mod3.html",
+      "title": "Operação e Característica Estática do Diodo de Potência",
+      "navAnchor": "mod3",
+      "anchors": [
+        "mod3",
+        "sol3_1"
+      ]
+    },
+    {
+      "id": "mod4",
+      "file": "pages/mod4.html",
+      "title": "Conversor CC-CC Buck em Modo de Condução Contínua (CCM)",
+      "navAnchor": "mod4",
+      "anchors": [
+        "mod4"
+      ]
+    },
+    {
+      "id": "mod5",
+      "file": "pages/mod5.html",
+      "title": "Conversor CC-CC Boost em Modo de Condução Contínua (CCM)",
+      "navAnchor": "mod5",
+      "anchors": [
+        "mod5"
+      ]
+    },
+    {
+      "id": "mod6",
+      "file": "pages/mod6.html",
+      "title": "Conversor CC-CC Buck-Boost em Modo de Condução Contínua (CCM)",
+      "navAnchor": "mod6",
+      "anchors": [
+        "mod6"
+      ]
+    },
+    {
+      "id": "mod7",
+      "file": "pages/mod7.html",
+      "title": "Conversor CC-CC Buck em Modo de Condução Descontínua (DCM)",
+      "navAnchor": "mod7",
+      "anchors": [
+        "mod7"
+      ]
+    },
+    {
+      "id": "mod8",
+      "file": "pages/mod8.html",
+      "title": "Conversor CC-CC Boost em Modo de Condução Descontínua (DCM)",
+      "navAnchor": "mod8",
+      "anchors": [
+        "mod8"
+      ]
+    },
+    {
+      "id": "mod9",
+      "file": "pages/mod9.html",
+      "title": "Conversor CC-CC Buck-Boost em Modo de Condução Descontínua (DCM)",
+      "navAnchor": "mod9",
+      "anchors": [
+        "mod9"
+      ]
+    },
+    {
+      "id": "revisao",
+      "file": "pages/revisao.html",
+      "title": "Revisão • Buck CCM",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "waveformReviewSection"
+      ]
+    },
+    {
+      "id": "revisao-buck-dcm",
+      "file": "pages/revisao-buck-dcm.html",
+      "title": "Revisão • Buck DCM",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "review-buck-dcm"
+      ]
+    },
+    {
+      "id": "revisao-boost-ccm",
+      "file": "pages/revisao-boost-ccm.html",
+      "title": "Revisão • Boost CCM",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "review-boost-ccm"
+      ]
+    },
+    {
+      "id": "revisao-boost-dcm",
+      "file": "pages/revisao-boost-dcm.html",
+      "title": "Revisão • Boost DCM",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "review-boost-dcm"
+      ]
+    },
+    {
+      "id": "revisao-buckboost-ccm",
+      "file": "pages/revisao-buckboost-ccm.html",
+      "title": "Revisão • Buck-Boost CCM",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "review-buckboost-ccm"
+      ]
+    },
+    {
+      "id": "revisao-buckboost-dcm",
+      "file": "pages/revisao-buckboost-dcm.html",
+      "title": "Revisão • Buck-Boost DCM",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "review-buckboost-dcm"
+      ]
+    },
+    {
+      "id": "revisao-roteiro",
+      "file": "pages/revisao-roteiro.html",
+      "title": "Roteiro de formas de onda e balanços",
+      "navAnchor": "waveformReviewSection",
+      "anchors": [
+        "reviewWorkflowSection"
+      ]
+    },
+    {
+      "id": "formulas",
+      "file": "pages/formulas.html",
+      "title": "Fórmulas para a P1",
+      "navAnchor": "cheatSheetSection",
+      "anchors": [
+        "cheatSheetSection",
+        "examFormulaSource"
+      ]
+    },
+    {
+      "id": "calculadora",
+      "file": "pages/calculadora.html",
+      "title": "Calculadora de conversores",
+      "navAnchor": "calculatorSection",
+      "anchors": [
+        "calculatorSection",
+        "converterCalcForm",
+        "calcTopology",
+        "calcVin",
+        "calcVo",
+        "calcPo",
+        "calcFs",
+        "calcL",
+        "calcC",
+        "calcError",
+        "resConductionMode",
+        "resDutyCycle",
+        "resIo",
+        "resDeltaIL",
+        "resDeltaVo",
+        "resILmax",
+        "resILmin",
+        "resLcrit",
+        "resVswMax",
+        "waveformSvgContainer"
+      ]
+    },
+    {
+      "id": "historico",
+      "file": "pages/historico.html",
+      "title": "Provas anteriores • análise histórica",
+      "navAnchor": "historySection",
+      "anchors": [
+        "historySection"
+      ]
+    },
+    {
+      "id": "p1-2024",
+      "file": "pages/p1-2024.html",
+      "title": "P1 • 12/11/2024",
+      "navAnchor": "historySection",
+      "anchors": [
+        "p1-2024-page",
+        "p1-2024",
+        "hist-2024-q1",
+        "hist-2024-q2",
+        "hist-2024-q3"
+      ]
+    },
+    {
+      "id": "p1-2025-maio",
+      "file": "pages/p1-2025-maio.html",
+      "title": "P1 • 07/05/2025",
+      "navAnchor": "historySection",
+      "anchors": [
+        "p1-2025-maio-page",
+        "p1-2025-maio",
+        "hist-2025a-q1",
+        "hist-2025a-q2",
+        "hist-2025a-q3"
+      ]
+    },
+    {
+      "id": "p1-2025-setembro",
+      "file": "pages/p1-2025-setembro.html",
+      "title": "P1 • 24/09/2025",
+      "navAnchor": "historySection",
+      "anchors": [
+        "p1-2025-setembro-page",
+        "p1-2025-setembro",
+        "hist-2025b-q1",
+        "hist-2025b-q2",
+        "hist-2025b-q3"
+      ]
+    },
+    {
+      "id": "p1-2026",
+      "file": "pages/p1-2026.html",
+      "title": "P1 • 22/04/2026",
+      "navAnchor": "historySection",
+      "anchors": [
+        "p1-2026-page",
+        "p1-2026",
+        "hist-2026-q1",
+        "hist-2026-q2",
+        "hist-2026-q3"
+      ]
+    },
+    {
+      "id": "simulado-a",
+      "file": "pages/simulado-a.html",
+      "title": "Simulado A — padrão histórico",
+      "navAnchor": "examSection",
+      "anchors": [
+        "examSection",
+        "mockA",
+        "solMockA1",
+        "solMockA2",
+        "solMockA3"
+      ]
+    },
+    {
+      "id": "simulado-b",
+      "file": "pages/simulado-b.html",
+      "title": "Simulado B — variações de gráficos",
+      "navAnchor": "examSection",
+      "anchors": [
+        "mockB",
+        "solMockB1",
+        "solMockB2",
+        "solMockB3"
+      ]
+    },
+    {
+      "id": "projeto-buck",
+      "file": "pages/projeto-buck.html",
+      "title": "Projeto • Buck CCM",
+      "navAnchor": "examSection",
+      "anchors": [
+        "quizSection",
+        "solP1_1"
+      ]
+    },
+    {
+      "id": "projeto-boost",
+      "file": "pages/projeto-boost.html",
+      "title": "Projeto • Boost DCM",
+      "navAnchor": "examSection",
+      "anchors": [
+        "projeto-boost-section",
+        "solP1_2"
+      ]
+    },
+    {
+      "id": "projeto-buckboost",
+      "file": "pages/projeto-buckboost.html",
+      "title": "Projeto • Buck-Boost DCM",
+      "navAnchor": "examSection",
+      "anchors": [
+        "projeto-buckboost-section",
+        "solP1_3"
+      ]
+    },
+    {
+      "id": "fundamentos",
+      "file": "pages/fundamentos.html",
+      "title": "Fundamentos complementares",
+      "navAnchor": "examSection",
+      "anchors": [
+        "fundamentalsPractice",
+        "solInsurance2026"
+      ]
+    }
+  ],
+  "checklistIds": [
+    "mod1-item1",
+    "mod1-item2",
+    "mod1-item3",
+    "mod1-item4",
+    "mod2-item1",
+    "mod2-item2",
+    "mod2-item3",
+    "mod2-item4",
+    "mod3-item1",
+    "mod3-item2",
+    "mod3-item3",
+    "mod3-item4",
+    "mod4-item1",
+    "mod4-item2",
+    "mod4-item3",
+    "mod4-item4",
+    "mod4-item5",
+    "mod5-item1",
+    "mod5-item2",
+    "mod5-item3",
+    "mod5-item4",
+    "mod6-item1",
+    "mod6-item2",
+    "mod6-item3",
+    "mod6-item4",
+    "mod7-item1",
+    "mod7-item2",
+    "mod7-item3",
+    "mod7-item4",
+    "mod8-item1",
+    "mod8-item2",
+    "mod8-item3",
+    "mod8-item4",
+    "mod9-item1",
+    "mod9-item2",
+    "mod9-item3",
+    "mod9-item4"
+  ]
 }

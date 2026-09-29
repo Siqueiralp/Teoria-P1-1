@@ -2620,3 +2620,109 @@ body.exam-formula-open {
     stroke: #111 !important;
   }
 }
+
+
+/* Alternativas gráficas reconstruídas das provas */
+.exam-alternatives {
+  margin: 12px 0 18px;
+  border: 1px solid var(--ahti-border, var(--border-subtle));
+  border-radius: 12px;
+  background: var(--ahti-bg, var(--bg-secondary));
+  overflow: hidden;
+}
+
+.exam-alternatives-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ahti-border, var(--border-subtle));
+  background: var(--ahti-surface, var(--bg-card));
+}
+
+.exam-alternatives-head strong {
+  color: var(--ahti-text, var(--text-bright));
+  font-size: 0.84rem;
+}
+
+.exam-alternatives-head span {
+  color: var(--ahti-subtle, var(--text-muted));
+  font-size: 0.7rem;
+}
+
+.exam-alternatives-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 10px;
+}
+
+.exam-alt-card {
+  margin: 0;
+  min-width: 0;
+  border: 1px solid var(--ahti-border, var(--border-subtle));
+  border-radius: 9px;
+  background: var(--ahti-surface, var(--bg-card));
+  overflow: hidden;
+}
+
+.exam-alt-card.is-correct {
+  border-width: 2px;
+  border-color: var(--ahti-success, #22c55e);
+}
+
+.exam-alt-label {
+  padding: 8px 9px 6px;
+  color: var(--ahti-text, var(--text-bright));
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.exam-alt-card.is-correct .exam-alt-label {
+  color: var(--ahti-success, #22c55e);
+}
+
+.exam-alt-card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.exam-alt-card figcaption {
+  min-height: 64px;
+  padding: 7px 9px 9px;
+  border-top: 1px solid var(--ahti-border, var(--border-subtle));
+  color: var(--ahti-muted, var(--text-muted));
+  font-size: 0.7rem;
+  line-height: 1.45;
+}
+
+.exam-solution-steps {
+  margin: 8px 0 14px;
+  padding-left: 23px;
+}
+
+.exam-solution-steps li {
+  margin: 8px 0;
+  line-height: 1.55;
+}
+
+.solution-content > p {
+  line-height: 1.6;
+}
+
+@media (max-width: 850px) {
+  .exam-alternatives-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-alt-card {
+    max-width: 520px;
+  }
+}
+
+@media print {
+  body.print-formula-only .exam-alternatives {
+    display: none !important;
+  }
+}

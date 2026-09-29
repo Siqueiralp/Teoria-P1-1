@@ -69,6 +69,16 @@
   ],
   "tools": [
     {
+      "anchor": "historySection",
+      "code": "P1",
+      "title": "Provas anteriores: revisão"
+    },
+    {
+      "anchor": "waveformReviewSection",
+      "code": "OND",
+      "title": "Roteiro de formas de onda"
+    },
+    {
       "anchor": "calculatorSection",
       "code": "SIM",
       "title": "Simulador Interativo"

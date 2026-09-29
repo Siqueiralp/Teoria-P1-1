@@ -63,6 +63,10 @@ button { font-family: inherit; }
 .brand-icon, .btn-complete-module, .subject-card-link { background: var(--ahti-text); color: var(--ahti-bg); }
 .btn-complete-module.completed { background: var(--ahti-success); color: var(--ahti-bg); }
 .module-title, .module-body h3, .triad-header { color: var(--ahti-text); font-weight: 600; }
+/* Gráficos históricos mantêm rótulos legíveis em telas estreitas. */
+[data-history-plot], [data-history-capacitor] { overflow-x: auto; }
+[data-history-plot] svg, [data-history-capacitor] svg { display: block; width: 100%; min-width: 600px; }
+#historySection article { scroll-margin-top: 96px; }
 .module-body h3 { font-size: 1.25rem; }
 .module-body > p, .hero-subtitle { max-width: 75ch; }
 .triad-card { background: transparent; box-shadow: none; border: 0; border-left: 2px solid var(--ahti-border); border-radius: 0; }

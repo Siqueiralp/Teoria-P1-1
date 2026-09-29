@@ -403,6 +403,29 @@ function initConverterDashboards() {
   });
 }
 
+// Integra iC por trechos e remove a média da carga acumulada. A saída é
+// uma aproximação de pequena ondulação, com Io constante e sem ESR/ESL.
+function capacitorRippleAt(config, tau) {
+  var p = config.params, buck = config.topology === 'buck';
+  var d2 = config.mode === 'CCM' ? 1 - p.D : p.D2;
+  var intervals = [
+    [p.D, buck ? p.Imin - p.Io : -p.Io, buck ? p.deltaIL / p.D : 0],
+    [d2, p.Imax - p.Io, -p.deltaIL / d2],
+    [Math.max(0, 1 - p.D - d2), -p.Io, 0]
+  ];
+  var q = 0, meanQ = 0, atTime = 0, start = 0;
+  tau = Math.max(0, Math.min(1, tau));
+  intervals.forEach(function (segment) {
+    var h = segment[0], i0 = segment[1], slope = segment[2];
+    var u = Math.max(0, Math.min(h, tau - start));
+    atTime += i0 * u + slope * u * u / 2;
+    meanQ += q * h + i0 * h * h / 2 + slope * h * h * h / 6;
+    q += i0 * h + slope * h * h / 2;
+    start += h;
+  });
+  return (atTime - meanQ) / (p.fs * p.C);
+}
+
 function calculateInstantState(config, tau) {
   var p = config.params;
   tau = Math.max(0, Math.min(1, tau)); // 1 representa o limite Ts− no controle manual.
@@ -419,6 +442,7 @@ function calculateInstantState(config, tau) {
     vS: on ? 0 : off ? (buck ? p.Vin : boost ? p.Vo : p.Vin + p.Vo) : (buck ? p.Vin - p.Vo : p.Vin),
     vD: off ? 0 : on ? -(buck ? p.Vin : boost ? p.Vo : p.Vin + p.Vo) : (boost ? p.Vin - p.Vo : -p.Vo),
     iC: (buck ? iL : iD) - p.Io,
+    vRipple: capacitorRippleAt(config, tau),
     iIn: boost ? iL : iS, Io: p.Io,
     // Corrente vertical física, positiva de cima para baixo.
     iCDown: ((buck ? iL : iD) - p.Io) * (config.topology === 'buckboost' ? -1 : 1),
@@ -455,15 +479,7 @@ function integrateCapacitorVoltageRise(config, tau) {
 }
 
 function capacitorVoltageAt(config, tau) {
-  var p = config.params;
-  if (!Number.isFinite(config._capVoltageMeanRise)) {
-    var samples = 256, sum = 0;
-    for (var i = 0; i < samples; i++) {
-      sum += integrateCapacitorVoltageRise(config, (i + 0.5) / samples);
-    }
-    config._capVoltageMeanRise = sum / samples;
-  }
-  return p.Vo + integrateCapacitorVoltageRise(config, tau) - config._capVoltageMeanRise;
+  return config.params.Vo + capacitorRippleAt(config, tau);
 }
 
 function capacitorRipple(config) {
@@ -1071,7 +1087,7 @@ function generateOscilloscopeSvgContent(config, state, channel) {
         });
       }
       html += '<path data-trace="' + key + '" d="' + d + '" fill="none" stroke="' + colors[key] + '" stroke-width="2.3"' + (index ? ' stroke-dasharray="' + (index === 1 ? '7 4' : '2 4') + '"' : '') + '/>';
-      html += text(460 + index * 62, top - 7, key, colors[key]);
+      html += text(460 + index * 62, top - 7, key === 'vRipple' ? 'δvC' : key, colors[key]);
       html += '<circle data-scope-dot="' + key + '" data-zero="' + zero + '" data-scale="' + scale + '" r="4" fill="' + colors[key] + '" stroke="#fff"/>';
     });
   }
@@ -1189,7 +1205,7 @@ function getExamFigureDefinitions() {
       {label:"iC",unit:"A",points:[[0,-2.4],[.4,-2.4],[.4,3.6],[1,-.4]],annotations:[{t:.18,v:-2.4,text:"−2,4 A"},{t:.4,v:3.6,text:"+3,6 A"}]},
       {label:"vC",unit:"qual.",points:[[0,1.04],[.4,.88],[.55,.94],[.9,1.10],[1,1.09]],min:.8,max:1.14,annotations:[{t:.4,v:.88,text:"mín."},{t:.9,v:1.10,text:"máx."}]}
     ]},
-    "solHist2024Q3":{title:"2024 Q3 — Buck: S, vL e iL",topology:"buck",Vin:60,Vo:48,D:.8,audit:"Leitura conferida: tON=80 µs, Ts=100 µs, vL,on=+12 V, IL,médio=4 A e ΔIL=2 A.",markers:[{t:.8,label:"80 µs"},{t:1,label:"100 µs"}],signals:[
+    "solHist2024Q3":{title:"2024 Q3 — Buck: S, vL e iL",topology:"buck",Vin:60,Vo:48,D:.8,audit:"Dados textuais: tON=80 µs, Ts=100 µs, vL,on=+12 V, IL,médio=4 A e ΔIL=2 A. O mínimo marcado na foto parece 1 A e conflita com o texto; esta reconstrução adota os dados textuais.",markers:[{t:.8,label:"80 µs"},{t:1,label:"100 µs"}],signals:[
       {label:"S",unit:"0/1",points:[[0,1],[.8,1],[.8,0],[1,0]],min:0,max:1},
       {label:"vL",unit:"V",points:[[0,12],[.8,12],[.8,-48],[1,-48]]},
       {label:"iL",unit:"A",points:[[0,3],[.8,5],[1,3]],brackets:[{t:.93,v1:3,v2:5,label:"ΔI=2 A"}]}
@@ -1226,7 +1242,7 @@ function getExamFigureDefinitions() {
       {label:"vL",unit:"V",points:[[0,100],[.3,100],[.3,-150],[.5,-150],[.5,0],[1,0]]},
       {label:"iL",unit:"A",points:[[0,0],[.3,4],[.5,0],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.3,0],[.3,4],[.5,0],[1,0]]},{label:"iC",unit:"A",points:[[0,-.4],[.3,-.4],[.3,3.6],[.5,-.4],[1,-.4]]}
     ]},
-    "solHistApr26Q3":{title:"2026 Q3 — Buck: iS, iC e vC",topology:"buck",Vin:100,Vo:60,D:.6,audit:"Imin=2 A é dado no texto; 2 A no gráfico é ΔIL. Logo Imax=4 A e Io=3 A. A forma de vC vem do sinal de iC.",alternatives:[{label:"Alternativa 1 — esquerda",correct:false,markers:[.3,.6,.8],vo:[[0,.55],[.3,.68],[.55,.76],[.62,.50],[1,.63]],ic:[[0,-1],[.6,1],[1,-1]],note:"Os extremos de vₒ não coincidem com os cruzamentos iC=0."},{label:"Alternativa 2 — centro",correct:true,markers:[.3,.6,.8],vo:[[0,.66],[.3,.52],[.6,.62],[.8,.74],[1,.66]],ic:[[0,-1],[.6,1],[1,-1]],note:"Compatível com iC=iL−Io: mínimo em 30 µs, máximo em 80 µs e trechos curvos por integração da corrente triangular."},{label:"Alternativa 3 — direita",correct:false,markers:[.3,.6,.8],vo:[[0,.55],[.3,.68],[.6,.55],[.8,.67],[1,.58]],ic:[[0,-1],[.6,1],[1,-1]],note:"Introduz extremos incompatíveis com dvₒ/dt=iC/C."}],markers:[{t:.6,label:"60 µs"},{t:1,label:"100 µs"}],signals:[
+    "solHistApr26Q3":{title:"2026 Q3 — Buck: iS, iC e vC",topology:"buck",Vin:100,Vo:60,D:.6,audit:"Imin=2 A é dado no texto; 2 A no gráfico é ΔIL. Logo Imax=4 A e Io=3 A. A forma de vC vem do sinal de iC.",alternatives:[{label:"Alternativa 1 — esquerda",correct:false,markers:[.3,.6,.8],vo:[[0,.55],[.3,.68],[.55,.76],[.62,.50],[1,.63]],ic:[[0,-1],[.6,1],[1,-1]],note:"Os extremos de vₒ não coincidem com os cruzamentos iC=0."},{label:"Alternativa 2 — centro",correct:false,markers:[.3,.6,.8],vo:[[0,.66],[.3,.80],[.6,.66],[.8,.52],[1,.66]],ic:[[0,-1],[.6,1],[1,-1]],note:"A alternativa central fotografada tem a inclinação invertida: sobe com iC negativa. Nenhuma das três é correta com a referência impressa; consulte a revisão histórica e a integral calculada."},{label:"Alternativa 3 — direita",correct:false,markers:[.3,.6,.8],vo:[[0,.55],[.3,.68],[.6,.55],[.8,.67],[1,.58]],ic:[[0,-1],[.6,1],[1,-1]],note:"Introduz extremos incompatíveis com dvₒ/dt=iC/C."}],markers:[{t:.6,label:"60 µs"},{t:1,label:"100 µs"}],signals:[
       {label:"iS",unit:"A",points:[[0,2],[.6,4],[.6,0],[1,0]],brackets:[{t:.55,v1:2,v2:4,label:"ΔI=2 A"}]},
       {label:"vL",unit:"V",points:[[0,40],[.6,40],[.6,-60],[1,-60]]},
       {label:"iC",unit:"A",points:[[0,-1],[.6,1],[1,-1]],annotations:[{t:.3,v:0,text:"vC mín."},{t:.8,v:0,text:"vC máx."}]},
@@ -1366,10 +1382,108 @@ function initExamMode() {
   });
 }
 
+// Reconstituição dos gráficos das fotos; níveis não impressos são deduzidos
+// nas resoluções do HTML. Tempo em µs, tensão em V e corrente em A.
+var HISTORY_PLOTS = {
+  '2024-q2': { end: 10, ticks: [0, 4, 10], traces: [
+    { name: 'iD [A] — dados da foto', points: [[0,0],[4,0],[4,6],[10,2],[10,0]] }
+  ] },
+  '2024-q3': { end: 100, ticks: [0,80,100], traces: [
+    { name: 'vL [V] — patamar OFF deduzido: −48 V', points: [[0,12],[80,12],[80,-48],[100,-48]] }
+  ] },
+  '2025a-q2': { end: 100, ticks: [0,70,100], traces: [
+    { name: 'vL [V] — ON deduzido: 42,857 V', points: [[0,300/7],[70,300/7],[70,-100],[100,-100]] },
+    { name: 'iC [A] — extremos OFF deduzidos; queda de 2 A', points: [[0,-1],[70,-1],[70,10/3],[100,4/3]] }
+  ] },
+  '2025a-q3': { end: 100, ticks: [0,70,100], traces: [
+    { name: 'iS [A] — ON dura 30 µs', points: [[0,0],[70,0],[70,6],[100,8],[100,0]] }
+  ] },
+  '2025b-q2': { end: 80, ticks: [0,50,80], traces: [
+    { name: 'vL [V] — ON deduzido: 60 V', points: [[0,60],[50,60],[50,-100],[80,-100]] },
+    { name: 'iC [A] — extremos OFF deduzidos; queda de 2 A', points: [[0,-1],[50,-1],[50,8/3],[80,2/3]] }
+  ] },
+  '2025b-q3': { end: 100, ticks: [0,70,100], traces: [
+    { name: 'iD [A] — OFF dura 30 µs', points: [[0,0],[70,0],[70,8],[100,6],[100,0]] }
+  ] },
+  '2026-q1': { end: 100, ticks: [0,65,100], traces: [
+    { name: 'vL [V] — ON deduzido: 80,769 V', points: [[0,150*35/65],[65,150*35/65],[65,-150],[100,-150]] },
+    { name: 'iD [A] — pico 11 A; mínimo deduzido: 6 A', points: [[0,0],[65,0],[65,11],[100,6],[100,0]] }
+  ] },
+  '2026-q2': { end: 100, ticks: [0,30,50,100], traces: [
+    { name: 'vL [V] — trecho negativo deduzido: −150 V', points: [[0,100],[30,100],[30,-150],[50,-150],[50,0],[100,0]] },
+    { name: 'iD [A] — diodo conduz só 20 µs', points: [[0,0],[30,0],[30,4],[50,0],[100,0]] }
+  ] },
+  '2026-q3': { end: 100, ticks: [0,60,100], traces: [
+    { name: 'iS [A] — mínimo 2 A; pico deduzido: 4 A', points: [[0,2],[60,4],[60,0],[100,0]] }
+  ] }
+};
+
+function historyPlotSvg(plot) {
+  var height = 155 * plot.traces.length + 25;
+  var x = function (t) { return 68 + 550 * t / plot.end; };
+  var html = '<svg viewBox="0 0 680 ' + height + '" role="img" aria-label="Gráfico reconstruído da prova; tempo em microssegundos" xmlns="http://www.w3.org/2000/svg">';
+  html += '<title>' + plot.traces.map(function (tr) { return tr.name; }).join('; ') + '</title>';
+  plot.traces.forEach(function (trace, index) {
+    var top = index * 155 + 33;
+    var values = trace.points.map(function (pt) { return pt[1]; }).concat([0]);
+    var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
+    var y = function (value) { return top + 90 * (hi - value) / (hi - lo || 1); };
+    var color = index % 2 ? 'var(--ahti-capacitor)' : 'var(--ahti-info)';
+    html += '<text x="68" y="' + (top - 13) + '" fill="var(--ahti-text)" font-size="13">' + trace.name + '</text>';
+    plot.ticks.forEach(function (time, tickIndex) {
+      var labelY = top + 114 + (tickIndex && x(time) - x(plot.ticks[tickIndex - 1]) < 36 ? 14 : 0);
+      html += '<path d="M' + x(time) + ' ' + (top - 2) + 'V' + (top + 96) + '" stroke="var(--ahti-border)" stroke-dasharray="3 4"/>';
+      html += '<text x="' + x(time) + '" y="' + labelY + '" text-anchor="middle" fill="var(--ahti-subtle)" font-size="12">' + time + '</text>';
+    });
+    html += '<path d="M68 ' + y(0) + 'H618" stroke="var(--ahti-control)" stroke-dasharray="4 3"/>';
+    Array.from(new Set(trace.levels || values)).sort(function (a,b) { return a-b; }).forEach(function (value) {
+      html += '<text x="59" y="' + (y(value) + 4) + '" text-anchor="end" fill="var(--ahti-muted)" font-size="12">' + Number(value.toFixed(2)) + '</text>';
+    });
+    html += '<path d="' + trace.points.map(function (pt, i) { return (i ? 'L' : 'M') + x(pt[0]) + ' ' + y(pt[1]); }).join(' ') + '" fill="none" stroke="' + color + '" stroke-width="2.5"/>';
+    html += '<text x="640" y="' + (top + 114) + '" fill="var(--ahti-muted)" font-size="12">µs</text>';
+  });
+  return html + '</svg>';
+}
+
+function initHistoryPlots() {
+  document.querySelectorAll('[data-history-plot]').forEach(function (host) {
+    var plot = HISTORY_PLOTS[host.dataset.historyPlot];
+    if (plot) host.innerHTML = historyPlotSvg(plot);
+  });
+  document.querySelectorAll('[data-history-capacitor]').forEach(function (host) {
+    host.innerHTML = historyPlotSvg(historyCapacitorPlot(host.dataset.historyCapacitor)) +
+      '<p>vC normalizada: 0 = mínimo e 1 = máximo, sobre o nível CC da saída. A amplitude depende de C; os tempos dos extremos vêm de iC.</p>';
+  });
+}
+
+function historyCapacitorPlot(id) {
+  var spec = {
+    '2024-q2': ['boost', 'CCM', 10, .4, .6, 2, 6, 2.4, [0,4,9.4,10]],
+    '2026-q2': ['boost', 'DCM', 100, .3, .2, 0, 4, .4, [0,30,48,50,100]],
+    '2026-q3': ['buck', 'CCM', 100, .6, .4, 2, 4, 3, [0,30,60,80,100]]
+  }[id];
+  var [topology, mode, T, D, D2, Imin, Imax, Io, ticks] = spec;
+  var config = { topology: topology, mode: mode, params: {
+    D: D, D2: D2, Imin: Imin, Imax: Imax, deltaIL: Imax - Imin,
+    Io: Io, fs: 1e6/T, C: 1 // Se cancela ao normalizar a tensão.
+  }};
+  var times = Array.from(new Set(Array.from({ length: 301 }, function (_, i) { return i*T/300; }).concat(ticks))).sort(function (a,b) { return a-b; });
+  var values = times.map(function (t) { return capacitorRippleAt(config, t/T); });
+  var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
+  var currents = topology === 'buck'
+    ? [[0,Imin-Io],[D*T,Imax-Io],[(D+D2)*T,Imin-Io]]
+    : [[0,-Io],[D*T,-Io],[D*T,Imax-Io],[(D+D2)*T,Imin-Io]];
+  if (mode === 'DCM') currents.push([T,-Io]);
+  return { end: T, ticks: ticks, traces: [
+    { name: 'vC — forma normalizada (vC − mínimo) / ΔVpp', levels: [0,1], points: times.map(function (t,i) { return [t,(values[i]-lo)/(hi-lo)]; }) },
+    { name: 'iC [A] — extremos de vC nas trocas de sinal', points: currents }
+  ] };
+}
 
 window.initSubjectTools = function () {
   initCalculator();
   initConverterDashboards();
   initExamFigures();
   initExamMode();
+  initHistoryPlots();
 };

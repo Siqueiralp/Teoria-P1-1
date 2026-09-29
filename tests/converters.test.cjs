@@ -122,3 +122,109 @@ test('Valores numéricos dos exercícios de Controle 1', () => {
   close(3780 * (1 / 0.07 - 1), 50220);
   assert.ok(151 * 2188 > 3780 + 50220);
 });
+
+test('Tensão de C: periodicidade, média, continuidade e C dv/dt = iC nos seis diagramas', () => {
+  for (const config of Object.values(context.CONVERTER_CONFIGS)) {
+    const p = config.params, n = 2000;
+    let mean = 0;
+    for (let i = 0; i < n; i++) mean += context.capacitorRippleAt(config, (i + 0.5) / n) / n;
+    close(mean, 0, 1e-7);
+    close(context.capacitorRippleAt(config, 0), context.capacitorRippleAt(config, 1));
+    for (const segment of context.waveformSegments(config)) {
+      for (let i = 1; i < 10; i++) {
+        const t = segment.start + (segment.end - segment.start) * i / 10, eps = 1e-7;
+        const derivative = (context.capacitorRippleAt(config, t + eps) -
+          context.capacitorRippleAt(config, t - eps)) / (2 * eps) * p.fs;
+        close(p.C * derivative, context.calculateInstantState(config, t).iC, 1e-7);
+      }
+    }
+    for (const t of [p.D, p.D + p.D2].filter(t => t < 1)) {
+      close(context.capacitorRippleAt(config, t - 1e-10), context.capacitorRippleAt(config, t + 1e-10));
+    }
+    const samples = Array.from({ length: n + 1 }, (_, i) => context.capacitorRippleAt(config, i / n));
+    const expected = config.mode === 'DCM'
+      ? p.Io / (p.fs * p.C) * (1 - (config.topology === 'buck' ? p.D + p.D2 : p.D2) / 2) ** 2
+      : config.topology === 'buck' ? p.deltaIL / (8 * p.fs * p.C) : p.Io * p.D / (p.fs * p.C);
+    close(Math.max(...samples) - Math.min(...samples), expected, 1e-6);
+    const svg = context.generateOscilloscopeSvgContent(config, context.calculateInstantState(config, 0.2), 'filtro');
+    assert.match(svg, /data-trace="vC"/);
+    assert.match(svg, /data-trace="iC"/);
+    assert.doesNotMatch(svg, /NaN|Infinity/);
+  }
+});
+
+const area = points => points.slice(1).reduce((sum, [t, v], i) =>
+  sum + (t - points[i][0]) * (v + points[i][1]) / 2, 0);
+
+test('Gráficos históricos: áreas, intervalos, médias e equilíbrio físico', () => {
+  const plots = context.HISTORY_PLOTS;
+  close(area(plots['2024-q2'].traces[0].points) / 10, 2.4);
+  close(area(plots['2025a-q3'].traces[0].points) / 100, 2.1);
+  close(area(plots['2025b-q3'].traces[0].points) / 100, 2.1);
+  close(area(plots['2026-q1'].traces[1].points) / 100, 2.975);
+  close(area(plots['2026-q2'].traces[1].points) / 100, 0.4);
+  close(area(plots['2026-q3'].traces[0].points) / 100, 1.8);
+  for (const id of ['2024-q3','2025a-q2','2025b-q2','2026-q1','2026-q2']) {
+    close(area(plots[id].traces[0].points), 0);
+  }
+  for (const id of ['2025a-q2','2025b-q2']) close(area(plots[id].traces[1].points), 0);
+  for (const plot of Object.values(plots)) {
+    assert.doesNotMatch(context.historyPlotSvg(plot), /NaN|Infinity/);
+    for (const trace of plot.traces) {
+      assert.equal(trace.points[0][0], 0);
+      assert.equal(trace.points.at(-1)[0], plot.end);
+      trace.points.slice(1).forEach(([t], i) => assert.ok(t >= trace.points[i][0]));
+    }
+  }
+});
+
+test('Provas 2024/2026: integrar o diodo reproduz carga de C e extremos de tensão', () => {
+  for (const [id, on, off, min, max, charge] of [
+    ['2024-q2', 4, 6, 2, 6, 9.72e-6],
+    ['2026-q2', 30, 20, 0, 4, 32.4e-6]
+  ]) {
+    const plot = context.HISTORY_PLOTS[id], T = plot.end;
+    const Io = area(plot.traces.at(-1).points) / T;
+    const V = id === '2024-q2' ? 100 : 250; // 2024: tensão arbitrada só para testar a forma, sem alegar dado da foto.
+    const config = { topology: 'boost', mode: min ? 'CCM' : 'DCM',
+      params: { D: on/T, D2: off/T, Imin: min, Imax: max, deltaIL: max-min,
+        Io, Vo: V, fs: 1/(T*1e-6), C: 100e-6 } };
+    const zero = on + (max-Io)/(max-min)*off;
+    close(zero, id === '2024-q2' ? 9.4 : 48);
+    const excursion = context.capacitorRippleAt(config, zero/T) - context.capacitorRippleAt(config, on/T);
+    close(excursion * config.params.C, charge);
+    close(context.capacitorRippleAt(config, 0), context.capacitorRippleAt(config, 1));
+  }
+});
+
+test('Provas: calculadora resolve os pontos de operação obtidos dos gráficos', () => {
+  const cases = [
+    ['buck', {calcVin:60,calcVo:48,calcPo:192,calcFs:10,calcL:480}, .8, 3, 5, 120],
+    ['buck', {calcVin:100,calcVo:30,calcPo:210,calcFs:10,calcL:1050}, .3, 6, 8, 150],
+    ['buck', {calcVin:100,calcVo:70,calcPo:490,calcFs:10,calcL:1050}, .7, 6, 8, 150],
+    ['buck', {calcVin:100,calcVo:60,calcPo:180,calcFs:10,calcL:1200}, .6, 2, 4, 400],
+    ['boost', {calcVin:300/7,calcVo:1000/7,calcPo:1000/7,calcFs:10,calcL:1500}, .7, 7/3, 13/3],
+    ['buck-boost', {calcVin:60,calcVo:100,calcPo:100,calcFs:12.5,calcL:1500}, .625, 5/3, 11/3],
+    ['buck-boost', {calcVin:150*35/65,calcVo:150,calcPo:446.25,calcFs:10,calcL:1050}, .65, 6, 11],
+    ['boost', {calcVin:100,calcVo:250,calcPo:100,calcFs:10,calcL:750}, .3, 0, 4]
+  ];
+  for (const [topology, input, D, min, max, Lcrit] of cases) {
+    const result = calculate(topology, input);
+    close(result.waveform.D, D);
+    close(result.waveform.IL_min, min);
+    close(result.waveform.IL_max, max);
+    if (Lcrit) close(parseFloat(result.text('resLcrit')), Lcrit, .1);
+  }
+});
+
+test('Curvas históricas de vC: extremos coincidem com as trocas de sinal de iC', () => {
+  for (const [id, tmin, tmax] of [['2024-q2',4,9.4],['2026-q2',30,48],['2026-q3',30,80]]) {
+    const plot = context.historyCapacitorPlot(id), voltage = plot.traces[0].points;
+    close(voltage.find(([t]) => Math.abs(t-tmin) < 1e-9)[1], 0);
+    close(voltage.find(([t]) => Math.abs(t-tmax) < 1e-9)[1], 1);
+    assert.ok(voltage[1][1] < voltage[0][1], 'iC inicialmente negativa exige tensão decrescente');
+    close(voltage[0][1], voltage.at(-1)[1]);
+    close(area(plot.traces[1].points), 0);
+    assert.doesNotMatch(context.historyPlotSvg(plot), /NaN|Infinity/);
+  }
+});

@@ -247,3 +247,14 @@ test('Curvas de capacitor das provas usam a integral quadrática, inclusive corr
   close(jumped.netCharge, .1);
   close(jumped.segments[0].q1, jumped.segments[1].q0);
 });
+
+test('Pontos chave: extremos da integral no cruzamento de corrente, não no pico', () => {
+  const extrema = context.waveformKeyPoints([[0, -2], [1, 2]], true);
+  const min = extrema.find(p => p.label === 'mín.');
+  close(min.t, 0.5); close(min.v, -0.5);
+  const monotonic = context.waveformKeyPoints([[0, 2], [0.5, 0], [1, 2]], true);
+  close(monotonic.find(p => p.label === 'máx.').t, 1);
+  const jump = context.waveformKeyPoints([[0, 0], [0.4, 0], [0.4, 6], [1, 2]], false);
+  close(jump.find(p => p.label === 'máx.').t, 0.4);
+  close(jump.find(p => p.label === 'máx.').v, 6);
+});

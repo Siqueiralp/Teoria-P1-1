@@ -495,7 +495,7 @@ function capacitorRipple(config) {
 function converterEvents(config) {
   var p = config.params, events = [
     { tau: 0, title: 'PWM fecha S', detail: 'Início do ciclo: S conduz e D bloqueia; vL torna-se positiva.' },
-    { tau: p.D, title: 'PWM abre S', detail: 'iL não salta: a corrente comuta de S para D; vL torna-se negativa.' }
+    { tau: p.D, title: 'Pico de iL · S abre', detail: 'iL atinge Imax no fim do ON. iS atinge o pico imediatamente antes da abertura; iD recebe esse pico logo depois. A corrente de L não salta; vL torna-se negativa e vS atinge a tensão de bloqueio.' }
   ];
   if (config.mode === 'DCM') events.push({ tau: p.D + p.D2, title: 'iL = 0: D bloqueia',
     detail: 'Fim da desmagnetização: o diodo impede corrente negativa e começa o intervalo de corrente nula.' });
@@ -1088,6 +1088,15 @@ function generateOscilloscopeSvgContent(config, state, channel) {
       }
       html += '<path data-trace="' + key + '" d="' + d + '" fill="none" stroke="' + colors[key] + '" stroke-width="2.3"' + (index ? ' stroke-dasharray="' + (index === 1 ? '7 4' : '2 4') + '"' : '') + '/>';
       html += text(460 + index * 62, top - 7, key === 'vRipple' ? 'δvC' : key, colors[key]);
+      var candidates=[];
+      if(key==='vC') {
+        converterEvents(config).concat([{tau:1}]).forEach(function(e){candidates.push({t:e.tau,v:capacitorVoltageAt(config,e.tau)});});
+      } else segments.forEach(function(s){candidates.push({t:s.start,v:s.left[key]},{t:s.end,v:s.right[key]});});
+      var extrema=waveformKeyPoints(candidates.map(function(p){return [p.t,p.v];}),false);
+      extrema.forEach(function(p){
+        html+='<circle data-key-point="'+key+'-'+p.label+'" cx="'+x(p.t)+'" cy="'+y(p.v)+'" r="4" fill="none" stroke="'+colors[key]+'"/>';
+        html+=text(x(p.t)+(p.t>.8?-6:6),y(p.v)+12+index*10,key+' '+p.label,colors[key],p.t>.8?'end':'start');
+      });
       html += '<circle data-scope-dot="' + key + '" data-zero="' + zero + '" data-scale="' + scale + '" r="4" fill="' + colors[key] + '" stroke="#fff"/>';
     });
   }
@@ -1149,6 +1158,23 @@ function capacitorIntegralPath(curve,x,y) {
   return d;
 }
 
+function waveformKeyPoints(points, integrate) {
+  var candidates = [], q = 0;
+  points.forEach(function(p, i) {
+    if (!integrate) { candidates.push({t:p[0],v:p[1]}); return; }
+    if (!i) { candidates.push({t:p[0],v:q}); return; }
+    var a=points[i-1], dt=p[0]-a[0];
+    if(dt<=0)return;
+    var slope=(p[1]-a[1])/dt;
+    if(slope!==0) { var u=-a[1]/slope; if(u>0&&u<dt)candidates.push({t:a[0]+u,v:q+a[1]*u+slope*u*u/2}); }
+    q+=(a[1]+p[1])*dt/2; candidates.push({t:p[0],v:q});
+  });
+  if(!candidates.length)return [];
+  var min=candidates.reduce(function(a,b){return b.v<a.v?b:a;}), max=candidates.reduce(function(a,b){return b.v>a.v?b:a;});
+  if(Math.abs(max.v-min.v)<1e-10)return [{t:min.t,v:min.v,label:'constante'}];
+  return [{t:min.t,v:min.v,label:'mín.'},{t:max.t,v:max.v,label:'máx.'}];
+}
+
 function examWaveSvg(def) {
   var W=720,left=72,right=20,top=28,panelH=120,gap=24,signals=def.signals||[];
   var ic=signals.find(function(s){return s.label==='iC';});
@@ -1174,6 +1200,11 @@ function examWaveSvg(def) {
     var d='';sig.points.forEach(function(p,i){d+=(i?' L':'M')+x(p[0])+' '+y(p[1]);});
     if(curve)d=capacitorIntegralPath(curve,x,y);
     h.push('<path d="'+d+'" class="exam-trace" fill="none"/>');
+    waveformKeyPoints(curve?ic.points:sig.points,!!curve).forEach(function(point){
+      var ax=x(point.t), ay=y(curve?curve.normalize(point.v):point.v);
+      h.push('<circle data-key-point="'+point.label+'" cx="'+ax+'" cy="'+ay+'" r="4" fill="none" stroke="currentColor" stroke-width="1.5"/>');
+      txt(ax+(point.t>.8?-8:8),ay+14,point.label+(curve?'':' '+Number(point.v.toFixed(3))+' '+sig.unit),'exam-svg-value',point.t>.8?'end':'start');
+    });
     (curve?[]:sig.annotations||[]).forEach(function(a){var ax=x(a.t),ay=y(a.v);h.push('<circle cx="'+ax+'" cy="'+ay+'" r="3.5" class="exam-point"/>');txt(ax+(a.dx||7),ay+(a.dy||-8),a.text,'exam-svg-value',a.anchor||'start');});
     (sig.brackets||[]).forEach(function(b){var bx=x(b.t),y1=y(b.v1),y2=y(b.v2);line(bx,y1,bx,y2,'exam-bracket');line(bx-6,y1,bx+6,y1,'exam-bracket');line(bx-6,y2,bx+6,y2,'exam-bracket');txt(bx+10,(y1+y2)/2+4,b.label,'exam-svg-value');});
   });
@@ -1300,8 +1331,14 @@ function topologyDescription(topology, mode) {
     buckboost: 'O Buck-Boost inversor gera uma saída negativa em relação ao terra, com magnitude menor ou maior que a entrada, sendo útil para obter uma alimentação de polaridade oposta. Em ON, a chave carrega o indutor e o capacitor alimenta a carga; no OFF, L transfere energia pelo diodo para C e a carga. A polaridade invertida exige atenção às referências: o terminal positivo de C fica ligado ao terra.',
     capacitor: 'O capacitor armazena energia no campo elétrico e suaviza a tensão aplicada à carga. A corrente que entra no terminal positivo altera sua carga: iC positiva aumenta vC e iC negativa a reduz. Corrente constante produz uma reta em q e vC; corrente em rampa produz uma parábola, pois a tensão é a integral da corrente dividida por C.'
   };
-  return (descriptions[topology] || '') + (topology==='capacitor' ? '' : mode==='DCM'
-    ? ' Em DCM, a corrente de L chega a zero antes do próximo ON: existe um terceiro intervalo com chave e diodo bloqueados, durante o qual C sustenta a carga. O ganho também depende da carga, da indutância e da frequência.'
+  var keyPoints = {
+    buck: ' A corrente de L e da chave é máxima no fim do ON (D·Ts); o diodo recebe esse pico no início do OFF. A tensão de bloqueio da chave é Vin no OFF e a tensão reversa máxima do diodo tem magnitude Vin no ON. vL vale Vin−Vo no ON e −Vo no OFF: o maior módulo depende dessas duas magnitudes. Como iC=iL−Io, vC é mínima quando iL cruza Io subindo e máxima quando cruza Io descendo; os extremos de tensão não coincidem com o pico de iL.',
+    boost: ' iL e iS atingem o pico no fim do ON; iD tem seu pico logo no início do OFF. A chave suporta Vo durante o OFF com diodo, e o diodo suporta tensão reversa de magnitude Vo no ON. vL vale Vin no ON e Vin−Vo no OFF; compare os módulos para identificar o maior esforço em L. C descarrega no ON (iC=−Io), atingindo o mínimo na abertura da chave se iD passa a superar Io. No OFF, vC sobe enquanto iD>Io e atinge o máximo quando iD cruza Io descendo; se iD permanece acima de Io até o fim do OFF, o máximo ocorre no fechamento seguinte de S.',
+    buckboost: ' iL e iS têm pico no fim do ON; iD recebe esse pico no início do OFF. A chave e o diodo devem suportar Vin+|Vo| em bloqueio (S no OFF com diodo, D no ON). vL vale Vin no ON e −|Vo| no OFF; o maior módulo depende da relação entre entrada e saída. C descarrega no ON e carrega no OFF enquanto iD>Io; sua tensão positiva atinge máximo quando iD cruza Io descendo ou, se não houver esse cruzamento no OFF, no fechamento seguinte de S. Como vout=−vC, o máximo de vC corresponde à saída mais negativa, de maior módulo.',
+    capacitor: ' A maior corrente em módulo produz a maior inclinação em módulo de vC, não necessariamente sua maior tensão. Um cruzamento de iC de positivo para negativo marca máximo de vC; de negativo para positivo, mínimo. Saltos de corrente mudam a inclinação, mas a tensão permanece contínua. Se iC apenas toca zero sem mudar de sinal, há tangente horizontal sem extremo; em corrente nula por um intervalo, vC permanece constante.'
+  };
+  return (descriptions[topology] || '') + (keyPoints[topology] || '') + (topology==='capacitor' ? '' : mode==='DCM'
+    ? ' Em DCM, a corrente de L chega a zero antes do próximo ON: existe um terceiro intervalo com chave e diodo bloqueados, durante o qual C sustenta a carga. O ganho também depende da carga, da indutância e da frequência. No terceiro intervalo, iL=iS=iD=0 e vL=0; C descarrega com iC=−Io. As tensões de bloqueio mudam nesse intervalo e não devem ser confundidas com os patamares do OFF com diodo.'
     : ' Em CCM, a corrente de L permanece positiva durante todo o período; em condução crítica, apenas toca zero ao final do OFF.');
 }
 

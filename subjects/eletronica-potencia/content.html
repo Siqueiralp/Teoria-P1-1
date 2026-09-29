@@ -2175,7 +2175,7 @@
           C=\frac{\max q-\min q}{\Delta V_{pp}}.$$
           <ul>
             <li>\(i_C&gt;0\): \(v_C\) cresce; \(i_C&lt;0\): diminui. O extremo ocorre na troca de sinal de \(i_C\), inclusive quando a corrente salta na comutação.</li>
-            <li>Corrente constante produz trecho linear de tensão; corrente em rampa produz trecho parabólico. Sem impulsos de corrente e sem ESR/ESL, a tensão de C não salta.</li>
+            <li>Corrente constante produz trecho linear de carga e tensão; corrente em rampa produz trecho parabólico. Se iC(t) = i₀ + a(t − t₀), então q(t) − q(t₀) = i₀(t − t₀) + a(t − t₀)²/2 e vC(t) − vC(t₀) = [q(t) − q(t₀)]/C. Rampa crescente gera concavidade para cima; rampa decrescente, para baixo. Concavidade e sentido de subida são distintos: o sinal de iC determina se a tensão sobe ou desce. Sem impulsos de corrente e sem ESR/ESL, a tensão de C não salta.</li>
             <li>No Buck CCM, \(i_C=i_L-I_o\): os extremos de tensão ocorrem nos cruzamentos \(i_L=I_o\), e não necessariamente na abertura/fechamento de S.</li>
             <li>No Boost/inversor, \(i_C=-I_o\) em ON. No intervalo do diodo, \(i_C=i_L-I_o\): se a corrente cruza zero antes de o diodo bloquear, a tensão já começa a cair.</li>
           </ul>

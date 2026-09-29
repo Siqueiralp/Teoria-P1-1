@@ -700,7 +700,7 @@ function createAnimatedConverterSimulator(host, config) {
         '<div class="converter-dashboard-formula">' +
           '<span>Tensão no Capacitor</span>' +
           '<strong>vC(t) = vC(t₀) + (1/C) ∫[t₀→t] iC(τ) dτ</strong>' +
-          '<small>Em RPP: vC(Ts) = vC(0) e ⟨iC⟩ = 0. A inclinação de vC é iC/C; os extremos de vC ocorrem quando iC = 0.</small>' +
+          '<small>Em RPP: vC(Ts) = vC(0) e ⟨iC⟩ = 0. Corrente linear → carga e tensão parabólicas; corrente constante → reta. A inclinação de vC é iC/C. Um cruzamento de iC por zero produz uma tangente horizontal.</small>' +
         '</div>' +
         '<p class="converter-conventions">Modelo ideal periódico, saída com pequena ondulação. fs = 50 kHz; L = ' + (config.params.L * 1e6).toFixed(1) + ' µH; C = ' + (config.params.C * 1e6).toFixed(0) + ' µF; R = ' + config.params.R.toFixed(2) + ' Ω. Tempo ampliado para estudo; pontos indicam o sentido, não a velocidade dos elétrons.</p>' +
       '</div>' +
@@ -1123,8 +1123,35 @@ function updateOscilloscopeSvg(box, state) {
    4. MODO DE PROVA: formulário flutuante, impressão e PDF via navegador
    ========================================================================== */
 
+// Integração exata por trecho: q(t)=q0+i0·u+(di/dt)·u²/2.
+// O caminho Bézier quadrático mantém a curvatura sem interpolar pontos arbitrários.
+function capacitorIntegralCurve(points) {
+  var q=0, segments=[], extrema=[0];
+  for(var i=1;i<points.length;i++) {
+    var a=points[i-1], b=points[i], dt=b[0]-a[0];
+    if(dt<=0) continue; // Salto de corrente não produz salto de carga/tensão.
+    var slope=(b[1]-a[1])/dt, end=q+(a[1]+b[1])*dt/2;
+    segments.push({start:a[0],end:b[0],q0:q,q1:end,control:q+a[1]*dt/2});
+    extrema.push(end);
+    if(slope!==0) {var u=-a[1]/slope;if(u>0&&u<dt)extrema.push(q+a[1]*u+slope*u*u/2);}
+    q=end;
+  }
+  var lo=Math.min.apply(null,extrema), span=Math.max.apply(null,extrema)-lo||1;
+  return {segments:segments,normalize:function(v){return (v-lo)/span;},netCharge:q};
+}
+
+function capacitorIntegralPath(curve,x,y) {
+  var d='';
+  curve.segments.forEach(function(s,i){
+    if(!i)d='M'+x(s.start)+' '+y(curve.normalize(s.q0));
+    d+=' Q'+x((s.start+s.end)/2)+' '+y(curve.normalize(s.control))+' '+x(s.end)+' '+y(curve.normalize(s.q1));
+  });
+  return d;
+}
+
 function examWaveSvg(def) {
-  var W=720,left=72,right=20,top=28,panelH=96,gap=16,signals=def.signals||[];
+  var W=720,left=72,right=20,top=28,panelH=120,gap=24,signals=def.signals||[];
+  var ic=signals.find(function(s){return s.label==='iC';});
   var H=top+signals.length*(panelH+gap)+40,h=[];
   function x(t){return left+(W-left-right)*t;}
   function txt(xp,yp,t,cls,anchor){h.push('<text x="'+xp+'" y="'+yp+'" class="'+(cls||'exam-svg-text')+'" text-anchor="'+(anchor||'start')+'">'+t+'</text>');}
@@ -1133,18 +1160,21 @@ function examWaveSvg(def) {
   (def.markers||[]).forEach(function(m){line(x(m.t),16,x(m.t),H-28,'exam-marker-line');txt(x(m.t),H-10,m.label,'exam-svg-subtle','middle');});
   signals.forEach(function(sig,idx){
     var yTop=top+idx*(panelH+gap),yBottom=yTop+panelH;
-    var vals=sig.points.map(function(p){return p[1];});
-    var lo=sig.min!=null?sig.min:Math.min.apply(null,vals.concat([0]));
-    var hi=sig.max!=null?sig.max:Math.max.apply(null,vals.concat([0]));
+    var curve=sig.label==='vC'&&ic?capacitorIntegralCurve(ic.points):null;
+    var vals=curve?[0,1]:sig.points.map(function(p){return p[1];});
+    var lo=curve?0:sig.min!=null?sig.min:Math.min.apply(null,vals.concat([0]));
+    var hi=curve?1:sig.max!=null?sig.max:Math.max.apply(null,vals.concat([0]));
     if(Math.abs(hi-lo)<1e-9){hi+=1;lo-=1;}
     var pad=(hi-lo)*0.14||1;hi+=pad;lo-=pad;
     function y(v){return yTop+(hi-v)/(hi-lo)*panelH;}
     line(left,yBottom,W-right,yBottom,'exam-grid');line(left,yTop,left,yBottom,'exam-grid');
     if(lo<=0&&hi>=0)line(left,y(0),W-right,y(0),'exam-zero-line');
-    txt(12,yTop+20,sig.label,'exam-svg-title');txt(12,yTop+38,'['+sig.unit+']','exam-svg-subtle');
+    txt(12,yTop+20,sig.label,'exam-svg-title');txt(12,yTop+38,'['+(curve?'0–1':sig.unit)+']','exam-svg-subtle');
+    if(curve)txt(left,yTop-7,'Integral de iC: retas → parábolas • ondulação normalizada','exam-svg-subtle');
     var d='';sig.points.forEach(function(p,i){d+=(i?' L':'M')+x(p[0])+' '+y(p[1]);});
+    if(curve)d=capacitorIntegralPath(curve,x,y);
     h.push('<path d="'+d+'" class="exam-trace" fill="none"/>');
-    (sig.annotations||[]).forEach(function(a){var ax=x(a.t),ay=y(a.v);h.push('<circle cx="'+ax+'" cy="'+ay+'" r="3.5" class="exam-point"/>');txt(ax+(a.dx||7),ay+(a.dy||-8),a.text,'exam-svg-value',a.anchor||'start');});
+    (curve?[]:sig.annotations||[]).forEach(function(a){var ax=x(a.t),ay=y(a.v);h.push('<circle cx="'+ax+'" cy="'+ay+'" r="3.5" class="exam-point"/>');txt(ax+(a.dx||7),ay+(a.dy||-8),a.text,'exam-svg-value',a.anchor||'start');});
     (sig.brackets||[]).forEach(function(b){var bx=x(b.t),y1=y(b.v1),y2=y(b.v2);line(bx,y1,bx,y2,'exam-bracket');line(bx-6,y1,bx+6,y1,'exam-bracket');line(bx-6,y2,bx+6,y2,'exam-bracket');txt(bx+10,(y1+y2)/2+4,b.label,'exam-svg-value');});
   });
   txt(left,H-10,'0','exam-svg-subtle','middle');txt(W-right,H-10,def.periodLabel||'Tₛ','exam-svg-subtle','end');
@@ -1170,6 +1200,8 @@ function examAlternativeSvg(alt) {
   function txt(xp,yp,t,cls,anchor){h.push('<text x="'+xp+'" y="'+yp+'" class="'+(cls||'exam-svg-text')+'" text-anchor="'+(anchor||'start')+'">'+t+'</text>');}
   function line(x1,y1,x2,y2,cls){h.push('<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" class="'+(cls||'exam-grid')+'"/>');}
   function plot(points,yTop,label){
+    var curve=label==='vₒ'&&alt.correct?capacitorIntegralCurve(alt.ic):null;
+    if(curve)points=[[0,0],[1,1]];
     var vals=points.map(function(p){return p[1];}),lo=Math.min.apply(null,vals.concat([0])),hi=Math.max.apply(null,vals.concat([0]));
     if(Math.abs(hi-lo)<1e-9){hi+=1;lo-=1;}var pad=(hi-lo)*.12||1;hi+=pad;lo-=pad;
     function y(v){return yTop+(hi-v)/(hi-lo)*panelH;}
@@ -1177,6 +1209,7 @@ function examAlternativeSvg(alt) {
     if(lo<=0&&hi>=0)line(left,y(0),W-right,y(0),'exam-zero-line');
     txt(5,yTop+16,label,'exam-svg-title');
     var d='';points.forEach(function(p,i){d+=(i?' L':'M')+x(p[0])+' '+y(p[1]);});
+    if(curve)d=capacitorIntegralPath(curve,x,y);
     h.push('<path d="'+d+'" class="exam-trace" fill="none"/>');
   }
   h.push('<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+alt.label+'">');
@@ -1452,7 +1485,7 @@ function initHistoryPlots() {
   });
   document.querySelectorAll('[data-history-capacitor]').forEach(function (host) {
     host.innerHTML = historyPlotSvg(historyCapacitorPlot(host.dataset.historyCapacitor)) +
-      '<p>vC normalizada: 0 = mínimo e 1 = máximo, sobre o nível CC da saída. A amplitude depende de C; os tempos dos extremos vêm de iC.</p>';
+      '<p>vC normalizada: 0 = mínimo e 1 = máximo, sobre o nível CC da saída. A ampliação destaca a curvatura: corrente em rampa gera parábola; corrente constante gera reta. q(t) = ∫iC dt tem a mesma forma de vC, pois vC = vC(0) + q/C. A amplitude depende de C; os tempos dos extremos vêm de iC.</p>';
   });
 }
 

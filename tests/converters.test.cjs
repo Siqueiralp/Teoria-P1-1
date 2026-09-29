@@ -228,3 +228,22 @@ test('Curvas históricas de vC: extremos coincidem com as trocas de sinal de iC'
     assert.doesNotMatch(context.historyPlotSvg(plot), /NaN|Infinity/);
   }
 });
+
+test('Curvas de capacitor das provas usam a integral quadrática, inclusive corrente com saltos', () => {
+  const curve = context.capacitorIntegralCurve([[0,-1],[.6,1],[1,-1]]);
+  close(curve.netCharge, 0);
+  const first = curve.segments[0];
+  const t = .5;
+  const bezier = (1-t)**2*first.q0 + 2*(1-t)*t*first.control + t*t*first.q1;
+  close(bezier, -.15);
+  assert.notEqual(bezier, (first.q0+first.q1)/2);
+  const defs = context.getExamFigureDefinitions();
+  for (const def of Object.values(defs)) {
+    if (def.signals.some(s => s.label === 'vC') && def.signals.some(s => s.label === 'iC')) {
+      assert.match(context.examWaveSvg(def), / Q/);
+    }
+  }
+  const jumped = context.capacitorIntegralCurve([[0,-2],[.3,-2],[.3,4],[1,-2]]);
+  close(jumped.netCharge, .1);
+  close(jumped.segments[0].q1, jumped.segments[1].q0);
+});

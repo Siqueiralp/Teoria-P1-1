@@ -2335,3 +2335,288 @@ body.exam-formula-open {
     margin: 10mm;
   }
 }
+
+
+/* ==========================================================================
+   FIGURAS VETORIAIS DE PROVAS E SIMULADOS
+   ========================================================================== */
+.exam-visual-block {
+  margin: 16px 0 18px;
+  border: 1px solid var(--ahti-border, var(--border-subtle));
+  border-radius: 14px;
+  background: var(--ahti-bg, var(--bg-secondary));
+  overflow: hidden;
+}
+
+.exam-visual-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--ahti-border, var(--border-subtle));
+  background: var(--ahti-surface, var(--bg-card));
+}
+
+.exam-visual-title strong {
+  color: var(--ahti-text, var(--text-bright));
+  font-size: 0.88rem;
+}
+
+.exam-visual-title span {
+  color: var(--ahti-subtle, var(--text-muted));
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.exam-visual-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.45fr);
+  gap: 12px;
+  padding: 12px;
+}
+
+.exam-circuit-pane,
+.exam-wave-pane {
+  min-width: 0;
+  border: 1px solid var(--ahti-raised, var(--border-subtle));
+  border-radius: 10px;
+  background: var(--ahti-surface, var(--bg-card));
+  overflow: auto;
+}
+
+.exam-circuit-pane {
+  display: grid;
+  place-items: center;
+  padding: 8px;
+}
+
+.exam-wave-pane {
+  padding: 6px;
+}
+
+.exam-circuit-pane svg,
+.exam-wave-pane svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 0;
+}
+
+.exam-audit-note {
+  padding: 10px 14px 12px;
+  border-top: 1px solid var(--ahti-border, var(--border-subtle));
+  color: var(--ahti-muted, var(--text-muted));
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.exam-audit-note strong {
+  color: var(--ahti-warning, var(--accent-yellow));
+}
+
+.exam-grid {
+  stroke: var(--ahti-border, var(--border-subtle));
+  stroke-width: 1;
+}
+
+.exam-zero-line {
+  stroke: var(--ahti-control, #64748b);
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+}
+
+.exam-marker-line {
+  stroke: var(--ahti-border, var(--border-subtle));
+  stroke-width: 1;
+  stroke-dasharray: 4 5;
+}
+
+.exam-trace {
+  stroke: var(--ahti-info, var(--accent-blue));
+  stroke-width: 2.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.exam-point {
+  fill: var(--ahti-warning, var(--accent-yellow));
+  stroke: var(--ahti-bg, var(--bg-primary));
+  stroke-width: 1.5;
+}
+
+.exam-bracket {
+  stroke: var(--ahti-warning, var(--accent-yellow));
+  stroke-width: 1.6;
+}
+
+.exam-svg-text {
+  fill: var(--ahti-text, var(--text-main));
+  font: 12px ui-sans-serif, system-ui, sans-serif;
+}
+
+.exam-svg-title {
+  fill: var(--ahti-text, var(--text-bright));
+  font: 700 13px ui-sans-serif, system-ui, sans-serif;
+}
+
+.exam-svg-subtle {
+  fill: var(--ahti-subtle, var(--text-muted));
+  font: 10px ui-sans-serif, system-ui, sans-serif;
+}
+
+.exam-svg-value {
+  fill: var(--ahti-warning, var(--accent-yellow));
+  font: 700 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+/* Reaproveita o circuito SVG dos dashboards, mas em modo estático. */
+.exam-circuit-pane .exam-wire,
+.exam-circuit-pane path,
+.exam-circuit-pane line {
+  vector-effect: non-scaling-stroke;
+}
+
+.exam-cap-symbol {
+  width: min(340px, 100%);
+  min-height: 210px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 10px;
+  color: var(--ahti-text, var(--text-bright));
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.exam-cap-symbol-plates {
+  width: 74px;
+  height: 46px;
+  position: relative;
+}
+
+.exam-cap-symbol-plates::before,
+.exam-cap-symbol-plates::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 74px;
+  height: 3px;
+  background: var(--ahti-capacitor, var(--accent-blue));
+  border-radius: 999px;
+}
+
+.exam-cap-symbol-plates::before { top: 14px; }
+.exam-cap-symbol-plates::after { bottom: 14px; }
+
+.exam-cap-symbol strong {
+  color: var(--ahti-capacitor, var(--accent-blue));
+  font-size: 1.1rem;
+}
+
+.exam-cap-symbol span {
+  color: var(--ahti-muted, var(--text-muted));
+  font-size: 0.78rem;
+}
+
+.formula-visual-overview {
+  margin: 0 0 18px;
+}
+
+.formula-visual-overview > h4 {
+  margin: 0 0 4px;
+  color: var(--ahti-text, var(--text-bright));
+  font-size: 1rem;
+}
+
+.formula-visual-lead {
+  margin: 0 0 12px;
+  color: var(--ahti-muted, var(--text-muted));
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.formula-visual-overview .exam-visual-block {
+  margin: 10px 0;
+}
+
+.formula-visual-overview .exam-visual-grid {
+  grid-template-columns: minmax(240px, 0.7fr) minmax(0, 1.3fr);
+}
+
+@media (max-width: 900px) {
+  .exam-visual-grid,
+  .formula-visual-overview .exam-visual-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-circuit-pane {
+    max-height: 340px;
+  }
+}
+
+@media (max-width: 560px) {
+  .exam-visual-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .exam-visual-title span {
+    white-space: normal;
+  }
+
+  .exam-visual-grid {
+    padding: 8px;
+  }
+
+  .exam-wave-pane {
+    overflow-x: auto;
+  }
+
+  .exam-wave-pane svg {
+    min-width: 620px;
+  }
+}
+
+@media print {
+  body.print-formula-only .formula-visual-overview .exam-visual-block {
+    break-inside: avoid;
+    border-color: #999 !important;
+    background: #fff !important;
+  }
+
+  body.print-formula-only .formula-visual-overview .exam-visual-grid {
+    grid-template-columns: 37% 63% !important;
+    gap: 3mm !important;
+    padding: 2mm !important;
+  }
+
+  body.print-formula-only .exam-circuit-pane,
+  body.print-formula-only .exam-wave-pane {
+    border-color: #bbb !important;
+    background: #fff !important;
+    overflow: visible !important;
+  }
+
+  body.print-formula-only .exam-audit-note,
+  body.print-formula-only .exam-visual-title span {
+    color: #333 !important;
+  }
+
+  body.print-formula-only .exam-svg-text,
+  body.print-formula-only .exam-svg-title,
+  body.print-formula-only .exam-svg-subtle,
+  body.print-formula-only .exam-svg-value {
+    fill: #111 !important;
+  }
+
+  body.print-formula-only .exam-trace,
+  body.print-formula-only .exam-bracket,
+  body.print-formula-only .exam-grid,
+  body.print-formula-only .exam-zero-line,
+  body.print-formula-only .exam-marker-line {
+    stroke: #111 !important;
+  }
+}

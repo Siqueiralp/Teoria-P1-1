@@ -65,13 +65,14 @@ Prioridade: formas de onda e balanços, três topologias, fronteira e DCM, dedu�
 
 ## Alterações no material
 
-1. Seção “Provas anteriores: revisão” com matriz, prioridade, resumos dos enunciados e 12 soluções expansíveis. Simulado antigo identificado como autoral.
+1. Seção “Provas anteriores” com matriz, prioridade, roteiro de estudo, resumos dos enunciados e 12 soluções expansíveis. As duas versões das mesmas questões foram consolidadas, com circuitos, gráficos calculados e alternativas dentro de cada resolução. “Simulados e exercícios” reúne os dois simulados autorais, os três projetos de conversores e o sprint de fundamentos. O menu separa “Revisão e consulta” de “Provas e prática”; a ordem das seções acompanha o menu.
 2. Canal de capacitor com integral de iC ampliada em torno do nível CC. C = 100 µF nos seis exemplos; a parcela alternada tem média zero e fecha o período. No inversor, a tensão referida ao terra tem sinal oposto ao módulo mostrado.
 3. Dedução de C pela carga, regra de sinais, trechos lineares/parabólicos, CCM com e sem cruzamento de iC e DCM. Três gráficos resolvidos mostram tensão normalizada e corrente.
 4. Diferença entre duração e posição do pulso: iS entre 70–100 µs em maio/2025 implica D = 0,3; iD no mesmo intervalo em setembro implica D = 0,7.
 5. Distinção entre média crítica de L e corrente crítica de saída: no Boost/inversor, Io,crit = (1 − D) IL,crit.
 6. Ganho DCM deduzido também com Io e Ts, além de M(D,K).
 7. Tabela por etapa com vL, vS, vD, iS, iD e iC, referências de polaridade, terceira etapa DCM e condições de validade. Os diagramas de topologia dos módulos 4–9 foram conferidos e preservados.
+8. Gráficos calculados dos exercícios aparecem ao abrir a resolução; os dados gráficos das fotos continuam junto ao enunciado. O treino duplicado de média/RMS aponta para o módulo 1. Os seis gabaritos autorais usam delimitadores LaTeX corretos, com unidades e sem os resíduos de exportação. Links antigos para `#quizSection` continuam no grupo de dimensionamento.
 
 ## Inconsistências e dados ausentes
 

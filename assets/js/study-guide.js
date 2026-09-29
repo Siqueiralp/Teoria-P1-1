@@ -37,8 +37,10 @@ document.addEventListener("DOMContentLoaded", function () {
       if (manifest.script) {
         return loadScript(base + manifest.script).then(function () {
           if (typeof window.initSubjectTools === "function") window.initSubjectTools();
+          scrollToInitialSection();
         });
       }
+      scrollToInitialSection();
     })
     .catch(function (error) {
       console.error(error);
@@ -48,6 +50,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function requireOk(response) {
     if (!response.ok) throw new Error("HTTP " + response.status + " ao carregar " + response.url);
     return response;
+  }
+
+  function scrollToInitialSection() {
+    var target = document.getElementById(window.location.hash.slice(1));
+    if (target) target.scrollIntoView();
   }
 
   function applyManifest(config) {
@@ -70,10 +77,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     if (config.tools && config.tools.length) {
-      var title = sectionTitle("Ferramentas de Apoio");
-      title.style.marginTop = "14px";
-      host.appendChild(title);
+      var currentGroup = null;
       config.tools.forEach(function (tool) {
+        var group = tool.group || "Ferramentas de Apoio";
+        if (group !== currentGroup) {
+          var title = sectionTitle(group);
+          title.style.marginTop = "14px";
+          host.appendChild(title);
+          currentGroup = group;
+        }
         host.appendChild(navItem(tool.anchor, tool.code, tool.title, null));
       });
     }
@@ -232,6 +244,15 @@ document.addEventListener("DOMContentLoaded", function () {
       navItems.forEach(function (item) {
         item.style.display = !query || item.textContent.toLowerCase().indexOf(query) >= 0 ? "flex" : "none";
       });
+      document.querySelectorAll(".nav-section-title").forEach(function (title) {
+        var item = title.nextElementSibling;
+        var hasVisibleItem = false;
+        while (item && !item.classList.contains("nav-section-title")) {
+          if (item.classList.contains("nav-item") && item.style.display !== "none") hasVisibleItem = true;
+          item = item.nextElementSibling;
+        }
+        title.hidden = !hasVisibleItem;
+      });
     });
 
     mobileToggle.setAttribute("aria-expanded", "false");
@@ -261,7 +282,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (window.innerWidth > 980) setMobileSidebar(false);
     });
 
-    var sections = document.querySelectorAll(".module-section, .calculator-section, #cheatSheetSection, #quizSection");
+    var sections = navItems.map(function (item) {
+      return document.getElementById(item.getAttribute("href").slice(1));
+    }).filter(Boolean);
     if (!("IntersectionObserver" in window)) return;
 
     var observer = new IntersectionObserver(function (entries) {
@@ -272,7 +295,7 @@ document.addEventListener("DOMContentLoaded", function () {
           link.classList.toggle("active", link.getAttribute("href") === "#" + id);
         });
       });
-    }, { threshold: 0.25 });
+    }, { threshold: 0, rootMargin: "-12% 0px -70% 0px" });
 
     sections.forEach(function (section) { observer.observe(section); });
   }

@@ -69,35 +69,35 @@
   ],
   "tools": [
     {
-      "anchor": "historySection",
-      "code": "P1",
-      "title": "Provas anteriores: revisão"
-    },
-    {
       "anchor": "waveformReviewSection",
       "code": "OND",
-      "title": "Roteiro de formas de onda"
-    },
-    {
-      "anchor": "calculatorSection",
-      "code": "SIM",
-      "title": "Simulador Interativo"
-    },
-    {
-      "anchor": "examSection",
-      "code": "P1",
-      "title": "Provas anteriores & Simulados"
+      "title": "Formas de onda e balanços",
+      "group": "Revisão e consulta"
     },
     {
       "anchor": "cheatSheetSection",
       "code": "TAB",
-      "title": "Cheat Sheet de Prova"
+      "title": "Fórmulas para a P1",
+      "group": "Revisão e consulta"
     },
     {
-      "anchor": "quizSection",
+      "anchor": "calculatorSection",
+      "code": "CAL",
+      "title": "Calculadora de conversores",
+      "group": "Revisão e consulta"
+    },
+    {
+      "anchor": "historySection",
+      "code": "P1",
+      "title": "Provas anteriores (4 P1)",
+      "group": "Provas e prática"
+    },
+    {
+      "anchor": "examSection",
       "code": "EX",
-      "title": "Simulado P1 Resolvido"
+      "title": "Simulados e exercícios",
+      "group": "Provas e prática"
     }
   ],
-  "script": "subject.js"
+  "script": "subject.js?v=20260929-organizacao"
 }

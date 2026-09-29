@@ -103,7 +103,7 @@ button { font-family: inherit; }
 .converter-dashboard-formula strong { font-size: 0.9375rem; }
 .converter-dashboard-formula { background: transparent; border: 0; border-top: 1px solid var(--ahti-border); border-radius: 0; }
 .converter-dashboard-panel > .converter-conventions { margin-top: 0; }
-.module-section { scroll-margin-top: 90px; }
+.module-section, .calculator-section, .exam-section h3[id] { scroll-margin-top: 90px; }
 @media (min-width: 1500px) {
   .converter-dashboard-layout { grid-template-columns: minmax(640px, 1fr) 360px; }
   .converter-dashboard-panel { display: flex; }

@@ -1183,605 +1183,80 @@
         </div>
       </section>
 
-      <!-- ==========================================================================
-           SEÇÃO INTERATIVA: SIMULADOR & CALCULADORA DE CONVERSORES
-           ========================================================================== -->
-      <section id="calculatorSection" class="calculator-section">
-        <div class="calc-header">
-          <div class="calc-title">
-            <span><span class="inline-icon" data-icon="calculator"></span> Simulador & Calculadora de Conversores CC-CC</span>
-          </div>
-          <span style="font-size: 0.8rem; color: var(--text-muted);">Cálculo analítico em tempo real • CCM e DCM</span>
-        </div>
-
-        <div class="calc-grid">
-          <!-- Entradas -->
-          <div class="calc-inputs" id="converterCalcForm">
-            <div class="input-group">
-              <label for="calcTopology">Topologia do Conversor</label>
-              <select id="calcTopology" class="calc-select">
-                <option value="buck" selected>Buck (Rebaixador)</option>
-                <option value="boost">Boost (Elevador)</option>
-                <option value="buck-boost">Buck-Boost (Inversor Rebaixador/Elevador)</option>
-              </select>
-            </div>
-
-            <div class="input-group">
-              <label for="calcVin">Tensão de Entrada (Vin) <span class="unit">[V]</span></label>
-              <input type="number" id="calcVin" class="calc-input" aria-describedby="calcError" value="24" step="1" min="1">
-            </div>
-
-            <div class="input-group">
-              <label for="calcVo">Magnitude da Saída (|Vo|) <span class="unit">[V]</span></label>
-              <input type="number" id="calcVo" class="calc-input" aria-describedby="calcError" value="12" step="0.5" min="1">
-            </div>
-
-            <div class="input-group">
-              <label for="calcPo">Potência de Saída (Po) <span class="unit">[W]</span></label>
-              <input type="number" id="calcPo" class="calc-input" aria-describedby="calcError" value="48" step="1" min="0.5">
-            </div>
-
-            <div class="input-group">
-              <label for="calcFs">Frequência de Chaveamento (fs) <span class="unit">[kHz]</span></label>
-              <input type="number" id="calcFs" class="calc-input" aria-describedby="calcError" value="50" step="5" min="1">
-            </div>
-
-            <div class="input-group">
-              <label for="calcL">Indutância (L) <span class="unit">[µH]</span></label>
-              <input type="number" id="calcL" class="calc-input" aria-describedby="calcError" value="100" step="5" min="1">
-            </div>
-
-            <div class="input-group">
-              <label for="calcC">Capacitância de Filtro (C) <span class="unit">[µF]</span></label>
-              <input type="number" id="calcC" class="calc-input" aria-describedby="calcError" value="47" step="1" min="0.1">
-            </div>
-          </div>
-
-          <!-- Resultados & Gráfico SVG -->
-          <div class="calc-results">
-            <p id="calcError" class="callout callout-warning" role="status" hidden></p>
-            <p class="converter-conventions">Conversor ideal em regime periódico, capacitor sem ESR e saída com pequena ondulação. No inversor, vout = −|Vo|. Lcrit corresponde à fronteira para a tensão e a carga informadas.</p>
-            <div id="resConductionMode" class="results-status-badge status-ccm">
-              <span class="inline-icon" data-icon="bolt"></span> Modo de Condução Contínua (CCM)
-            </div>
-
-            <div class="results-metrics-grid">
-              <div class="metric-card">
-                <div class="metric-card-label">Razão Cíclica (D)</div>
-                <div class="metric-card-val highlight" id="resDutyCycle">50.0%</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Corrente de Carga (Io)</div>
-                <div class="metric-card-val" id="resIo">4.00 A</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Ondulação Corrente (ΔIL)</div>
-                <div class="metric-card-val" id="resDeltaIL">1.20 A</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Ondulação Tensão (ΔVo)</div>
-                <div class="metric-card-val" id="resDeltaVo">63.8 mV</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Corrente de Pico (IL,max)</div>
-                <div class="metric-card-val" id="resILmax">4.60 A</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Corrente Mínima (IL,min)</div>
-                <div class="metric-card-val" id="resILmin">3.40 A</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Indutância Crítica (Lcrit)</div>
-                <div class="metric-card-val" id="resLcrit">15.0 µH</div>
-              </div>
-              <div class="metric-card">
-                <div class="metric-card-label">Tensão Máxima na Chave (Vs,max)</div>
-                <div class="metric-card-val" id="resVswMax">24.0 V</div>
-              </div>
-            </div>
-
-            <!-- Visualizador Gráfico de Formas de Onda em SVG -->
-            <div class="waveform-canvas-box">
-              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
-                Formas de Onda Teóricas Geradas em Tempo Real:
-              </div>
-              <div id="waveformSvgContainer"></div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      <!-- ==========================================================================
-           PROVAS ANTERIORES, PADRÕES E SIMULADOS P1
-           ========================================================================== -->
-      <section id="examSection" class="module-section exam-section">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-tag">P1 • Treino orientado por provas reais</span>
-            <h2 class="module-title">Provas anteriores, padrões e simulados</h2>
-            <p class="module-desc">Reconstrução conferida das P1 encontradas, com leitura explícita dos gráficos, gabarito e variações para treinar mudanças de representação.</p>
-          </div>
-          <div class="module-header-right">
-            <button type="button" class="solution-toggle" data-open-exam-formula>ABRIR FORMULÁRIO P1</button>
-          </div>
-        </div>
-
+      <section id="waveformReviewSection" class="module-section">
+        <div class="module-header"><div class="module-header-left">
+          <span class="module-tag">Revisão dirigida • Gráficos e deduções</span>
+          <h2 class="module-title">Formas de onda e balanços</h2>
+          <p class="module-desc">Roteiro para os pedidos recorrentes das provas: topologia, etapas, amplitudes, intervalos e capacitor.</p>
+        </div></div>
         <div class="module-body">
-          <div class="callout callout-exam exam-source-note">
-            <div class="callout-title">O que as quatro provas mostram</div>
-            <p><strong>Amostra conferida:</strong> P1 de 12/11/2024, 07/05/2025, 24/09/2025 e 22/04/2026, todas do Prof. Daniel Flores Cortez. Em todas há três questões e o núcleo é a leitura física dos conversores CC-CC, sobretudo DCM, balanços em L/C e extração de grandezas a partir de formas de onda.</p>
-            <p>Os valores abaixo foram reconstituídos diretamente das fotografias. Quando uma fotografia não permite recuperar uma grandeza com segurança, isso é indicado em vez de completar o dado por inferência.</p>
-          </div>
-
-          <div class="exam-pattern-grid" aria-label="Padrões observados nas provas anteriores">
-            <div class="exam-pattern-card"><strong>4/4</strong><span>provas com 3 questões</span></div>
-            <div class="exam-pattern-card"><strong>4/4</strong><span>cobram DCM ou condução crítica</span></div>
-            <div class="exam-pattern-card"><strong>4/4</strong><span>Q2 usa capacitor + forma de onda</span></div>
-            <div class="exam-pattern-card"><strong>4/4</strong><span>Q3 é Buck por leitura de gráfico</span></div>
-          </div>
-
-          <h3>Prioridade para a P1 de 30/09/2026</h3>
-          <div class="exam-priority-grid">
-            <div class="exam-priority-card priority-a">
-              <span class="exam-priority-label">A • quase obrigatório</span>
-              <strong>CC-CC em DCM/BCM</strong>
-              <p>Buck, Boost e Buck-Boost; três intervalos; balanço volt-segundo; área triangular; D, D₂ e D₃; indutância crítica.</p>
-            </div>
-            <div class="exam-priority-card priority-a">
-              <span class="exam-priority-label">A • recorrência 4/4</span>
-              <strong>Capacitor e leitura de gráficos</strong>
-              <p>\(i_C=C\,dv_C/dt\), balanço de carga, identificação de máximos/mínimos e média da corrente no diodo.</p>
-            </div>
-            <div class="exam-priority-card priority-b">
-              <span class="exam-priority-label">B • escopo 2026</span>
-              <strong>Valor médio, RMS e potência</strong>
-              <p>Definições integrais, pulsos, ondas triangulares e \(P=(1/T)\int vi\,dt\). É conteúdo do semestre atual mesmo sem aparecer nessas quatro P1.</p>
-            </div>
-            <div class="exam-priority-card priority-b">
-              <span class="exam-priority-label">B • escopo 2026</span>
-              <strong>Diodo e tiristor</strong>
-              <p>Estados de condução/bloqueio, princípio de disparo e corrente de manutenção. Revisão curta de segurança contra mudança de modelo.</p>
-            </div>
-          </div>
-
-          <h3>Roteiro de véspera</h3>
-          <ol class="exam-study-plan">
-            <li><strong>20–30 min:</strong> decorar os estados ON/OFF de Buck, Boost e Buck-Boost e as regras para reconhecer \(D\) quando o gráfico mostra \(i_S\) ou \(i_D\).</li>
-            <li><strong>45 min:</strong> resolver duas Q3 históricas sem olhar o gabarito. Objetivo: obter \(D\), \(V_o\), \(\overline I_L\), \(L\), \(R\) e \(L_{crit}\) só pelo gráfico.</li>
-            <li><strong>45 min:</strong> resolver duas Q2. Priorize \(i_C=C\,dv_C/dt\), balanço de carga e área de \(i_D\).</li>
-            <li><strong>60 min:</strong> refazer as deduções DCM da Q1 usando áreas triangulares. Não dependa apenas da fórmula final.</li>
-            <li><strong>20 min:</strong> seguro 2026: valor médio/RMS/potência, diodo e princípio do tiristor.</li>
-            <li><strong>45–60 min:</strong> fazer um dos simulados abaixo cronometrado e revisar somente os erros.</li>
+          <p>Use componentes ideais, regime permanente periódico, carga resistiva e pequena ondulação de saída. Aqui \(E=V_{in}\), \(V=|v_{out}|&gt;0\), \(I_o=V/R\) e \(\Delta I_L=I_{max}-I_{min}\) é pico a pico. No inversor, \(v_{out}=-V\) em relação ao terra; a tensão com o sinal “+” embaixo, como nas provas, é \(V\).</p>
+          <ol>
+            <li>Identifique o circuito pelas conexões: <a href="#mod4">Buck: L em série com a saída</a>; <a href="#mod5">Boost: L em série com a entrada</a>; <a href="#mod6">Buck-Boost inversor: L entre o nó comutado e o terra, saída negativa</a>. Os diagramas desses módulos mostram as setas, os terminais e os caminhos de corrente.</li>
+            <li>Marque os instantes de comutação. \(D=t_{S,on}/T_s\), mesmo quando o pulso aparece no fim do desenho. Em CCM, o diodo conduz por \(1-D\); em DCM, por \(D_2\), e não por todo o tempo OFF.</li>
+            <li>Desenhe \(v_L\) por patamares e use \(di_L/dt=v_L/L\). A corrente de L é contínua; as correntes de S e D podem saltar na comutação.</li>
+            <li>Encontre médias pela área dividida pelo período completo. Para rampa de \(a\) a \(b\) durante \(\delta T_s\), nula no restante: \(\overline i=\delta(a+b)/2\) e \(I_{rms}=\sqrt{\delta(a^2+ab+b^2)/3}\).</li>
+            <li>Use \(\langle v_L\rangle=0\) e \(\langle i_C\rangle=0\). Depois verifique se \(I_{min}&gt;0\) (CCM), se apenas toca zero (crítica) ou se permanece zero por tempo positivo (DCM).</li>
           </ol>
 
-          <h3>Mudanças de representação que mais derrubam a resolução</h3>
-          <div class="exam-trap-grid">
-            <div class="exam-trap"><strong>\(i_S\) versus \(i_D\)</strong><p>No Buck, \(i_S\neq0\) durante ON; \(i_D\neq0\) durante OFF. Se o gráfico é do diodo, \(D=1-t_{off}/T_s\).</p></div>
-            <div class="exam-trap"><strong>Colchete é \(\Delta I\)</strong><p>Uma marca vertical “2 A” ou “5 A” pode indicar ondulação, não o valor final da corrente. Leia os níveis absolutos separadamente.</p></div>
-            <div class="exam-trap"><strong>DCM tem 3º intervalo</strong><p>Depois de \(i_L\) chegar a zero, chave e diodo permanecem bloqueados: \(i_L=0\) e \(v_L=0\) no modelo ideal.</p></div>
-            <div class="exam-trap"><strong>Buck-Boost troca a polaridade</strong><p>Trabalhe primeiro com \(V_o>0\) como magnitude. No desenho convencional \(v_{out}=-V_o\); algumas provas desenham a referência invertida.</p></div>
-            <div class="exam-trap"><strong>\(v_C\) não copia \(i_C\)</strong><p>\(dv_C/dt=i_C/C\). Corrente triangular gera trechos parabólicos de tensão; extremos de \(v_C\) ocorrem quando \(i_C=0\).</p></div>
-            <div class="exam-trap"><strong>BCM não é DCM genérico</strong><p>Na condução crítica, \(I_{min}=0\) exatamente no fim do ciclo e \(D_3=0\). Se a onda é triangular por todo \(T_s\), \(\overline I_L=I_{pk}/2\).</p></div>
+          <h3>Tensões e correntes por etapa</h3>
+          <p>\(v_D=v_A-v_K\); bloqueio reverso aparece negativo. \(v_S\) vai da entrada ao nó comutado no Buck/inversor, e do nó ao terra no Boost. \(i_C\) entra no terminal positivo de C, que fica embaixo no inversor. Os valores de \(v_C\) e \(v_R\) são aproximadamente \(V\), e \(i_R\approx I_o\); o canal <strong>Capacitor (vC, iC)</strong> dos seis diagramas amplia a ondulação sobre esse nível CC.</p>
+          <div class="table-wrapper"><table class="content-table">
+            <thead><tr><th>Topologia / intervalo</th><th>\(v_L\)</th><th>\(i_S\) / \(i_D\)</th><th>\(v_S\) / \(v_D\)</th><th>\(i_C\)</th></tr></thead>
+            <tbody>
+              <tr><td>Buck • ON</td><td>\(E-V\)</td><td>\(i_L\) / \(0\)</td><td>\(0\) / \(-E\)</td><td>\(i_L-I_o\)</td></tr>
+              <tr><td>Buck • diodo conduz</td><td>\(-V\)</td><td>\(0\) / \(i_L\)</td><td>\(E\) / \(0\)</td><td>\(i_L-I_o\)</td></tr>
+              <tr><td>Buck • corrente nula</td><td>\(0\)</td><td>\(0\) / \(0\)</td><td>\(E-V\) / \(-V\)</td><td>\(-I_o\)</td></tr>
+              <tr><td>Boost • ON</td><td>\(E\)</td><td>\(i_L\) / \(0\)</td><td>\(0\) / \(-V\)</td><td>\(-I_o\)</td></tr>
+              <tr><td>Boost • diodo conduz</td><td>\(E-V\)</td><td>\(0\) / \(i_L\)</td><td>\(V\) / \(0\)</td><td>\(i_L-I_o\)</td></tr>
+              <tr><td>Boost • corrente nula</td><td>\(0\)</td><td>\(0\) / \(0\)</td><td>\(E\) / \(E-V\)</td><td>\(-I_o\)</td></tr>
+              <tr><td>Inversor • ON</td><td>\(E\)</td><td>\(i_L\) / \(0\)</td><td>\(0\) / \(-(E+V)\)</td><td>\(-I_o\)</td></tr>
+              <tr><td>Inversor • diodo conduz</td><td>\(-V\)</td><td>\(0\) / \(i_L\)</td><td>\(E+V\) / \(0\)</td><td>\(i_L-I_o\)</td></tr>
+              <tr><td>Inversor • corrente nula</td><td>\(0\)</td><td>\(0\) / \(0\)</td><td>\(E\) / \(-V\)</td><td>\(-I_o\)</td></tr>
+            </tbody>
+          </table></div>
+          <p>ON dura \(DT_s\), a condução do diodo dura \(D_2T_s\). A última etapa existe somente em DCM e dura \(D_3T_s=(1-D-D_2)T_s\). Em CCM, use \(D_2=1-D\) e elimine a terceira etapa.</p>
+          <p>Em CCM: \(\overline I_S=D\overline I_L\), \(\overline I_D=(1-D)\overline I_L\). No Buck, \(\overline I_L=I_o\); no Boost e inversor, \(\overline I_D=I_o\). Em DCM: \(\overline I_L=I_{pk}(D+D_2)/2\), \(\overline I_S=I_{pk}D/2\), \(\overline I_D=I_{pk}D_2/2\). Na crítica, \(D+D_2=1\) e \(\overline I_{L,crit}=I_{pk}/2\), que não é a corrente crítica de saída do Boost/inversor.</p>
+
+          <h3>Deduzir C e escolher o gráfico correto de tensão</h3>
+          <p>Defina \(q(t)=\int_0^t i_C(\tau)\,d\tau\). A dedução geral é:</p>
+          $$v_C(t)=v_C(0)+\frac{q(t)}{C},\qquad
+          C=\frac{\max q-\min q}{\Delta V_{pp}}.$$
+          <ul>
+            <li>\(i_C&gt;0\): \(v_C\) cresce; \(i_C&lt;0\): diminui. O extremo ocorre na troca de sinal de \(i_C\), inclusive quando a corrente salta na comutação.</li>
+            <li>Corrente constante produz trecho linear de carga e tensão; corrente em rampa produz trecho parabólico. Se iC(t) = i₀ + a(t − t₀), então q(t) − q(t₀) = i₀(t − t₀) + a(t − t₀)²/2 e vC(t) − vC(t₀) = [q(t) − q(t₀)]/C. Rampa crescente gera concavidade para cima; rampa decrescente, para baixo. Concavidade e sentido de subida são distintos: o sinal de iC determina se a tensão sobe ou desce. Sem impulsos de corrente e sem ESR/ESL, a tensão de C não salta.</li>
+            <li>No Buck CCM, \(i_C=i_L-I_o\): os extremos de tensão ocorrem nos cruzamentos \(i_L=I_o\), e não necessariamente na abertura/fechamento de S.</li>
+            <li>No Boost/inversor, \(i_C=-I_o\) em ON. No intervalo do diodo, \(i_C=i_L-I_o\): se a corrente cruza zero antes de o diodo bloquear, a tensão já começa a cair.</li>
+          </ul>
+          <div class="callout callout-math">
+            <div class="callout-title">Áreas que levam às fórmulas</div>
+            <p><strong>Buck CCM:</strong> a área positiva de \(i_C\) é um triângulo de altura \(\Delta I_L/2\) e base \(T_s/2\): \(\Delta Q=\Delta I_LT_s/8\). Logo \(C=\Delta I_L/(8f_s\Delta V_{pp})\).</p>
+            <p><strong>Boost/inversor CCM, \(I_{min}\ge I_o\):</strong> toda a descarga ocorre em ON: \(\Delta Q=I_oDT_s\). Logo \(C=I_oD/(f_s\Delta V_{pp})\).</p>
+            <p><strong>Boost/inversor CCM, \(I_{min}&lt;I_o\):</strong> o trecho positivo termina antes do fim de OFF. Sua base é \((1-D)T_s(I_{max}-I_o)/\Delta I_L\), portanto:</p>
+            $$C=\frac{(1-D)(I_{max}-I_o)^2}{2f_s\Delta I_L\Delta V_{pp}}.$$
+            <p><strong>DCM:</strong> seja \(h=D+D_2\) no Buck ou \(h=D_2\) no Boost/inversor. A corrente entregue à saída tem área \(I_oT_s=I_{pk}hT_s/2\). Acima de \(I_o\), o triângulo tem altura \(I_{pk}-I_o\) e base \(hT_s(1-I_o/I_{pk})\). Assim:</p>
+            $$\Delta Q=I_oT_s(1-h/2)^2,\qquad
+            C=\frac{I_o(1-h/2)^2}{f_s\Delta V_{pp}}.$$
           </div>
+          <p>Essas expressões calculam a ondulação capacitiva sob pequena ondulação, com ESR/ESL desprezíveis. Sem valor exigido para \(\Delta V_{pp}\), a prova permite deduzir C simbolicamente, mas não obter uma capacitância numérica única.</p>
 
-          <h3>Provas anteriores reconstruídas</h3>
-
-          <details class="past-exam-card" open>
-            <summary><span>P1 • 12/11/2024</span><small>Buck-Boost DCM • Boost/capacitor • Buck</small></summary>
-            <div class="past-exam-body">
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 1 — Buck-Boost inversor</span><span>\(E=100\,V,\;T_s=20\,\mu s\)</span></div>
-                <div class="exercise-body">
-                  <p><strong>(a)</strong> Descreva as etapas de operação em condução descontínua e desenhe \(v_L(t)\) e \(i_L(t)\), com amplitudes e intervalos. <strong>(b)</strong> Determine a corrente média no indutor para condução crítica, considerando \(D=0{,}4\) e \(L=0{,}3\,mH\). <strong>(c)</strong> Deduza a tensão de saída em DCM em função de \(E,D,T_s,I_o,L\).</p>
-                  <button class="solution-toggle" data-target="solHist2024Q1">Ver gabarito</button>
-                  <div id="solHist2024Q1" class="solution-content">\n
-                    <p><strong>(a) Etapas em DCM.</strong> Use (V_o>0) como magnitude da saída invertida. Na convenção desenhada na prova, o capacitor tem <strong>− em cima e + embaixo</strong>, (i_C) aponta para cima e (I_o) retorna pelo barramento superior.</p>
-                    <ol class="exam-solution-steps">
-                      <li><strong>Intervalo 1 — chave ON:</strong> diodo bloqueado, (v_L=E) e a corrente cresce com inclinação (di_L/dt=E/L). Partindo de zero em DCM,
-                      $I_{pk}=\frac{EDT_s}{L}$</li>
-                      <li><strong>Intervalo 2 — chave OFF, diodo ON:</strong> a energia de (L) vai para (C/R), (v_L=-V_o) e (i_L) decresce. Se o intervalo dura (D_2T_s),
-                      $0=I_{pk}-\frac{V_oD_2T_s}{L}\quad\Rightarrow\quad D_2=\frac{ED}{V_o}$</li>
-                      <li><strong>Intervalo 3 — corrente nula:</strong> depois de (i_L) chegar a zero, chave e diodo permanecem bloqueados; idealmente (i_L=0) e (v_L=0).</li>
-                    </ol>
-                    <p><strong>(b) Condução crítica.</strong> Na fronteira entre CCM e DCM, (D_3=0), portanto a corrente triangular ocupa todo o período.</p>
-                    $I_{pk}=\frac{100\cdot0{,}4\cdot20\,\mu s}{0{,}3\,mH}=2{,}667\,A$
-                    $\overline I_{L,crit}=\frac{\text{área do triângulo}}{T_s}=\frac{I_{pk}}2=1{,}333\,A$
-                    <p>Como (D_2=1-D=0{,}6), o balanço volt-segundo também fornece (|V_o|=ED/D_2=66{,}67,V).</p>
-                    <p><strong>(c) Ganho em DCM.</strong> A carga recebe corrente apenas durante a condução do diodo. Logo:</p>
-                    $I_o=\overline I_D=\frac12 I_{pk}D_2$
-                    $I_o=\frac12\left(\frac{EDT_s}{L}\right)\left(\frac{ED}{V_o}\right)$
-                    $\boxed{V_o=\frac{E^2D^2T_s}{2LI_o}}$
-                    <p>Essa é a magnitude. Se a tensão de saída for definida de cima para baixo em relação ao terra de entrada, então (v_{out}=-V_o).</p>
-\n                  </div>
-                </div>
-              </div>
-
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 2 — Boost</span><span>gráfico de \(i_D\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa do gráfico:</strong> \(T_s=10\,\mu s\). \(i_D=0\) de 0 a \(4\,\mu s\); em \(4\,\mu s\), \(i_D=6\,A\); depois cai linearmente até \(2\,A\) em \(10\,\mu s\).</div>
-                  <p><strong>(a)</strong> Deduza a expressão do capacitor. <strong>(b)</strong> Calcule a corrente média na carga. <strong>(c)</strong> Escolha a forma correta de \(v_o/i_C\). <strong>(d)</strong> Determine a indutância crítica.</p>
-                  <button class="solution-toggle" data-target="solHist2024Q2">Ver gabarito</button>
-                  <div id="solHist2024Q2" class="solution-content">\n
-                    <p><strong>(a) Relação do capacitor.</strong></p>
-                    $i_C=C\frac{dv_C}{dt}\qquad\Longleftrightarrow\qquad v_C(t)=v_C(t_0)+\frac1C\int_{t_0}^{t}i_C(\tau)d\tau$
-                    <p><strong>(b) Corrente média na carga.</strong> Em regime permanente (overline i_C=0), logo (overline i_D=I_o). O gráfico de (i_D) é nulo por (4,\mu s) e forma um trapézio de (6	o2,A) nos (6,\mu s) restantes:</p>
-                    $I_o=\overline I_D=\frac{\frac{6+2}{2}\cdot6\,\mu s}{10\,\mu s}=2{,}4\,A$
-                    <p><strong>(c) Alternativa gráfica.</strong> Durante ON, (i_D=0), então (i_C=-I_o=-2{,}4,A). No OFF:</p>
-                    $i_C=i_D-I_o: \quad 3{,}6\,A\rightarrow-0{,}4\,A$
-                    <p>Portanto (v_o) <strong>cai linearmente</strong> de (0) a (4,\mu s). Em (4,\mu s), (i_C) salta para positivo e (v_o) passa a subir; como (i_C) decresce linearmente, (v_o) é curvo, não triangular. O máximo ocorre em (i_C=0):</p>
-                    $t_{max}=4+\frac{3{,}6}{3{,}6+0{,}4}\cdot6=9{,}4\,\mu s$
-                    <p>Assim, entre as três alternativas reconstruídas acima, a correta é a <strong>da direita</strong>.</p>
-                    <p><strong>(d) Indutância crítica.</strong> Do gráfico, (D=4/10=0{,}4), (1-D=0{,}6), (I_{L,max}=6,A), (I_{L,min}=2,A), então (Delta I_L=4,A). A fotografia não fornece uma escala absoluta de tensão suficiente para obter (L) ou (L_{crit}) em henrys, mas a razão é determinável:</p>
-                    $L=\frac{EDT_s}{\Delta I_L}$
-                    $L_{crit}=\frac{D(1-D)^2R}{2f_s},\qquad R=\frac{V_o}{I_o}=\frac{E/(1-D)}{I_o}$
-                    $\boxed{L_{crit}=0{,}5L}$
-                    <p>Qualquer valor absoluto em (mu H) aqui exigiria um dado de tensão que não está legível/fornecido na imagem usada.</p>
-\n                  </div>
-                </div>
-              </div>
-
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 3 — Buck</span><span>\(T_s=100\,\mu s\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> chave ON por \(80\,\mu s\); \(v_L=+12\,V\) nesse intervalo; \(\Delta I_L=2\,A\); \(\overline I_L=4\,A\).</div>
-                  <p>Determine \(V_o\), \(R\), a razão cíclica e \(L\).</p>
-                  <button class="solution-toggle" data-target="solHist2024Q3">Ver gabarito</button>
-                  <div id="solHist2024Q3" class="solution-content">\n
-                    <p><strong>1. Duty cycle.</strong> A chave fica ON por (80,\mu s) em (T_s=100,\mu s):</p>
-                    $D=\frac{80}{100}=0{,}80$
-                    <p><strong>2. Tensões.</strong> Para Buck em CCM, (V_o=DE) e (v_{L,on}=E-V_o=E(1-D)). Como o gráfico marca (+12,V):</p>
-                    $12=E(0{,}20)\Rightarrow E=60,V$
-                    $\boxed{V_o=0{,}8\cdot60=48,V}$
-                    <p>Conferência no OFF: (v_{L,off}=-V_o=-48,V) e (12\cdot80-48\cdot20=0).</p>
-                    <p><strong>3. Carga.</strong> No Buck, (overline I_L=I_o=4,A):</p>
-                    $\boxed{R=\frac{48}{4}=12\,\Omega}$
-                    <p><strong>4. Indutor.</strong> A ondulação é (Delta I_L=2,A), logo (I_{min}=3,A) e (I_{max}=5,A). Usando o intervalo ON:</p>
-                    $\boxed{L=\frac{12\cdot80\,\mu s}{2}=480\,\mu H}$
-\n                  </div>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details class="past-exam-card">
-            <summary><span>P1 • 07/05/2025</span><small>Buck-Boost DCM • Boost • Buck por \(i_S\)</small></summary>
-            <div class="past-exam-body">
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 1 — Buck-Boost inversor</span><span>\(E=200\,V,\;T_s=10\,\mu s\)</span></div>
-                <div class="exercise-body">
-                  <p>Mesma família de 2024: etapas DCM, corrente crítica com \(D=0{,}5,\;L=100\,\mu H\), e dedução da tensão de saída em DCM.</p>
-                  <button class="solution-toggle" data-target="solHistMay25Q1">Ver gabarito</button>
-                  <div id="solHistMay25Q1" class="solution-content">\n
-                    <p><strong>(a) DCM.</strong> ON: (v_L=E) e (i_L) cresce. OFF com diodo: (v_L=-V_o) e (i_L) cai. Depois de chegar a zero existe o terceiro intervalo, com (i_L=v_L=0).</p>
-                    $I_{pk}=\frac{EDT_s}{L},\qquad D_2=\frac{ED}{V_o},\qquad D_3=1-D-D_2$
-                    <p><strong>(b) Fronteira crítica, (D=0{,}5).</strong></p>
-                    $I_{pk}=\frac{200\cdot0{,}5\cdot10\,\mu s}{100\,\mu H}=10,A$
-                    $\boxed{\overline I_{L,crit}=I_{pk}/2=5,A}$
-                    <p>Na fronteira (D_2=1-D=0{,}5), portanto (|V_o|=ED/D_2=200,V).</p>
-                    <p><strong>(c) Dedução em DCM.</strong></p>
-                    $I_o=\frac12I_{pk}D_2=\frac12\left(\frac{EDT_s}{L}\right)\left(\frac{ED}{V_o}\right)$
-                    $\boxed{V_o=\frac{E^2D^2T_s}{2LI_o}}\quad\text{(magnitude)}$
-\n                  </div>
-                </div>
-              </div>
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 2 — Boost</span><span>gráficos de \(S,\;v_L,\;i_C\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> ON \(=70\,\mu s\), OFF \(=30\,\mu s\), \(T_s=100\,\mu s\); \(v_{L,off}=-100\,V\); \(i_C=-1\,A\) durante ON; no OFF a rampa de \(i_C\) possui variação de \(2\,A\).</div>
-                  <p>Deduza a expressão do capacitor e determine \(E\), \(\overline I_D\) e \(L\).</p>
-                  <button class="solution-toggle" data-target="solHistMay25Q2">Ver gabarito</button>
-                  <div id="solHistMay25Q2" class="solution-content">\n
-                    <p><strong>(a) Capacitor.</strong></p>
-                    $i_C=C\frac{dv_C}{dt},\qquad v_C(t)=v_C(t_0)+\frac1C\int i_C(t)dt$
-                    <p><strong>(b) Tensão de entrada.</strong> O gráfico fornece (70,\mu s) com (v_L=E) e (30,\mu s) com (v_L=-100,V). Em RPP:</p>
-                    $E\cdot70-100\cdot30=0\Rightarrow\boxed{E=42{,}857,V}$
-                    <p>No Boost, (v_{L,off}=E-V_o=-100,V):</p>
-                    $\boxed{V_o=E+100=142{,}857,V}$
-                    <p><strong>(c) Corrente média no diodo.</strong> Durante ON o diodo está bloqueado e o capacitor sozinho alimenta a carga. Como (i_C=-1,A), então (I_o=1,A). Em RPP:</p>
-                    $\boxed{\overline I_D=I_o=1,A}$
-                    <p>Como (overline i_C=0), o valor médio de (i_C) no OFF deve ser (70/30=2{,}333,A). Com (Delta i_C=2,A), os extremos reconstruídos são (3{,}333,A) e (1{,}333,A).</p>
-                    <p><strong>(d) Indutância.</strong> No OFF, (Delta i_C=Delta i_D=Delta i_L=2,A):</p>
-                    $\boxed{L=\frac{|v_{L,off}|t_{off}}{\Delta I_L}=\frac{100\cdot30\,\mu s}{2}=1{,}5,mH}$
-\n                  </div>
-                </div>
-              </div>
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 3 — Buck</span><span>gráfico de \(i_S\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> \(i_S=0\) de 0 a \(70\,\mu s\); \(i_S\) existe de 70 a \(100\,\mu s\), crescendo de \(6\) a \(8\,A\). \(E=100\,V\).</div>
-                  <p>Determine \(\overline I_L\), \(D\), \(L\) e \(L_{crit}\).</p>
-                  <button class="solution-toggle" data-target="solHistMay25Q3">Ver gabarito</button>
-                  <div id="solHistMay25Q3" class="solution-content">\n
-                    <p><strong>1. Identifique ON pelo sinal medido.</strong> O gráfico é (i_S). No Buck, (i_S=i_L) somente com a chave ON. O pulso dura (30,\mu s), ainda que esteja desenhado no fim do período:</p>
-                    $\boxed{D=30/100=0{,}30}$
-                    <p><strong>2. Corrente média e saída.</strong></p>
-                    $\overline I_L=\frac{6+8}{2}=\boxed{7,A},\qquad V_o=DE=\boxed{30,V}$
-                    $R=\frac{V_o}{I_o}=\frac{30}{7}=4{,}286\,\Omega$
-                    <p><strong>3. Indutor.</strong> (Delta I_L=8-6=2,A), (v_{L,on}=E-V_o=70,V):</p>
-                    $\boxed{L=\frac{70\cdot30\,\mu s}{2}=1{,}05,mH}$
-                    <p><strong>4. Indutância crítica.</strong> (f_s=1/100,\mu s=10,kHz):</p>
-                    $\boxed{L_{crit}=\frac{(1-D)R}{2f_s}=\frac{0{,}7\cdot4{,}286}{20,000}=150\,\mu H}$
-\n                  </div>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details class="past-exam-card">
-            <summary><span>P1 • 24/09/2025</span><small>Boost DCM • Buck-Boost • Buck por \(i_D\)</small></summary>
-            <div class="past-exam-body">
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 1 — Boost em DCM</span><span>\(E=200\,V,\;T_s=10\,\mu s\)</span></div>
-                <div class="exercise-body">
-                  <p>Descreva DCM, calcule a corrente crítica para \(D=0{,}5,\;L=100\,\mu H\) e deduza \(V_o\) em função de \(E,D,T_s,I_o,L\).</p>
-                  <button class="solution-toggle" data-target="solHistSep25Q1">Ver gabarito</button>
-                  <div id="solHistSep25Q1" class="solution-content">\n
-                    <p><strong>(a) Boost em DCM.</strong> ON: (v_L=E), diodo bloqueado e (i_L) cresce. OFF com diodo: (v_L=E-V_o<0), (i_L) cai até zero. Terceiro intervalo: (i_L=v_L=0).</p>
-                    $I_{pk}=\frac{EDT_s}{L},\qquad D_2=\frac{ED}{V_o-E},\qquad D_3=1-D-D_2$
-                    <p><strong>(b) Condução crítica.</strong> Com (D=0{,}5), (E=200,V), (T_s=10,\mu s) e (L=100,\mu H):</p>
-                    $I_{pk}=10,A,\qquad\boxed{\overline I_{L,crit}=5,A}$
-                    <p>Na fronteira, (D_2=1-D=0{,}5); portanto (V_o=E/(1-D)=400,V).</p>
-                    <p><strong>(c) Dedução de (V_o) em DCM.</strong> A saída recebe corrente apenas no intervalo do diodo:</p>
-                    $I_o=\frac12I_{pk}D_2=\frac12\left(\frac{EDT_s}{L}\right)\left(\frac{ED}{V_o-E}\right)$
-                    $I_o(V_o-E)=\frac{E^2D^2T_s}{2L}$
-                    $\boxed{V_o=E+\frac{E^2D^2T_s}{2LI_o}}$
-                    <p>Com carga resistiva, a mesma relação pode ser escrita (M=(1+\sqrt{1+4D^2/K})/2), (K=2Lf_s/R).</p>
-\n                  </div>
-                </div>
-              </div>
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 2 — Buck-Boost</span><span>gráficos de \(S,\;v_L,\;i_C\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> ON \(=50\,\mu s\), OFF \(=30\,\mu s\), \(T_s=80\,\mu s\); \(v_{L,off}=-100\,V\); \(i_C=-1\,A\) no ON; rampa OFF com \(\Delta i_C=2\,A\).</div>
-                  <p>Deduza a expressão do capacitor e determine \(E\), \(\overline I_D\) e \(L\).</p>
-                  <button class="solution-toggle" data-target="solHistSep25Q2">Ver gabarito</button>
-                  <div id="solHistSep25Q2" class="solution-content">\n
-                    <p><strong>Topologia e sinais.</strong> A foto confirma <strong>Buck-Boost inversor</strong>: saída com − no barramento superior e + no inferior; (i_C) é referenciado para cima.</p>
-                    <p><strong>(a) Capacitor.</strong> Com a referência de tensão da própria prova, a corrente entra no terminal positivo do capacitor:</p>
-                    $i_C=C\frac{dv_o}{dt},\qquad v_o(t)=v_o(t_0)+\frac1C\int i_C(t)dt$
-                    <p><strong>(b) Entrada.</strong> (t_{on}=50,\mu s), (t_{off}=30,\mu s), (v_{L,off}=-100,V):</p>
-                    $E\cdot50-100\cdot30=0\Rightarrow\boxed{E=60,V}$
-                    <p>Para Buck-Boost, (v_{L,off}=-V_o), portanto (oxed{V_o=100,V}) na referência invertida da prova.</p>
-                    <p><strong>(c) Corrente média no diodo.</strong> No ON, diodo bloqueado e (i_C=-I_o=-1,A), então (I_o=1,A). Em RPP:</p>
-                    $\boxed{\overline I_D=I_o=1,A}$
-                    <p><strong>(d) Indutor.</strong> A rampa de (i_C) no OFF tem a mesma variação de (i_D=i_L): (Delta I_L=2,A).</p>
-                    $\boxed{L=\frac{100\cdot30\,\mu s}{2}=1{,}5,mH}$
-                    <p>Cheque: (D=50/80=0{,}625) e (|V_o|/E=D/(1-D)=0{,}625/0{,}375=1{,}667), coerente com (100/60).</p>
-\n                  </div>
-                </div>
-              </div>
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 3 — Buck</span><span>gráfico de \(i_D\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> \(i_D\) existe apenas entre \(70\) e \(100\,\mu s\), caindo de \(8\) para \(6\,A\). Como é a corrente do diodo Buck, esse trecho é OFF. \(E=100\,V\).</div>
-                  <p>Determine \(\overline I_L\), \(D\), \(L\) e \(L_{crit}\).</p>
-                  <button class="solution-toggle" data-target="solHistSep25Q3">Ver gabarito</button>
-                  <div id="solHistSep25Q3" class="solution-content">\n
-                    <p><strong>1. Descubra (D) pelo componente medido.</strong> O gráfico é (i_D). No Buck, o diodo conduz no OFF por (30,\mu s):</p>
-                    $1-D=30/100=0{,}30\Rightarrow\boxed{D=0{,}70}$
-                    <p><strong>2. Corrente média e saída.</strong></p>
-                    $\overline I_L=\frac{8+6}{2}=\boxed{7,A},\qquad V_o=DE=\boxed{70,V}$
-                    $R=70/7=\boxed{10\,\Omega}$
-                    <p><strong>3. Indutor.</strong> Durante o OFF, (v_L=-V_o=-70,V), (Delta I_L=2,A):</p>
-                    $\boxed{L=\frac{70\cdot30\,\mu s}{2}=1{,}05,mH}$
-                    <p><strong>4. Indutância crítica.</strong></p>
-                    $\boxed{L_{crit}=\frac{(1-D)R}{2f_s}=\frac{0{,}30\cdot10}{2\cdot10,kHz}=150\,\mu H}$
-\n                  </div>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <details class="past-exam-card">
-            <summary><span>P1 • 22/04/2026</span><small>Buck-Boost • Boost DCM • Buck por \(i_S\)</small></summary>
-            <div class="past-exam-body">
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 1 — Buck-Boost</span><span>forma de onda em CCM</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> ON \(=65\,\mu s\), OFF \(=35\,\mu s\), \(T_s=100\,\mu s\); \(v_{L,off}=-150\,V\); \(i_D\) no OFF começa em \(11\,A\) e cai <strong>5 A</strong>, terminando em \(6\,A\). O “5 A” da foto é \(\Delta I\), não corrente final.</div>
-                  <p>Descreva as etapas/ondas, determine \(V_o\) e \(\overline I_L\).</p>
-                  <button class="solution-toggle" data-target="solHistApr26Q1">Ver gabarito</button>
-                  <div id="solHistApr26Q1" class="solution-content">\n
-                    <p><strong>(a) Etapas pedidas no item teórico.</strong> Em DCM do Buck-Boost: (1) chave ON, (v_L=E), (i_L) cresce e o diodo bloqueia; (2) chave OFF e diodo ON, (v_L=-V_o), (i_L) decresce; (3) após (i_L=0), ambos bloqueiam e (v_L=i_L=0).</p>
-                    <p><strong>Convenções da prova:</strong> capacitor/saída com <strong>− em cima e + embaixo</strong>; (i_C) para cima e (I_o) no sentido de retorno pelo barramento superior.</p>
-                    <p><strong>(b) Tensão de saída e entrada.</strong> O gráfico dado para o ponto de operação mostra (v_{L,off}=-150,V), portanto:</p>
-                    $\boxed{V_o=150,V}\quad\text{na referência invertida desenhada}$
-                    <p>O balanço volt-segundo com (65,\mu s) ON e (35,\mu s) OFF fornece:</p>
-                    $E\cdot65-150\cdot35=0\Rightarrow\boxed{E=80{,}77,V}$
-                    <p><strong>(c) Corrente média no indutor.</strong> No OFF, (i_D=i_L). A anotação <strong>5 A é a altura/ondulação</strong>, não o valor final:</p>
-                    $I_{L,max}=11,A,\qquad I_{L,min}=11-5=6,A$
-                    $\boxed{\overline I_L=\frac{11+6}{2}=8{,}5,A}$
-                    <p>O gráfico fornecido é compatível com CCM nesse ponto de operação; o item (a) pede separadamente a descrição do modo DCM.</p>
-\n                  </div>
-                </div>
-              </div>
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 2 — Boost DCM</span><span>terceiro intervalo explícito</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> ON \(=30\,\mu s\), depois o diodo conduz por apenas \(20\,\mu s\), e há \(50\,\mu s\) com corrente nula; \(T_s=100\,\mu s\). \(v_{L,on}=+100\,V\); \(i_D\) é um triângulo de \(4\,A\) a zero no intervalo de \(20\,\mu s\).</div>
-                  <p>Deduza a expressão do capacitor, determine \(V_o\) e \(R\).</p>
-                  <button class="solution-toggle" data-target="solHistApr26Q2">Ver gabarito</button>
-                  <div id="solHistApr26Q2" class="solution-content">\n
-                    <p><strong>(a) Expressão do capacitor.</strong></p>
-                    $i_C=C\frac{dv_o}{dt},\qquad v_o(t)=v_o(t_0)+\frac1C\int i_C(t)dt$
-                    <p><strong>1. Identifique os três intervalos.</strong></p>
-                    $D=30/100=0{,}30,\qquad D_2=20/100=0{,}20,\qquad D_3=0{,}50$
-                    <p>O gráfico inferior da prova é <strong>(i_D)</strong>: ele só existe durante (D_2), de (4,A) até zero.</p>
-                    <p><strong>(b) Tensão de saída.</strong> O gráfico dá (v_{L,on}=E=100,V). No segundo intervalo, (v_L=E-V_o). Balanço volt-segundo:</p>
-                    $100\cdot30+(100-V_o)\cdot20=0$
-                    $\boxed{V_o=250,V}$
-                    <p><strong>(c) Carga.</strong> A corrente média no diodo é a área do triângulo dividida por (T_s):</p>
-                    $I_o=\overline I_D=\frac{\frac12\cdot4\cdot20\,\mu s}{100\,\mu s}=\boxed{0{,}4,A}$
-                    $\boxed{R=\frac{250}{0{,}4}=625\,\Omega}$
-                    <p>Durante (D_3), (i_L=i_D=0) e (v_L=0). O capacitor continua alimentando a carga, portanto (i_C=-I_o).</p>
-\n                  </div>
-                </div>
-              </div>
-              <div class="exercise-box">
-                <div class="exercise-header"><span>Questão 3 — Buck</span><span>gráfico de \(i_S\)</span></div>
-                <div class="exercise-body">
-                  <div class="exam-wave-read"><strong>Leitura limpa:</strong> \(i_S\) existe por \(60\,\mu s\) em \(T_s=100\,\mu s\); o enunciado fornece \(I_{L,min}=2\,A\) e o gráfico marca \(\Delta I_L=2\,A\). Logo \(I_{L,max}=4\,A\). \(E=100\,V\).</div>
-                  <p>Escolha a forma qualitativa de \(v_o\), determine \(\overline I_L\), \(L\) e \(L_{crit}\).</p>
-                  <button class="solution-toggle" data-target="solHistApr26Q3">Ver gabarito</button>
-                  <div id="solHistApr26Q3" class="solution-content">\n
-                    <p><strong>(a) Forma correta de (v_o).</strong> O gráfico é (i_S), portanto o trecho de (0) a (60,\mu s) é ON e (D=0{,}60). O enunciado fornece (I_{L,min}=2,A) e a seta de (2,A) é (Delta I_L):</p>
-                    $I_{L,max}=4,A,\qquad \overline I_L=I_o=\frac{2+4}{2}=3,A$
-                    <p>Assim (i_C=i_L-I_o) varia de (-1	o+1,A) no ON e de (+1	o-1,A) no OFF. Os cruzamentos (i_C=0) ocorrem em (30,\mu s) e (80,\mu s). Logo:</p>
-                    <ul>
-                      <li>(v_o) cai até (30,\mu s) → mínimo;</li>
-                      <li>sobe de (30) a (80,\mu s) → máximo em (80,\mu s);</li>
-                      <li>volta a cair até (T_s);</li>
-                      <li>como (i_C) é linear por trechos, (v_o) é <strong>parabólico/curvo</strong> por trechos.</li>
-                    </ul>
-                    <p>Nenhuma das três alternativas fotografadas satisfaz a referência impressa: todas começam com tensão crescente e corrente negativa. A central tem os sinais de inclinação invertidos. Consulte a revisão histórica para a curva obtida pela integral.</p>
-                    <p><strong>(b) Corrente média e saída.</strong></p>
-                    $\boxed{\overline I_L=3,A},\qquad \boxed{V_o=DE=60,V}$
-                    <p><strong>(c) Indutância.</strong></p>
-                    $\boxed{L=\frac{(100-60)\cdot60\,\mu s}{2}=1{,}2,mH}$
-                    <p><strong>(d) Condução crítica.</strong> (R=V_o/I_o=20,\Omega), (f_s=10,kHz):</p>
-                    $\boxed{L_{crit}=\frac{(1-D)R}{2f_s}=400\,\mu H}$
-\n                  </div>
-                </div>
-              </div>
-            </div>
-          </details>
-
-          <h3>Simulado A — espelho do padrão histórico</h3>
-          <div class="exam-timer-hint">Meta: 45–55 min • faça sem abrir o formulário na primeira tentativa.</div>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>A1 — Buck-Boost: DCM e condução crítica</span><span>3,3 pontos</span></div>
-            <div class="exercise-body">
-              <p>Um Buck-Boost ideal opera com \(E=120\,V\), \(T_s=20\,\mu s\), \(D=0{,}40\) e \(L=200\,\mu H\). (a) Descreva os três intervalos do DCM. (b) Calcule \(\overline I_L\) no limite crítico. (c) Deduza \(V_o(E,D,T_s,L,I_o)\) em DCM.</p>
-              <button class="solution-toggle" data-target="solMockA1">Ver gabarito</button>
-              <div id="solMockA1" class="solution-content">\n
-                <p><strong>1. Três intervalos.</strong> ON: (v_L=120,V), (i_L) cresce. OFF com diodo: (v_L=-V_o), (i_L) decresce. DCM: depois de zerar, (v_L=i_L=0).</p>
-                <p><strong>2. Fronteira crítica.</strong></p>
-                $I_{pk}=\frac{120\cdot0{,}4\cdot20\,\mu s}{200\,\mu H}=4{,}8,A$
-                $\boxed{\overline I_{L,crit}=2{,}4,A}$
-                <p>Na fronteira, (D_2=0{,}6), então (|V_o|=120(0{,}4/0{,}6)=80,V).</p>
-                <p><strong>3. DCM genérico.</strong></p>
-                $D_2=\frac{ED}{V_o},\qquad I_o=\frac12\left(\frac{EDT_s}{L}\right)D_2$
-                $\boxed{V_o=\frac{E^2D^2T_s}{2LI_o}}$
-\n                  </div>
-            </div>
-          </div>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>A2 — Buck-Boost: capacitor e gráfico</span><span>3,3 pontos</span></div>
-            <div class="exercise-body">
-              <div class="exam-wave-read"><strong>Dados de forma de onda:</strong> \(T_s=60\,\mu s\); ON \(=40\,\mu s\); OFF \(=20\,\mu s\); \(v_{L,off}=-90\,V\); \(i_C=-1{,}5\,A\) no ON; no OFF \(i_C\) decresce linearmente com \(\Delta i_C=3\,A\).</div>
-              <p>(a) Escreva a relação \(v_C/i_C\). (b) Determine \(E\), \(V_o\), \(\overline I_D\) e \(L\). (c) Descreva qualitativamente \(v_C(t)\).</p>
-              <button class="solution-toggle" data-target="solMockA2">Ver gabarito</button>
-              <div id="solMockA2" class="solution-content">\n
-                <p><strong>(a) Capacitor.</strong> (i_C=C,dv_C/dt) e (v_C=v_C(t_0)+(1/C)\int i_Cdt).</p>
-                <p><strong>(b) Tensões.</strong></p>
-                $E\cdot40-90\cdot20=0\Rightarrow\boxed{E=45,V},\qquad\boxed{V_o=90,V}$
-                <p>No ON, (i_C=-I_o=-1{,}5,A), então (oxed{I_o=\overline I_D=1{,}5,A}).</p>
-                <p>A rampa OFF de (i_C) precisa ter média (+3,A) para zerar a carga líquida do capacitor: (-1{,}5\cdot40+3\cdot20=0). Com (Delta i_C=3,A), ela vai de (4{,}5) a (1{,}5,A).</p>
-                $\boxed{L=\frac{90\cdot20\,\mu s}{3}=600\,\mu H}$
-                <p><strong>(c)</strong> (v_C) cai durante o ON e sobe durante todo o OFF, pois (i_C) permanece positivo nesse intervalo.</p>
-\n                  </div>
-            </div>
-          </div>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>A3 — Buck por corrente do diodo</span><span>3,4 pontos</span></div>
-            <div class="exercise-body">
-              <div class="exam-wave-read"><strong>Dados:</strong> \(E=120\,V\), \(T_s=100\,\mu s\); \(i_D\) aparece somente nos últimos \(30\,\mu s\), caindo de \(9\) para \(7\,A\).</div>
-              <p>Determine \(D\), \(V_o\), \(\overline I_L\), \(L\), \(R\) e \(L_{crit}\).</p>
-              <button class="solution-toggle" data-target="solMockA3">Ver gabarito</button>
-              <div id="solMockA3" class="solution-content">\n
-                <p>Como o gráfico é (i_D) do Buck, os (30,\mu s) finais são OFF:</p>
-                $1-D=0{,}30\Rightarrow\boxed{D=0{,}70},\qquad\boxed{V_o=84,V}$
-                $\boxed{\overline I_L=(9+7)/2=8,A},\qquad\boxed{R=84/8=10{,}5\,\Omega}$
-                <p>No OFF, (v_L=-84,V), (Delta I_L=2,A):</p>
-                $\boxed{L=\frac{84\cdot30\,\mu s}{2}=1{,}26,mH}$
-                $\boxed{L_{crit}=\frac{0{,}30\cdot10{,}5}{2\cdot10,kHz}=157{,}5\,\mu H}$
-\n                  </div>
-            </div>
-          </div>
-
-          <h3>Simulado B — professor mudou o desenho</h3>
-          <div class="exam-timer-hint">Meta: 45–55 min • os dados foram deliberadamente apresentados de outra forma.</div>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>B1 — Boost DCM: descubra \(D_2\)</span><span>3,3 pontos</span></div>
-            <div class="exercise-body">
-              <div class="exam-wave-read"><strong>Dados:</strong> \(E=80\,V\), \(T_s=100\,\mu s\). Chave ON por \(25\,\mu s\). Depois, o diodo conduz por \(15\,\mu s\), com \(i_D\) caindo linearmente de \(5\,A\) a zero. Nos \(60\,\mu s\) restantes, \(i_L=0\).</div>
-              <p>Determine \(D,D_2,D_3,V_o,I_o\) e \(R\).</p>
-              <button class="solution-toggle" data-target="solMockB1">Ver gabarito</button>
-              <div id="solMockB1" class="solution-content">\n
-                $\boxed{D=0{,}25},\qquad\boxed{D_2=0{,}15},\qquad\boxed{D_3=0{,}60}$
-                <p>Para Boost, (v_L=E=80,V) em ON e (v_L=E-V_o) enquanto o diodo conduz:</p>
-                $80(0{,}25)+(80-V_o)(0{,}15)=0\Rightarrow\boxed{V_o=213{,}33,V}$
-                <p>A carga recebe a área do triângulo de (i_D):</p>
-                $\boxed{I_o=\frac12\cdot5\cdot0{,}15=0{,}375,A}$
-                $\boxed{R=V_o/I_o=568{,}89\,\Omega}$
-                <p>Cheque: nos (60,\mu s) finais, (i_L=i_D=0) e o capacitor sozinho alimenta (R).</p>
-\n                  </div>
-            </div>
-          </div>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>B2 — capacitor: escolha pela física, não pelo desenho</span><span>3,3 pontos</span></div>
-            <div class="exercise-body">
-              <p>Em um período, \(i_C=-2\,A\) durante \(0<t<30\,\mu s\). Depois, \(i_C\) salta para \(+4\,A\) e cai linearmente até \(-2\,A\) em \(100\,\mu s\). Sem integrar uma expressão completa, indique em quais instantes \(v_C\) tem mínimo/máximo e verifique se o balanço de carga é compatível com RPP.</p>
-              <button class="solution-toggle" data-target="solMockB2">Ver gabarito</button>
-              <div id="solMockB2" class="solution-content">\n
-                <p><strong>Extremos.</strong> De (0) a (30,\mu s), (i_C=-2,A), então (v_C) cai. Depois (i_C) salta para (+4,A) e desce linearmente até (-2,A).</p>
-                <p>O cruzamento com zero acontece após (4/(4+2)=2/3) do trecho de (70,\mu s):</p>
-                $t_{max}=30+\frac23\cdot70=\boxed{76{,}67\,\mu s}$
-                <p>Assim, o mínimo é em (30,\mu s) e o máximo em (76{,}67,\mu s).</p>
-                <p><strong>Balanço de carga.</strong></p>
-                $Q_1=(-2)(30)=-60\,A\mu s$
-                $Q_2=\frac{4+(-2)}2\cdot70=+70\,A\mu s$
-                $\boxed{Q_{ciclo}=+10\,A\mu s\neq0}$
-                <p>Portanto o gráfico <strong>não</strong> pode representar regime periódico permanente; (v_C(T_s)\neq v_C(0)).</p>
-\n                  </div>
-            </div>
-          </div>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>B3 — Buck por \(i_S\) deslocada no período</span><span>3,4 pontos</span></div>
-            <div class="exercise-body">
-              <div class="exam-wave-read"><strong>Dados:</strong> \(E=90\,V\), \(T_s=80\,\mu s\). O trecho não nulo de \(i_S\) dura \(40\,\mu s\), mas aparece na segunda metade do gráfico, crescendo de \(3\) a \(7\,A\).</div>
-              <p>Determine \(D,V_o,\overline I_L,L,R,L_{crit}\). O deslocamento horizontal do pulso muda \(D\)?</p>
-              <button class="solution-toggle" data-target="solMockB3">Ver gabarito</button>
-              <div id="solMockB3" class="solution-content">\n
-                <p>O trecho não nulo de (i_S) dura (40,\mu s) dentro de (T_s=80,\mu s). A posição horizontal não importa:</p>
-                $\boxed{D=0{,}50}$
-                $\boxed{V_o=DE=45,V},\qquad\boxed{\overline I_L=(3+7)/2=5,A}$
-                $\boxed{R=45/5=9\,\Omega}$
-                <p>No ON, (v_L=90-45=45,V), (Delta I_L=4,A):</p>
-                $\boxed{L=\frac{45\cdot40\,\mu s}{4}=450\,\mu H}$
-                $\boxed{L_{crit}=\frac{0{,}5\cdot9}{2\cdot12{,}5,kHz}=180\,\mu H}$
-                <p><strong>Resposta conceitual:</strong> deslocar o pulso no eixo do tempo não altera (D); só sua duração dentro de um período importa.</p>
-\n                  </div>
-            </div>
-          </div>
-
-          <h3>Seguro 2026 — questões curtas que as provas antigas não cobrem</h3>
-          <div class="exercise-box">
-            <div class="exercise-header"><span>Sprint conceitual</span><span>15–20 min</span></div>
-            <div class="exercise-body">
-              <p><strong>1.</strong> Um pulso unipolar de amplitude \(30\,A\) ocupa \(25\%\) do período. Calcule média e RMS. <strong>2.</strong> Uma resistência de \(0{,}15\,\Omega\) conduz esse pulso. Calcule a perda. <strong>3.</strong> Explique em uma frase como um SCR liga e como desliga. <strong>4.</strong> Em uma forma de onda chaveada arbitrária, qual expressão define potência ativa média?</p>
-              <button class="solution-toggle" data-target="solInsurance2026">Ver gabarito</button>
-              <div id="solInsurance2026" class="solution-content">
-                $$I_{med}=DA=7{,}5\,A,\qquad I_{rms}=A\sqrt D=15\,A$$
-                $$P_R=R I_{rms}^2=0{,}15\cdot225=33{,}75\,W$$
-                <p>SCR: um pulso de gate inicia a condução quando polarizado adequadamente; depois ele fica travado e normalmente só desliga quando a corrente de ânodo cai abaixo da corrente de manutenção ou é comutada/revertida.</p>
-                $$P=\frac{1}{T}\int_0^T v(t)i(t)\,dt$$
-              </div>
-            </div>
-          </div>
+          <h3>Dedução de saída em DCM nas variáveis pedidas nas provas</h3>
+          <p>Parta de \(I_{pk}=EDT_s/L\), válido para Boost e inversor, e de \(I_o=I_{pk}D_2/2\).</p>
+          <p><strong>Boost:</strong> \(D_2=ED/(V-E)\). Substituindo na área do diodo:</p>
+          $$I_o=\frac{E^2D^2T_s}{2L(V-E)}
+          \ \Rightarrow\ V=E+\frac{E^2D^2T_s}{2LI_o}.$$
+          <p><strong>Inversor:</strong> \(D_2=ED/V\). Portanto:</p>
+          $$I_o=\frac{E^2D^2T_s}{2LV}
+          \ \Rightarrow\ V=\frac{E^2D^2T_s}{2LI_o},\qquad v_{out}=-V.$$
+          <p>Quando a carga é especificada por R, substitua \(I_o=V/R\): obtém-se \(V/E=[1+\sqrt{1+2D^2RT_s/L}]/2\) no Boost e \(V/E=D\sqrt{RT_s/(2L)}\) no inversor. Confira sempre \(D+D_2&lt;1\).</p>
         </div>
       </section>
 
-      <!-- ==========================================================================
-           CHEAT SHEET DEFINITIVO DE PROVA (TABELA RESUMO GERAL)
-           ========================================================================== -->
       <section id="cheatSheetSection" class="module-section">
         <div class="module-header">
           <div class="module-header-left">
             <span class="module-tag">Formulário de Bolso</span>
-            <h2 class="module-title">Cheat Sheet Definitivo de Fórmulas para a P1</h2>
+            <h2 class="module-title">Fórmulas para a P1</h2>
             <p class="module-desc">Tabela comparativa com todas as relações de projeto para consulta rápida antes da prova.</p>
           </div>
         </div>
@@ -1976,237 +1451,115 @@
         </div>
       </section>
 
-      <!-- ==========================================================================
-           SIMULADO DE PROVA P1 (BANCO DE QUESTÕES RESOLVIDAS)
-           ========================================================================== -->
-      <section id="quizSection" class="module-section">
-        <div class="module-header">
-          <div class="module-header-left">
-            <span class="module-tag">Treinamento Intensivo</span>
-            <h2 class="module-title">Simulado de Prova P1 (Questões Resolvidas Passo a Passo)</h2>
-            <p class="module-desc">Exercícios autorais de treino. Para as questões das quatro provas fotografadas, consulte <a href="#historySection">Provas anteriores: revisão</a>.</p>
+      <section id="calculatorSection" class="calculator-section">
+        <div class="calc-header">
+          <div class="calc-title">
+            <span><span class="inline-icon" data-icon="calculator"></span> Calculadora de conversores CC-CC</span>
           </div>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Cálculo analítico em tempo real • CCM e DCM</span>
         </div>
 
-        <div class="module-body">
-          <!-- Questão 1 -->
-          <div class="exercise-box">
-            <div class="exercise-header">
-              <span>Questão de Treino 1 — Dimensionamento Completo de Conversor Buck</span>
-              <span>Tema: Buck CCM • Projeto de Filtros</span>
+        <div class="calc-grid">
+          <!-- Entradas -->
+          <div class="calc-inputs" id="converterCalcForm">
+            <div class="input-group">
+              <label for="calcTopology">Topologia do Conversor</label>
+              <select id="calcTopology" class="calc-select">
+                <option value="buck" selected>Buck (Rebaixador)</option>
+                <option value="boost">Boost (Elevador)</option>
+                <option value="buck-boost">Buck-Boost (Inversor Rebaixador/Elevador)</option>
+              </select>
             </div>
-            <div class="exercise-body">
-              <p>
-                Projete um conversor CC-CC Buck para alimentar uma carga resistiva de \(24\text{ V}\) e \(120\text{ W}\) a partir 
-                de uma fonte de tensão contínua não regulada de \(V_{in} = 60\text{ V}\). 
-                A frequência de comutação adotada é \(f_s = 40\text{ kHz}\). 
-                Exige-se que: (i) A ondulação de corrente no indutor não ultrapasse \(20\%\) da corrente média na carga; 
-                (ii) A ondulação de tensão na saída não exceda \(0{,}5\%\) de \(V_o\); 
-                (iii) O conversor permaneça em CCM mesmo se a carga for reduzida para \(25\%\) da potência nominal. 
-                Calcule a razão cíclica \(D\), a indutância \(L\), a capacitância \(C\) e os esforços de tensão e corrente nos semicondutores.
-              </p>
-              <button class="solution-toggle" data-target="solP1_1">Ver Resolução Completa Passo a Passo</button>
-              <div id="solP1_1" class="solution-content">
-                <p><strong>1. Cálculo da Razão Cíclica \(D\) e Corrente Nominal de Carga:</strong></p>
-                $$D = \frac{V_o}{V_{in}} = \frac{24}{60} = 0{,}40 \quad (40\%)$$
-                $$I_o = \frac{P_o}{V_o} = \frac{120\text{ W}}{24\text{ V}} = 5{,}0\text{ A}, \qquad R_{nom} = \frac{V_o}{I_o} = \frac{24}{5} = 4{,}8\,\Omega$$
 
-                <p><strong>2. Dimensionamento da Indutância \(L\) pelo Critério de Ripple (\(\Delta I_L \le 20\%\)):</strong></p>
-                $$\Delta I_L = 0{,}20 \cdot I_o = 0{,}20 \cdot 5{,}0\text{ A} = 1{,}0\text{ A}$$
-                $$\Delta I_L = \frac{V_o(1 - D)}{L \cdot f_s} \implies L_{ripple} = \frac{24 \cdot (1 - 0{,}40)}{1{,}0 \cdot 40 \times 10^3} = \frac{14{,}4}{40 \times 10^3} = 360\,\mu\text{H}$$
+            <div class="input-group">
+              <label for="calcVin">Tensão de Entrada (Vin) <span class="unit">[V]</span></label>
+              <input type="number" id="calcVin" class="calc-input" aria-describedby="calcError" value="24" step="1" min="1">
+            </div>
 
-                <p><strong>3. Verificação da Indutância Crítica a \(25\%\) de Carga:</strong></p>
-                $$P_{min} = 0{,}25 \cdot 120 = 30\text{ W} \implies I_{o,min} = \frac{30}{24} = 1{,}25\text{ A} \implies R_{max} = \frac{24}{1{,}25} = 19{,}2\,\Omega$$
-                $$L_{crit} = \frac{(1 - D) R_{max}}{2 f_s} = \frac{(1 - 0{,}40) \cdot 19{,}2}{2 \cdot 40 \times 10^3} = \frac{11{,}52}{80 \times 10^3} = 144\,\mu\text{H}$$
-                <p>Como \(L_{ripple} = 360\,\mu\text{H} > L_{crit} = 144\,\mu\text{H}\), a indutância adotada é \(L = 360\,\mu\text{H}\), garantindo CCM em toda a faixa!</p>
+            <div class="input-group">
+              <label for="calcVo">Magnitude da Saída (|Vo|) <span class="unit">[V]</span></label>
+              <input type="number" id="calcVo" class="calc-input" aria-describedby="calcError" value="12" step="0.5" min="1">
+            </div>
 
-                <p><strong>4. Dimensionamento da Capacitância \(C\) (\(\Delta V_o \le 0{,}5\%\)):</strong></p>
-                $$\Delta V_o = 0{,}005 \cdot 24\text{ V} = 0{,}12\text{ V} = 120\text{ mV}$$
-                $$\Delta V_o = \frac{\Delta I_L}{8 C f_s} \implies C = \frac{\Delta I_L}{8 \cdot \Delta V_o \cdot f_s} = \frac{1{,}0}{8 \cdot 0{,}12 \cdot 40 \times 10^3} = \frac{1{,}0}{38400} \approx 26\,\mu\text{F}$$
-                <p>Adota-se comercialmente um capacitor de \(33\,\mu\text{F}\) ou \(47\,\mu\text{F}\) com baixo ESR.</p>
+            <div class="input-group">
+              <label for="calcPo">Potência de Saída (Po) <span class="unit">[W]</span></label>
+              <input type="number" id="calcPo" class="calc-input" aria-describedby="calcError" value="48" step="1" min="0.5">
+            </div>
 
-                <p><strong>5. Esforços nos Semicondutores:</strong></p>
-                <ul>
-                  <li>Tensão máxima na chave e no diodo: \(V_{S,max} = V_{D,max} = V_{in} = 60\text{ V}\).</li>
-                  <li>Corrente de pico na chave e no diodo: \(I_{pk} = I_o + \Delta I_L/2 = 5{,}0 + 0{,}5 = 5{,}5\text{ A}\).</li>
-                  <li>Corrente média na chave: \(I_{S,med} = D I_o = 0{,}40 \cdot 5{,}0 = 2{,}0\text{ A}\).</li>
-                  <li>Corrente média no diodo: \(I_{D,med} = (1 - D) I_o = 0{,}60 \cdot 5{,}0 = 3{,}0\text{ A}\).</li>
-                </ul>
+            <div class="input-group">
+              <label for="calcFs">Frequência de Chaveamento (fs) <span class="unit">[kHz]</span></label>
+              <input type="number" id="calcFs" class="calc-input" aria-describedby="calcError" value="50" step="5" min="1">
+            </div>
+
+            <div class="input-group">
+              <label for="calcL">Indutância (L) <span class="unit">[µH]</span></label>
+              <input type="number" id="calcL" class="calc-input" aria-describedby="calcError" value="100" step="5" min="1">
+            </div>
+
+            <div class="input-group">
+              <label for="calcC">Capacitância de Filtro (C) <span class="unit">[µF]</span></label>
+              <input type="number" id="calcC" class="calc-input" aria-describedby="calcError" value="47" step="1" min="0.1">
+            </div>
+          </div>
+
+          <!-- Resultados & Gráfico SVG -->
+          <div class="calc-results">
+            <p id="calcError" class="callout callout-warning" role="status" hidden></p>
+            <p class="converter-conventions">Conversor ideal em regime periódico, capacitor sem ESR e saída com pequena ondulação. No inversor, vout = −|Vo|. Lcrit corresponde à fronteira para a tensão e a carga informadas.</p>
+            <div id="resConductionMode" class="results-status-badge status-ccm">
+              <span class="inline-icon" data-icon="bolt"></span> Modo de Condução Contínua (CCM)
+            </div>
+
+            <div class="results-metrics-grid">
+              <div class="metric-card">
+                <div class="metric-card-label">Razão Cíclica (D)</div>
+                <div class="metric-card-val highlight" id="resDutyCycle">50.0%</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Corrente de Carga (Io)</div>
+                <div class="metric-card-val" id="resIo">4.00 A</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Ondulação Corrente (ΔIL)</div>
+                <div class="metric-card-val" id="resDeltaIL">1.20 A</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Ondulação Tensão (ΔVo)</div>
+                <div class="metric-card-val" id="resDeltaVo">63.8 mV</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Corrente de Pico (IL,max)</div>
+                <div class="metric-card-val" id="resILmax">4.60 A</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Corrente Mínima (IL,min)</div>
+                <div class="metric-card-val" id="resILmin">3.40 A</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Indutância Crítica (Lcrit)</div>
+                <div class="metric-card-val" id="resLcrit">15.0 µH</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-card-label">Tensão Máxima na Chave (Vs,max)</div>
+                <div class="metric-card-val" id="resVswMax">24.0 V</div>
               </div>
             </div>
-          </div>
 
-          <!-- Questão 2 -->
-          <div class="exercise-box">
-            <div class="exercise-header">
-              <span>Questão de Treino 2 — Análise de Boost com Transição para DCM</span>
-              <span>Tema: Boost • DCM • Análise Paramétrica</span>
-            </div>
-            <div class="exercise-body">
-              <p>
-                Um conversor Boost opera com \(V_{in} = 12\text{ V}\), razão cíclica fixa \(D = 0{,}60\), frequência \(f_s = 25\text{ kHz}\) 
-                e indutância \(L = 40\,\mu\text{H}\). 
-                (a) Determine o valor da resistência de carga crítica \(R_{crit}\) que define a transição entre CCM e DCM. 
-                (b) Se a carga for \(R = 100\,\Omega\), verifique em qual modo de condução o conversor opera e calcule a tensão de saída prevista pelo modelo ideal \(V_o\).
-                (c) Compare essa tensão com a que seria obtida caso o conversor estivesse em CCM.
-              </p>
-              <button class="solution-toggle" data-target="solP1_2">Ver Resolução Completa Passo a Passo</button>
-              <div id="solP1_2" class="solution-content">
-                <p><strong>(a) Cálculo de \(R_{crit}\):</strong></p>
-                $$K_{crit} = D (1 - D)^2 = 0{,}60 \cdot (1 - 0{,}60)^2 = 0{,}60 \cdot 0{,}16 = 0{,}096$$
-                $$K = \frac{2 L f_s}{R} \implies R_{crit} = \frac{2 L f_s}{K_{crit}} = \frac{2 \cdot (40 \times 10^{-6}) \cdot (25 \times 10^3)}{0{,}096} = \frac{2{,}0}{0{,}096} \approx 20{,}83\,\Omega$$
-
-                <p><strong>(b) Operação para \(R = 100\,\Omega\):</strong></p>
-                <p>Como \(R = 100\,\Omega > R_{crit} = 20{,}83\,\Omega\), o parâmetro \(K\) real é:</p>
-                $$K = \frac{2 L f_s}{R} = \frac{2{,}0}{100} = 0{,}020 < K_{crit} \implies \text{O conversor está em DCM!}$$
-                <p>Cálculo do ganho estático \(M(D, K)\) em DCM:</p>
-                $$M = \frac{1 + \sqrt{1 + \frac{4 D^2}{K}}}{2} = \frac{1 + \sqrt{1 + \frac{4 \cdot (0{,}60)^2}{0{,}020}}}{2} = \frac{1 + \sqrt{1 + \frac{1{,}44}{0{,}020}}}{2} = \frac{1 + \sqrt{1 + 72}}{2} = \frac{1 + \sqrt{73}}{2} \approx \frac{1 + 8{,}544}{2} \approx 4{,}772$$
-                $$V_o = M \cdot V_{in} = 4{,}772 \cdot 12\text{ V} \approx 57{,}26\text{ V}$$
-
-                <p><strong>(c) Comparação com o modelo de CCM:</strong></p>
-                $$V_{o,CCM} = \frac{V_{in}}{1 - D} = \frac{12}{1 - 0{,}60} = \frac{12}{0{,}40} = 30{,}0\text{ V}$$
-                <p><em>Conclusão Pedagógica:</em> Devido à descontinuidade de condução provocada pela carga leve (\(100\,\Omega\)), a tensão de saída subiu de \(30\text{ V}\) para quase \(57{,}3\text{ V}\) (um acréscimo de mais de \(90\%\))! Este cálculo ilustra a dependência da carga em malha aberta. Controle e proteção devem ser dimensionados para a faixa de operação; DCM, por si só, não implica dano à carga.</p>
+            <!-- Visualizador Gráfico de Formas de Onda em SVG -->
+            <div class="waveform-canvas-box">
+              <div style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;">
+                Formas de Onda Teóricas Geradas em Tempo Real:
               </div>
+              <div id="waveformSvgContainer"></div>
             </div>
           </div>
-
-          <!-- Questão 3 -->
-          <div class="exercise-box">
-            <div class="exercise-header">
-              <span>Questão de Treino 3 — Dedução e Projeto de Buck-Boost DCM</span>
-              <span>Tema: Buck-Boost • DCM • Dimensionamento</span>
-            </div>
-            <div class="exercise-body">
-              <p>
-                Um conversor Buck-Boost em DCM deve alimentar uma carga de \(15\text{ W}\) com tensão de \(V_o = 15\text{ V}\) (magnitude) 
-                a partir de uma entrada de \(V_{in} = 30\text{ V}\). 
-                A frequência de comutação é \(f_s = 100\text{ kHz}\) e a indutância é \(L = 20\,\mu\text{H}\). 
-                (a) Calcule o parâmetro \(K\); 
-                (b) Calcule a razão cíclica \(D\) necessária; 
-                (c) Calcule o tempo de condução da chave (\(t_{on}\)) e o tempo de condução do diodo (\(t_{diodo}\)); 
-                (d) Verifique a condição de condução descontínua.
-              </p>
-              <button class="solution-toggle" data-target="solP1_3">Ver Resolução Completa Passo a Passo</button>
-              <div id="solP1_3" class="solution-content">
-                <p><strong>(a) Cálculo da Resistência e Parâmetro \(K\):</strong></p>
-                $$I_o = \frac{P_o}{V_o} = \frac{15\text{ W}}{15\text{ V}} = 1{,}0\text{ A} \implies R = \frac{15}{1{,}0} = 15\,\Omega$$
-                $$K = \frac{2 L f_s}{R} = \frac{2 \cdot (20 \times 10^{-6}) \cdot (100 \times 10^3)}{15} = \frac{4{,}0}{15} \approx 0{,}2667$$
-
-                <p><strong>(b) Cálculo da Razão Cíclica \(D\):</strong></p>
-                <p>O ganho estático desejado é: \(M = \frac{V_o}{V_{in}} = \frac{15}{30} = 0{,}50\).</p>
-                <p>Em DCM, a relação para o Buck-Boost é: \(M = \frac{D}{\sqrt{K}}\).</p>
-                $$D = M \cdot \sqrt{K} = 0{,}50 \cdot \sqrt{0{,}2667} \approx 0{,}50 \cdot 0{,}5164 \approx 0{,}2582 \quad (25{,}82\%)$$
-
-                <p><strong>(c) Tempos de Condução (\(T_s = 10\,\mu\text{s}\)):</strong></p>
-                $$t_{on} = D \cdot T_s = 0{,}2582 \cdot 10\,\mu\text{s} \approx 2{,}58\,\mu\text{s}$$
-                $$D_2 = \sqrt{K} = \sqrt{0{,}2667} \approx 0{,}5164 \implies t_{diodo} = D_2 \cdot T_s = 5{,}16\,\mu\text{s}$$
-                <p>Tempo de corrente nula: \(t_{zero} = (1 - D - D_2) \cdot T_s = (1 - 0{,}2582 - 0{,}5164) \cdot 10 = 0{,}2254 \cdot 10 \approx 2{,}25\,\mu\text{s}\).</p>
-
-                <p><strong>(d) Verificação do Limite CCM/DCM:</strong></p>
-                $$D + D_2 = 0{,}2582 + 0{,}5164 = 0{,}7746 < 1{,}0$$
-                <p>Como \(D + D_2 < 1\) (e \(K = 0{,}2667 < K_{crit}(D) = (1 - 0{,}2582)^2 \approx 0{,}5503\)), confirma-se plenamente a operação em modo descontínuo para os parâmetros ideais informados.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      <button id="examFormulaFab" class="exam-formula-fab" type="button" aria-controls="examFormulaModal" aria-expanded="false">
-        Formulário P1
-      </button>
-
-      <div id="examFormulaModal" class="exam-formula-modal" hidden aria-hidden="true">
-        <div class="exam-formula-panel" role="dialog" aria-modal="true" aria-labelledby="examFormulaModalTitle">
-          <header class="exam-formula-modal-head">
-            <div>
-              <span class="module-tag">Consulta rápida</span>
-              <h2 id="examFormulaModalTitle">Formulário P1</h2>
-            </div>
-            <div class="exam-formula-actions">
-              <button id="examFormulaPdf" type="button">Gerar PDF</button>
-              <button id="examFormulaPrint" type="button">Imprimir</button>
-              <button id="examFormulaClose" type="button" aria-label="Fechar formulário">Fechar</button>
-            </div>
-          </header>
-          <p class="exam-formula-print-note">“Gerar PDF” abre o diálogo de impressão já formatado. Selecione <strong>Salvar como PDF</strong> no navegador.</p>
-          <div id="examFormulaModalContent" class="exam-formula-modal-content"></div>
-        </div>
-      </div>
-
-      <section id="waveformReviewSection" class="module-section">
-        <div class="module-header"><div class="module-header-left">
-          <span class="module-tag">Revisão dirigida • Gráficos e deduções</span>
-          <h2 class="module-title">Como reconstruir todas as formas de onda</h2>
-          <p class="module-desc">Roteiro para os pedidos recorrentes das provas: topologia, etapas, amplitudes, intervalos e capacitor.</p>
-        </div></div>
-        <div class="module-body">
-          <p>Use componentes ideais, regime permanente periódico, carga resistiva e pequena ondulação de saída. Aqui \(E=V_{in}\), \(V=|v_{out}|&gt;0\), \(I_o=V/R\) e \(\Delta I_L=I_{max}-I_{min}\) é pico a pico. No inversor, \(v_{out}=-V\) em relação ao terra; a tensão com o sinal “+” embaixo, como nas provas, é \(V\).</p>
-          <ol>
-            <li>Identifique o circuito pelas conexões: <a href="#mod4">Buck: L em série com a saída</a>; <a href="#mod5">Boost: L em série com a entrada</a>; <a href="#mod6">Buck-Boost inversor: L entre o nó comutado e o terra, saída negativa</a>. Os diagramas desses módulos mostram as setas, os terminais e os caminhos de corrente.</li>
-            <li>Marque os instantes de comutação. \(D=t_{S,on}/T_s\), mesmo quando o pulso aparece no fim do desenho. Em CCM, o diodo conduz por \(1-D\); em DCM, por \(D_2\), e não por todo o tempo OFF.</li>
-            <li>Desenhe \(v_L\) por patamares e use \(di_L/dt=v_L/L\). A corrente de L é contínua; as correntes de S e D podem saltar na comutação.</li>
-            <li>Encontre médias pela área dividida pelo período completo. Para rampa de \(a\) a \(b\) durante \(\delta T_s\), nula no restante: \(\overline i=\delta(a+b)/2\) e \(I_{rms}=\sqrt{\delta(a^2+ab+b^2)/3}\).</li>
-            <li>Use \(\langle v_L\rangle=0\) e \(\langle i_C\rangle=0\). Depois verifique se \(I_{min}&gt;0\) (CCM), se apenas toca zero (crítica) ou se permanece zero por tempo positivo (DCM).</li>
-          </ol>
-
-          <h3>Tensões e correntes por etapa</h3>
-          <p>\(v_D=v_A-v_K\); bloqueio reverso aparece negativo. \(v_S\) vai da entrada ao nó comutado no Buck/inversor, e do nó ao terra no Boost. \(i_C\) entra no terminal positivo de C, que fica embaixo no inversor. Os valores de \(v_C\) e \(v_R\) são aproximadamente \(V\), e \(i_R\approx I_o\); o canal <strong>Capacitor (vC, iC)</strong> dos seis diagramas amplia a ondulação sobre esse nível CC.</p>
-          <div class="table-wrapper"><table class="content-table">
-            <thead><tr><th>Topologia / intervalo</th><th>\(v_L\)</th><th>\(i_S\) / \(i_D\)</th><th>\(v_S\) / \(v_D\)</th><th>\(i_C\)</th></tr></thead>
-            <tbody>
-              <tr><td>Buck • ON</td><td>\(E-V\)</td><td>\(i_L\) / \(0\)</td><td>\(0\) / \(-E\)</td><td>\(i_L-I_o\)</td></tr>
-              <tr><td>Buck • diodo conduz</td><td>\(-V\)</td><td>\(0\) / \(i_L\)</td><td>\(E\) / \(0\)</td><td>\(i_L-I_o\)</td></tr>
-              <tr><td>Buck • corrente nula</td><td>\(0\)</td><td>\(0\) / \(0\)</td><td>\(E-V\) / \(-V\)</td><td>\(-I_o\)</td></tr>
-              <tr><td>Boost • ON</td><td>\(E\)</td><td>\(i_L\) / \(0\)</td><td>\(0\) / \(-V\)</td><td>\(-I_o\)</td></tr>
-              <tr><td>Boost • diodo conduz</td><td>\(E-V\)</td><td>\(0\) / \(i_L\)</td><td>\(V\) / \(0\)</td><td>\(i_L-I_o\)</td></tr>
-              <tr><td>Boost • corrente nula</td><td>\(0\)</td><td>\(0\) / \(0\)</td><td>\(E\) / \(E-V\)</td><td>\(-I_o\)</td></tr>
-              <tr><td>Inversor • ON</td><td>\(E\)</td><td>\(i_L\) / \(0\)</td><td>\(0\) / \(-(E+V)\)</td><td>\(-I_o\)</td></tr>
-              <tr><td>Inversor • diodo conduz</td><td>\(-V\)</td><td>\(0\) / \(i_L\)</td><td>\(E+V\) / \(0\)</td><td>\(i_L-I_o\)</td></tr>
-              <tr><td>Inversor • corrente nula</td><td>\(0\)</td><td>\(0\) / \(0\)</td><td>\(E\) / \(-V\)</td><td>\(-I_o\)</td></tr>
-            </tbody>
-          </table></div>
-          <p>ON dura \(DT_s\), a condução do diodo dura \(D_2T_s\). A última etapa existe somente em DCM e dura \(D_3T_s=(1-D-D_2)T_s\). Em CCM, use \(D_2=1-D\) e elimine a terceira etapa.</p>
-          <p>Em CCM: \(\overline I_S=D\overline I_L\), \(\overline I_D=(1-D)\overline I_L\). No Buck, \(\overline I_L=I_o\); no Boost e inversor, \(\overline I_D=I_o\). Em DCM: \(\overline I_L=I_{pk}(D+D_2)/2\), \(\overline I_S=I_{pk}D/2\), \(\overline I_D=I_{pk}D_2/2\). Na crítica, \(D+D_2=1\) e \(\overline I_{L,crit}=I_{pk}/2\), que não é a corrente crítica de saída do Boost/inversor.</p>
-
-          <h3>Deduzir C e escolher o gráfico correto de tensão</h3>
-          <p>Defina \(q(t)=\int_0^t i_C(\tau)\,d\tau\). A dedução geral é:</p>
-          $$v_C(t)=v_C(0)+\frac{q(t)}{C},\qquad
-          C=\frac{\max q-\min q}{\Delta V_{pp}}.$$
-          <ul>
-            <li>\(i_C&gt;0\): \(v_C\) cresce; \(i_C&lt;0\): diminui. O extremo ocorre na troca de sinal de \(i_C\), inclusive quando a corrente salta na comutação.</li>
-            <li>Corrente constante produz trecho linear de carga e tensão; corrente em rampa produz trecho parabólico. Se iC(t) = i₀ + a(t − t₀), então q(t) − q(t₀) = i₀(t − t₀) + a(t − t₀)²/2 e vC(t) − vC(t₀) = [q(t) − q(t₀)]/C. Rampa crescente gera concavidade para cima; rampa decrescente, para baixo. Concavidade e sentido de subida são distintos: o sinal de iC determina se a tensão sobe ou desce. Sem impulsos de corrente e sem ESR/ESL, a tensão de C não salta.</li>
-            <li>No Buck CCM, \(i_C=i_L-I_o\): os extremos de tensão ocorrem nos cruzamentos \(i_L=I_o\), e não necessariamente na abertura/fechamento de S.</li>
-            <li>No Boost/inversor, \(i_C=-I_o\) em ON. No intervalo do diodo, \(i_C=i_L-I_o\): se a corrente cruza zero antes de o diodo bloquear, a tensão já começa a cair.</li>
-          </ul>
-          <div class="callout callout-math">
-            <div class="callout-title">Áreas que levam às fórmulas</div>
-            <p><strong>Buck CCM:</strong> a área positiva de \(i_C\) é um triângulo de altura \(\Delta I_L/2\) e base \(T_s/2\): \(\Delta Q=\Delta I_LT_s/8\). Logo \(C=\Delta I_L/(8f_s\Delta V_{pp})\).</p>
-            <p><strong>Boost/inversor CCM, \(I_{min}\ge I_o\):</strong> toda a descarga ocorre em ON: \(\Delta Q=I_oDT_s\). Logo \(C=I_oD/(f_s\Delta V_{pp})\).</p>
-            <p><strong>Boost/inversor CCM, \(I_{min}&lt;I_o\):</strong> o trecho positivo termina antes do fim de OFF. Sua base é \((1-D)T_s(I_{max}-I_o)/\Delta I_L\), portanto:</p>
-            $$C=\frac{(1-D)(I_{max}-I_o)^2}{2f_s\Delta I_L\Delta V_{pp}}.$$
-            <p><strong>DCM:</strong> seja \(h=D+D_2\) no Buck ou \(h=D_2\) no Boost/inversor. A corrente entregue à saída tem área \(I_oT_s=I_{pk}hT_s/2\). Acima de \(I_o\), o triângulo tem altura \(I_{pk}-I_o\) e base \(hT_s(1-I_o/I_{pk})\). Assim:</p>
-            $$\Delta Q=I_oT_s(1-h/2)^2,\qquad
-            C=\frac{I_o(1-h/2)^2}{f_s\Delta V_{pp}}.$$
-          </div>
-          <p>Essas expressões calculam a ondulação capacitiva sob pequena ondulação, com ESR/ESL desprezíveis. Sem valor exigido para \(\Delta V_{pp}\), a prova permite deduzir C simbolicamente, mas não obter uma capacitância numérica única.</p>
-
-          <h3>Dedução de saída em DCM nas variáveis pedidas nas provas</h3>
-          <p>Parta de \(I_{pk}=EDT_s/L\), válido para Boost e inversor, e de \(I_o=I_{pk}D_2/2\).</p>
-          <p><strong>Boost:</strong> \(D_2=ED/(V-E)\). Substituindo na área do diodo:</p>
-          $$I_o=\frac{E^2D^2T_s}{2L(V-E)}
-          \ \Rightarrow\ V=E+\frac{E^2D^2T_s}{2LI_o}.$$
-          <p><strong>Inversor:</strong> \(D_2=ED/V\). Portanto:</p>
-          $$I_o=\frac{E^2D^2T_s}{2LV}
-          \ \Rightarrow\ V=\frac{E^2D^2T_s}{2LI_o},\qquad v_{out}=-V.$$
-          <p>Quando a carga é especificada por R, substitua \(I_o=V/R\): obtém-se \(V/E=[1+\sqrt{1+2D^2RT_s/L}]/2\) no Boost e \(V/E=D\sqrt{RT_s/(2L)}\) no inversor. Confira sempre \(D+D_2&lt;1\).</p>
         </div>
       </section>
 
       <section id="historySection" class="module-section">
         <div class="module-header"><div class="module-header-left">
           <span class="module-tag">Análise histórica • Revisada em 29/09/2026</span>
-          <h2 class="module-title">As quatro P1 anteriores: cobertura e resolução</h2>
+          <h2 class="module-title">Provas anteriores — 4 P1, 12 questões</h2>
           <p class="module-desc">12 questões principais nas folhas de 12/11/2024, 07/05/2025, 24/09/2025 e 22/04/2026. Resoluções refeitas pelas leis do circuito, sem usar notas ou marcações dos alunos como gabarito.</p>
         </div></div>
         <div class="module-body">
@@ -2224,7 +1577,18 @@
               <tr><td><a href="#p1-2026">22/04/2026</a></td><td>Inversor: DCM conceitual; V e média no gráfico</td><td>Boost DCM: C, V, R</td><td>Buck: \(v_o(i_C)\), média, L, \(L_{crit}\)</td></tr>
             </tbody>
           </table></div>
-          <p>Os gráficos abaixo reconstroem os dados legíveis, com as unidades da foto. Trechos calculados são identificados no texto. As topologias e todas as tensões/correntes por etapa estão nos seis diagramas dos módulos 4 a 9 e na <a href="#waveformReviewSection">tabela de revisão</a>. As soluções abaixo são didáticas; não constituem gabarito oficial.</p>
+          <p>Os gráficos abaixo reconstroem os dados legíveis, com as unidades da foto. Trechos calculados são identificados no texto. As topologias e todas as tensões/correntes por etapa estão nos seis diagramas dos módulos 4 a 9 e na <a href="#waveformReviewSection">tabela de revisão</a>. Abra cada resolução para consultar o circuito, as formas de onda calculadas e, quando houver, as alternativas fotografadas. As soluções são didáticas; não constituem gabarito oficial.</p>
+
+          <h3>Roteiro de véspera</h3>
+          <ol class="exam-study-plan">
+            <li><strong>20–30 min:</strong> decorar os estados ON/OFF de Buck, Boost e Buck-Boost e as regras para reconhecer \(D\) quando o gráfico mostra \(i_S\) ou \(i_D\).</li>
+            <li><strong>45 min:</strong> resolver duas Q3 históricas sem olhar o gabarito. Objetivo: obter \(D\), \(V_o\), \(\overline I_L\), \(L\), \(R\) e \(L_{crit}\) só pelo gráfico.</li>
+            <li><strong>45 min:</strong> resolver duas Q2. Priorize \(i_C=C\,dv_C/dt\), balanço de carga e área de \(i_D\).</li>
+            <li><strong>60 min:</strong> refazer as deduções DCM da Q1 usando áreas triangulares. Não dependa apenas da fórmula final.</li>
+            <li><strong>20 min:</strong> fundamentos complementares: valor médio/RMS/potência, diodo e princípio do tiristor.</li>
+            <li><strong>45–60 min:</strong> fazer um dos <a href="#examSection">simulados autorais</a> cronometrado e revisar somente os erros.</li>
+          </ol>
+
 
           <article id="p1-2024" class="exercise-box">
             <div class="exercise-header"><span>P1 • 12/11/2024</span><span>Inversor → Boost → Buck</span></div>
@@ -2374,6 +1738,281 @@
           <p>Referências de apoio às convenções e formas de onda: Texas Instruments, <a href="https://www.ti.com/document-viewer/lit/html/SLVAFJ5" target="_blank" rel="noopener">SLVAFJ5, seções Buck e Boost</a>, e <a href="https://www.ti.com/lit/an/slva061/slva061.pdf" target="_blank" rel="noopener">SLVA061, análise do Boost em CCM/DCM</a>; <a href="https://www.ti.com/lit/an/slva057/slva057.pdf" target="_blank" rel="noopener">SLVA057, Buck em CCM/DCM</a>; e <a href="https://www.ti.com/lit/an/slva059a/slva059a.pdf" target="_blank" rel="noopener">SLVA059, Buck-Boost inversor em CCM/DCM</a>. Os usos, compromissos de projeto e diferenças operacionais dos textos de topologia também se apoiam nessas notas. A matriz histórica vem exclusivamente das quatro fotos locais; as contas e integrais foram refeitas para esta revisão.</p>
         </div>
       </section>
+
+      <section id="examSection" class="module-section exam-section">
+        <div class="module-header">
+          <div class="module-header-left">
+            <span class="module-tag">Prática • Exercícios autorais</span>
+            <h2 class="module-title">Simulados e exercícios</h2>
+            <p class="module-desc">Dois simulados com três questões cada, três exercícios de dimensionamento e um treino curto de fundamentos, todos com resolução.</p>
+          </div>
+          <div class="module-header-right">
+            <button type="button" class="solution-toggle" data-open-exam-formula>ABRIR FORMULÁRIO P1</button>
+          </div>
+        </div>
+
+        <div class="module-body">
+          <p>Comece pelo <a href="#mockA">Simulado A</a> para treinar o padrão das provas; use o <a href="#mockB">Simulado B</a> para variar a representação dos gráficos. Depois, pratique <a href="#quizSection">dimensionamento</a> e <a href="#fundamentalsPractice">fundamentos</a>. Reserve 45–60 minutos para cada simulado e abra as resoluções ao terminar. As questões das quatro provas fotografadas estão em <a href="#historySection">Provas anteriores</a>.</p>
+
+          <h3 id="mockA">Simulado A — padrão histórico</h3>
+          <div class="exam-timer-hint">Meta: 45–55 min • faça sem abrir o formulário na primeira tentativa.</div>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>A1 — Buck-Boost: DCM e condução crítica</span><span>3,3 pontos</span></div>
+            <div class="exercise-body">
+              <p>Um Buck-Boost ideal opera com \(E=120\,V\), \(T_s=20\,\mu s\), \(D=0{,}40\) e \(L=200\,\mu H\). (a) Descreva os três intervalos do DCM. (b) Calcule \(\overline I_L\) no limite crítico. (c) Deduza \(V_o(E,D,T_s,L,I_o)\) em DCM.</p>
+              <button class="solution-toggle" data-target="solMockA1">Ver gabarito</button>
+              <div id="solMockA1" class="solution-content">
+                <p><strong>Três intervalos em DCM.</strong> ON: \(v_L=120\,V\), \(i_L:0\to I_{pk}\). Com diodo: \(v_L=-V_o\), \(i_L:I_{pk}\to0\). No intervalo nulo: \(v_L=i_L=0\).</p>
+                <p><strong>Fronteira crítica.</strong> A corrente toca zero ao fim do período:</p>
+                $$I_{pk}=\frac{120\cdot0{,}4\cdot20\,\mu s}{200\,\mu H}=4{,}8\,A,\qquad \overline I_{L,crit}=I_{pk}/2=2{,}4\,A.$$
+                <p>Na fronteira, \(D_2=0{,}6\) e \(V_o=120(0{,}4/0{,}6)=80\,V\) em magnitude.</p>
+                <p><strong>DCM genérico.</strong> Pelos balanços de volt-segundo e carga:</p>
+                $$D_2=\frac{ED}{V_o},\qquad I_o=\frac12\left(\frac{EDT_s}{L}\right)D_2\quad\Rightarrow\quad V_o=\frac{E^2D^2T_s}{2LI_o}.$$
+                <p>A saída referida ao terra é \(v_{out}=-V_o\).</p>
+              </div>
+            </div>
+          </div>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>A2 — Buck-Boost: capacitor e gráfico</span><span>3,3 pontos</span></div>
+            <div class="exercise-body">
+              <div class="exam-wave-read"><strong>Dados de forma de onda:</strong> \(T_s=60\,\mu s\); ON \(=40\,\mu s\); OFF \(=20\,\mu s\); \(v_{L,off}=-90\,V\); \(i_C=-1{,}5\,A\) no ON; no OFF \(i_C\) decresce linearmente com \(\Delta i_C=3\,A\).</div>
+              <p>(a) Escreva a relação \(v_C/i_C\). (b) Determine \(E\), \(V_o\), \(\overline I_D\) e \(L\). (c) Descreva qualitativamente \(v_C(t)\).</p>
+              <button class="solution-toggle" data-target="solMockA2">Ver gabarito</button>
+              <div id="solMockA2" class="solution-content">
+                <p><strong>(a)</strong> \(i_C=C\,dv_C/dt\) e \(v_C(t)=v_C(t_0)+(1/C)\int_{t_0}^{t}i_C(\tau)\,d\tau\).</p>
+                <p><strong>(b)</strong> Pelo balanço de volt-segundo:</p>
+                $$E\cdot40-90\cdot20=0\quad\Rightarrow\quad E=45\,V,\qquad V_o=90\,V\text{ (magnitude)}.$$
+                <p>Em ON, \(i_C=-I_o=-1{,}5\,A\), logo \(I_o=\overline I_D=1{,}5\,A\). A média de \(i_C\) em OFF deve ser \(3\,A\): \(-1{,}5\cdot40+3\cdot20=0\). Com \(\Delta i_C=3\,A\), os extremos são \(4{,}5\) e \(1{,}5\,A\).</p>
+                $$L=\frac{90\cdot20\,\mu s}{3\,A}=600\,\mu H.$$
+                <p><strong>(c)</strong> \(v_C\) cai linearmente no ON e sobe com concavidade para baixo em todo OFF, pois \(i_C\) permanece positiva. O mínimo é em 40 µs e o máximo no fim do período.</p>
+              </div>
+            </div>
+          </div>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>A3 — Buck por corrente do diodo</span><span>3,4 pontos</span></div>
+            <div class="exercise-body">
+              <div class="exam-wave-read"><strong>Dados:</strong> \(E=120\,V\), \(T_s=100\,\mu s\); \(i_D\) aparece somente nos últimos \(30\,\mu s\), caindo de \(9\) para \(7\,A\).</div>
+              <p>Determine \(D\), \(V_o\), \(\overline I_L\), \(L\), \(R\) e \(L_{crit}\).</p>
+              <button class="solution-toggle" data-target="solMockA3">Ver gabarito</button>
+              <div id="solMockA3" class="solution-content">
+                <p>O pulso de \(i_D\) no Buck indica OFF: os 30 µs finais correspondem a \(1-D=0{,}30\).</p>
+                $$D=0{,}70,\qquad V_o=84\,V,\qquad \overline I_L=\frac{9+7}2=8\,A,\qquad R=\frac{84}{8}=10{,}5\,\Omega.$$
+                <p>Em OFF, \(v_L=-84\,V\) e \(\Delta I_L=2\,A\):</p>
+                $$L=\frac{84\cdot30\,\mu s}{2\,A}=1{,}26\,mH,\qquad L_{crit}=\frac{(1-D)R}{2f_s}=\frac{0{,}30\cdot10{,}5}{2\cdot10\,kHz}=157{,}5\,\mu H.$$
+              </div>
+            </div>
+          </div>
+
+          <h3 id="mockB">Simulado B — variações de gráficos</h3>
+          <div class="exam-timer-hint">Meta: 45–55 min • os dados foram deliberadamente apresentados de outra forma.</div>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>B1 — Boost DCM: descubra \(D_2\)</span><span>3,3 pontos</span></div>
+            <div class="exercise-body">
+              <div class="exam-wave-read"><strong>Dados:</strong> \(E=80\,V\), \(T_s=100\,\mu s\). Chave ON por \(25\,\mu s\). Depois, o diodo conduz por \(15\,\mu s\), com \(i_D\) caindo linearmente de \(5\,A\) a zero. Nos \(60\,\mu s\) restantes, \(i_L=0\).</div>
+              <p>Determine \(D,D_2,D_3,V_o,I_o\) e \(R\).</p>
+              <button class="solution-toggle" data-target="solMockB1">Ver gabarito</button>
+              <div id="solMockB1" class="solution-content">
+                $$D=0{,}25,\qquad D_2=0{,}15,\qquad D_3=0{,}60.$$
+                <p>No Boost, \(v_L=E=80\,V\) em ON e \(v_L=E-V_o\) enquanto o diodo conduz:</p>
+                $$80(0{,}25)+(80-V_o)(0{,}15)=0\quad\Rightarrow\quad V_o=213{,}33\,V.$$
+                <p>A média no diodo usa a área do triângulo sobre o período completo:</p>
+                $$I_o=\frac12\cdot5\cdot0{,}15=0{,}375\,A,\qquad R=V_o/I_o=568{,}89\,\Omega.$$
+                <p>Nos 60 µs finais, \(i_L=i_D=0\) e C alimenta a carga. Os três intervalos fecham o ciclo: \(D+D_2+D_3=1\).</p>
+              </div>
+            </div>
+          </div>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>B2 — capacitor: escolha pela física, não pelo desenho</span><span>3,3 pontos</span></div>
+            <div class="exercise-body">
+              <p>Em um período, \(i_C=-2\,A\) durante \(0\lt t\lt30\,\mu s\). Depois, \(i_C\) salta para \(+4\,A\) e cai linearmente até \(-2\,A\) em \(100\,\mu s\). Sem integrar uma expressão completa, indique em quais instantes \(v_C\) tem mínimo/máximo e verifique se o balanço de carga é compatível com RPP.</p>
+              <button class="solution-toggle" data-target="solMockB2">Ver gabarito</button>
+              <div id="solMockB2" class="solution-content">
+                <p><strong>Extremos.</strong> Até 30 µs, \(i_C=-2\,A\) e \(v_C\) cai. Depois, a corrente salta para \(+4\,A\) e decresce até \(-2\,A\). O mínimo de tensão ocorre no salto em 30 µs; o máximo, no cruzamento por zero:</p>
+                $$t_{max}=30+\frac{4}{4+2}\cdot70=76{,}67\,\mu s.$$
+                <p><strong>Balanço de carga.</strong></p>
+                $$Q_1=(-2)(30)=-60\,\mu C,\qquad Q_2=\frac{4+(-2)}2\cdot70=70\,\mu C.$$
+                $$Q_{ciclo}=Q_1+Q_2=10\,\mu C\ne0.$$
+                <p>A onda não representa regime permanente periódico: \(v_C(T_s)-v_C(0)=10\,\mu C/C\ne0\). A tensão é linear no primeiro trecho e parabólica e contínua depois do salto.</p>
+              </div>
+            </div>
+          </div>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>B3 — Buck por \(i_S\) deslocada no período</span><span>3,4 pontos</span></div>
+            <div class="exercise-body">
+              <div class="exam-wave-read"><strong>Dados:</strong> \(E=90\,V\), \(T_s=80\,\mu s\). O trecho não nulo de \(i_S\) dura \(40\,\mu s\), mas aparece na segunda metade do gráfico, crescendo de \(3\) a \(7\,A\).</div>
+              <p>Determine \(D,V_o,\overline I_L,L,R,L_{crit}\). O deslocamento horizontal do pulso muda \(D\)?</p>
+              <button class="solution-toggle" data-target="solMockB3">Ver gabarito</button>
+              <div id="solMockB3" class="solution-content">
+                <p>O pulso de \(i_S\) dura 40 µs em um período de 80 µs. Sua posição no eixo do tempo não altera a razão cíclica:</p>
+                $$D=0{,}50,\qquad V_o=45\,V,\qquad \overline I_L=\frac{3+7}2=5\,A,\qquad R=45/5=9\,\Omega.$$
+                <p>Em ON, \(v_L=45\,V\), \(\Delta I_L=4\,A\) e \(f_s=12{,}5\,kHz\):</p>
+                $$L=\frac{45\cdot40\,\mu s}{4\,A}=450\,\mu H,\qquad L_{crit}=\frac{0{,}5\cdot9}{2\cdot12{,}5\,kHz}=180\,\mu H.$$
+                <p><strong>Conclusão:</strong> \(D\) depende da duração de ON dentro do período.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3 id="quizSection">Exercícios de dimensionamento</h3>
+          <p>Três projetos resolvidos: Buck em CCM, Boost em DCM e Buck-Boost em DCM. Pratique a escolha de L/C e a verificação do regime.</p>
+
+          <!-- Questão 1 -->
+          <div class="exercise-box">
+            <div class="exercise-header">
+              <span>Questão de Treino 1 — Dimensionamento Completo de Conversor Buck</span>
+              <span>Tema: Buck CCM • Projeto de Filtros</span>
+            </div>
+            <div class="exercise-body">
+              <p>
+                Projete um conversor CC-CC Buck para alimentar uma carga resistiva de \(24\text{ V}\) e \(120\text{ W}\) a partir
+                de uma fonte de tensão contínua não regulada de \(V_{in} = 60\text{ V}\).
+                A frequência de comutação adotada é \(f_s = 40\text{ kHz}\).
+                Exige-se que: (i) A ondulação de corrente no indutor não ultrapasse \(20\%\) da corrente média na carga;
+                (ii) A ondulação de tensão na saída não exceda \(0{,}5\%\) de \(V_o\);
+                (iii) O conversor permaneça em CCM mesmo se a carga for reduzida para \(25\%\) da potência nominal.
+                Calcule a razão cíclica \(D\), a indutância \(L\), a capacitância \(C\) e os esforços de tensão e corrente nos semicondutores.
+              </p>
+              <button class="solution-toggle" data-target="solP1_1">Ver Resolução Completa Passo a Passo</button>
+              <div id="solP1_1" class="solution-content">
+                <p><strong>1. Cálculo da Razão Cíclica \(D\) e Corrente Nominal de Carga:</strong></p>
+                $$D = \frac{V_o}{V_{in}} = \frac{24}{60} = 0{,}40 \quad (40\%)$$
+                $$I_o = \frac{P_o}{V_o} = \frac{120\text{ W}}{24\text{ V}} = 5{,}0\text{ A}, \qquad R_{nom} = \frac{V_o}{I_o} = \frac{24}{5} = 4{,}8\,\Omega$$
+
+                <p><strong>2. Dimensionamento da Indutância \(L\) pelo Critério de Ripple (\(\Delta I_L \le 20\%\)):</strong></p>
+                $$\Delta I_L = 0{,}20 \cdot I_o = 0{,}20 \cdot 5{,}0\text{ A} = 1{,}0\text{ A}$$
+                $$\Delta I_L = \frac{V_o(1 - D)}{L \cdot f_s} \implies L_{ripple} = \frac{24 \cdot (1 - 0{,}40)}{1{,}0 \cdot 40 \times 10^3} = \frac{14{,}4}{40 \times 10^3} = 360\,\mu\text{H}$$
+
+                <p><strong>3. Verificação da Indutância Crítica a \(25\%\) de Carga:</strong></p>
+                $$P_{min} = 0{,}25 \cdot 120 = 30\text{ W} \implies I_{o,min} = \frac{30}{24} = 1{,}25\text{ A} \implies R_{max} = \frac{24}{1{,}25} = 19{,}2\,\Omega$$
+                $$L_{crit} = \frac{(1 - D) R_{max}}{2 f_s} = \frac{(1 - 0{,}40) \cdot 19{,}2}{2 \cdot 40 \times 10^3} = \frac{11{,}52}{80 \times 10^3} = 144\,\mu\text{H}$$
+                <p>Como \(L_{ripple} = 360\,\mu\text{H} > L_{crit} = 144\,\mu\text{H}\), a indutância adotada é \(L = 360\,\mu\text{H}\), garantindo CCM em toda a faixa!</p>
+
+                <p><strong>4. Dimensionamento da Capacitância \(C\) (\(\Delta V_o \le 0{,}5\%\)):</strong></p>
+                $$\Delta V_o = 0{,}005 \cdot 24\text{ V} = 0{,}12\text{ V} = 120\text{ mV}$$
+                $$\Delta V_o = \frac{\Delta I_L}{8 C f_s} \implies C = \frac{\Delta I_L}{8 \cdot \Delta V_o \cdot f_s} = \frac{1{,}0}{8 \cdot 0{,}12 \cdot 40 \times 10^3} = \frac{1{,}0}{38400} \approx 26\,\mu\text{F}$$
+                <p>Adota-se comercialmente um capacitor de \(33\,\mu\text{F}\) ou \(47\,\mu\text{F}\) com baixo ESR.</p>
+
+                <p><strong>5. Esforços nos Semicondutores:</strong></p>
+                <ul>
+                  <li>Tensão máxima na chave e no diodo: \(V_{S,max} = V_{D,max} = V_{in} = 60\text{ V}\).</li>
+                  <li>Corrente de pico na chave e no diodo: \(I_{pk} = I_o + \Delta I_L/2 = 5{,}0 + 0{,}5 = 5{,}5\text{ A}\).</li>
+                  <li>Corrente média na chave: \(I_{S,med} = D I_o = 0{,}40 \cdot 5{,}0 = 2{,}0\text{ A}\).</li>
+                  <li>Corrente média no diodo: \(I_{D,med} = (1 - D) I_o = 0{,}60 \cdot 5{,}0 = 3{,}0\text{ A}\).</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questão 2 -->
+          <div class="exercise-box">
+            <div class="exercise-header">
+              <span>Questão de Treino 2 — Análise de Boost com Transição para DCM</span>
+              <span>Tema: Boost • DCM • Análise Paramétrica</span>
+            </div>
+            <div class="exercise-body">
+              <p>
+                Um conversor Boost opera com \(V_{in} = 12\text{ V}\), razão cíclica fixa \(D = 0{,}60\), frequência \(f_s = 25\text{ kHz}\)
+                e indutância \(L = 40\,\mu\text{H}\).
+                (a) Determine o valor da resistência de carga crítica \(R_{crit}\) que define a transição entre CCM e DCM.
+                (b) Se a carga for \(R = 100\,\Omega\), verifique em qual modo de condução o conversor opera e calcule a tensão de saída prevista pelo modelo ideal \(V_o\).
+                (c) Compare essa tensão com a que seria obtida caso o conversor estivesse em CCM.
+              </p>
+              <button class="solution-toggle" data-target="solP1_2">Ver Resolução Completa Passo a Passo</button>
+              <div id="solP1_2" class="solution-content">
+                <p><strong>(a) Cálculo de \(R_{crit}\):</strong></p>
+                $$K_{crit} = D (1 - D)^2 = 0{,}60 \cdot (1 - 0{,}60)^2 = 0{,}60 \cdot 0{,}16 = 0{,}096$$
+                $$K = \frac{2 L f_s}{R} \implies R_{crit} = \frac{2 L f_s}{K_{crit}} = \frac{2 \cdot (40 \times 10^{-6}) \cdot (25 \times 10^3)}{0{,}096} = \frac{2{,}0}{0{,}096} \approx 20{,}83\,\Omega$$
+
+                <p><strong>(b) Operação para \(R = 100\,\Omega\):</strong></p>
+                <p>Como \(R = 100\,\Omega > R_{crit} = 20{,}83\,\Omega\), o parâmetro \(K\) real é:</p>
+                $$K = \frac{2 L f_s}{R} = \frac{2{,}0}{100} = 0{,}020 < K_{crit} \implies \text{O conversor está em DCM!}$$
+                <p>Cálculo do ganho estático \(M(D, K)\) em DCM:</p>
+                $$M = \frac{1 + \sqrt{1 + \frac{4 D^2}{K}}}{2} = \frac{1 + \sqrt{1 + \frac{4 \cdot (0{,}60)^2}{0{,}020}}}{2} = \frac{1 + \sqrt{1 + \frac{1{,}44}{0{,}020}}}{2} = \frac{1 + \sqrt{1 + 72}}{2} = \frac{1 + \sqrt{73}}{2} \approx \frac{1 + 8{,}544}{2} \approx 4{,}772$$
+                $$V_o = M \cdot V_{in} = 4{,}772 \cdot 12\text{ V} \approx 57{,}26\text{ V}$$
+
+                <p><strong>(c) Comparação com o modelo de CCM:</strong></p>
+                $$V_{o,CCM} = \frac{V_{in}}{1 - D} = \frac{12}{1 - 0{,}60} = \frac{12}{0{,}40} = 30{,}0\text{ V}$$
+                <p><em>Conclusão Pedagógica:</em> Devido à descontinuidade de condução provocada pela carga leve (\(100\,\Omega\)), a tensão de saída subiu de \(30\text{ V}\) para quase \(57{,}3\text{ V}\) (um acréscimo de mais de \(90\%\))! Este cálculo ilustra a dependência da carga em malha aberta. Controle e proteção devem ser dimensionados para a faixa de operação; DCM, por si só, não implica dano à carga.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Questão 3 -->
+          <div class="exercise-box">
+            <div class="exercise-header">
+              <span>Questão de Treino 3 — Dedução e Projeto de Buck-Boost DCM</span>
+              <span>Tema: Buck-Boost • DCM • Dimensionamento</span>
+            </div>
+            <div class="exercise-body">
+              <p>
+                Um conversor Buck-Boost em DCM deve alimentar uma carga de \(15\text{ W}\) com tensão de \(V_o = 15\text{ V}\) (magnitude)
+                a partir de uma entrada de \(V_{in} = 30\text{ V}\).
+                A frequência de comutação é \(f_s = 100\text{ kHz}\) e a indutância é \(L = 20\,\mu\text{H}\).
+                (a) Calcule o parâmetro \(K\);
+                (b) Calcule a razão cíclica \(D\) necessária;
+                (c) Calcule o tempo de condução da chave (\(t_{on}\)) e o tempo de condução do diodo (\(t_{diodo}\));
+                (d) Verifique a condição de condução descontínua.
+              </p>
+              <button class="solution-toggle" data-target="solP1_3">Ver Resolução Completa Passo a Passo</button>
+              <div id="solP1_3" class="solution-content">
+                <p><strong>(a) Cálculo da Resistência e Parâmetro \(K\):</strong></p>
+                $$I_o = \frac{P_o}{V_o} = \frac{15\text{ W}}{15\text{ V}} = 1{,}0\text{ A} \implies R = \frac{15}{1{,}0} = 15\,\Omega$$
+                $$K = \frac{2 L f_s}{R} = \frac{2 \cdot (20 \times 10^{-6}) \cdot (100 \times 10^3)}{15} = \frac{4{,}0}{15} \approx 0{,}2667$$
+
+                <p><strong>(b) Cálculo da Razão Cíclica \(D\):</strong></p>
+                <p>O ganho estático desejado é: \(M = \frac{V_o}{V_{in}} = \frac{15}{30} = 0{,}50\).</p>
+                <p>Em DCM, a relação para o Buck-Boost é: \(M = \frac{D}{\sqrt{K}}\).</p>
+                $$D = M \cdot \sqrt{K} = 0{,}50 \cdot \sqrt{0{,}2667} \approx 0{,}50 \cdot 0{,}5164 \approx 0{,}2582 \quad (25{,}82\%)$$
+
+                <p><strong>(c) Tempos de Condução (\(T_s = 10\,\mu\text{s}\)):</strong></p>
+                $$t_{on} = D \cdot T_s = 0{,}2582 \cdot 10\,\mu\text{s} \approx 2{,}58\,\mu\text{s}$$
+                $$D_2 = \sqrt{K} = \sqrt{0{,}2667} \approx 0{,}5164 \implies t_{diodo} = D_2 \cdot T_s = 5{,}16\,\mu\text{s}$$
+                <p>Tempo de corrente nula: \(t_{zero} = (1 - D - D_2) \cdot T_s = (1 - 0{,}2582 - 0{,}5164) \cdot 10 = 0{,}2254 \cdot 10 \approx 2{,}25\,\mu\text{s}\).</p>
+
+                <p><strong>(d) Verificação do Limite CCM/DCM:</strong></p>
+                $$D + D_2 = 0{,}2582 + 0{,}5164 = 0{,}7746 < 1{,}0$$
+                <p>Como \(D + D_2 < 1\) (e \(K = 0{,}2667 < K_{crit}(D) = (1 - 0{,}2582)^2 \approx 0{,}5503\)), confirma-se plenamente a operação em modo descontínuo para os parâmetros ideais informados.</p>
+              </div>
+            </div>
+          </div>
+
+          <h3 id="fundamentalsPractice">Fundamentos complementares — média, RMS, potência e SCR</h3>
+          <div class="exercise-box">
+            <div class="exercise-header"><span>Treino conceitual</span><span>5–10 min</span></div>
+            <div class="exercise-body">
+              <p>Para média, RMS e perdas resistivas, refaça o <a href="#mod1">exercício de corrente pulsada do módulo 1</a>. Complete a revisão: <strong>1.</strong> Como um SCR liga e desliga? <strong>2.</strong> Em uma onda chaveada arbitrária, qual expressão define a potência ativa média?</p>
+              <button class="solution-toggle" data-target="solInsurance2026">Ver gabarito</button>
+              <div id="solInsurance2026" class="solution-content">
+                <p>SCR: um pulso de gate inicia a condução quando polarizado adequadamente; depois ele fica travado e normalmente só desliga quando a corrente de ânodo cai abaixo da corrente de manutenção ou é comutada/revertida.</p>
+                $$P=\frac{1}{T}\int_0^T v(t)i(t)\,dt$$
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <button id="examFormulaFab" class="exam-formula-fab" type="button" aria-controls="examFormulaModal" aria-expanded="false">
+        Formulário P1
+      </button>
+
+      <div id="examFormulaModal" class="exam-formula-modal" hidden aria-hidden="true">
+        <div class="exam-formula-panel" role="dialog" aria-modal="true" aria-labelledby="examFormulaModalTitle">
+          <header class="exam-formula-modal-head">
+            <div>
+              <span class="module-tag">Consulta rápida</span>
+              <h2 id="examFormulaModalTitle">Formulário P1</h2>
+            </div>
+            <div class="exam-formula-actions">
+              <button id="examFormulaPdf" type="button">Gerar PDF</button>
+              <button id="examFormulaPrint" type="button">Imprimir</button>
+              <button id="examFormulaClose" type="button" aria-label="Fechar formulário">Fechar</button>
+            </div>
+          </header>
+          <p class="exam-formula-print-note">“Gerar PDF” abre o diálogo de impressão já formatado. Selecione <strong>Salvar como PDF</strong> no navegador.</p>
+          <div id="examFormulaModalContent" class="exam-formula-modal-content"></div>
+        </div>
+      </div>
+
+
 
       <!-- RODAPÉ TÉCNICO -->
       <footer style="margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border-subtle); text-align: center; font-size: 0.82rem; color: var(--text-dim);">

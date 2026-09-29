@@ -1102,7 +1102,105 @@ function updateOscilloscopeSvg(box, state) {
 }
 
 
+
+/* ==========================================================================
+   4. MODO DE PROVA: formulário flutuante, impressão e PDF via navegador
+   ========================================================================== */
+function initExamMode() {
+  var modal = document.getElementById('examFormulaModal');
+  var source = document.getElementById('examFormulaSource');
+  var fab = document.getElementById('examFormulaFab');
+  var closeBtn = document.getElementById('examFormulaClose');
+  var printBtn = document.getElementById('examFormulaPrint');
+  var pdfBtn = document.getElementById('examFormulaPdf');
+  var content = document.getElementById('examFormulaModalContent');
+  if (!modal || !source || !content || modal.dataset.initialized === 'true') return;
+
+  modal.dataset.initialized = 'true';
+  var lastFocus = null;
+  var originalTitle = document.title;
+
+  function hydrateFormulaCopy() {
+    content.innerHTML = '';
+    var clone = source.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.classList.add('exam-formula-sheet-modal');
+    clone.querySelectorAll('[data-open-exam-formula]').forEach(function (button) {
+      button.remove();
+    });
+    content.appendChild(clone);
+
+    if (window.UiIcons) window.UiIcons.hydrate(content);
+    if (typeof window.renderMathInElement === 'function') {
+      window.renderMathInElement(content, {
+        delimiters: [
+          { left: '$$', right: '$$', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+
+  function openFormula(trigger) {
+    lastFocus = trigger || document.activeElement;
+    hydrateFormulaCopy();
+    modal.hidden = false;
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('exam-formula-open');
+    if (fab) fab.setAttribute('aria-expanded', 'true');
+    requestAnimationFrame(function () {
+      if (closeBtn) closeBtn.focus();
+    });
+  }
+
+  function closeFormula() {
+    if (document.body.classList.contains('print-formula-only')) return;
+    modal.hidden = true;
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('exam-formula-open');
+    if (fab) fab.setAttribute('aria-expanded', 'false');
+    if (lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus();
+  }
+
+  function printFormula(asPdf) {
+    if (modal.hidden) openFormula(pdfBtn || printBtn);
+    document.body.classList.add('print-formula-only');
+    document.title = asPdf ? 'Formulario-P1-Eletronica-de-Potencia' : originalTitle;
+
+    var cleanup = function () {
+      document.body.classList.remove('print-formula-only');
+      document.title = originalTitle;
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+
+    // Alguns navegadores/WebViews não disparam afterprint.
+    window.setTimeout(function () {
+      if (document.body.classList.contains('print-formula-only')) cleanup();
+    }, 1500);
+  }
+
+  document.querySelectorAll('[data-open-exam-formula]').forEach(function (button) {
+    button.addEventListener('click', function () { openFormula(button); });
+  });
+  if (fab) fab.addEventListener('click', function () { openFormula(fab); });
+  if (closeBtn) closeBtn.addEventListener('click', closeFormula);
+  if (printBtn) printBtn.addEventListener('click', function () { printFormula(false); });
+  if (pdfBtn) pdfBtn.addEventListener('click', function () { printFormula(true); });
+
+  modal.addEventListener('click', function (event) {
+    if (event.target === modal) closeFormula();
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !modal.hidden) closeFormula();
+  });
+}
+
+
 window.initSubjectTools = function () {
   initCalculator();
   initConverterDashboards();
+  initExamMode();
 };

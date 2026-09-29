@@ -1143,8 +1143,39 @@ function examStaticCircuit(def) {
   var closed=svg.querySelector('[data-switch="closed"]'),open=svg.querySelector('[data-switch="open"]');
   if(closed)closed.style.display='';if(open)open.style.display='none';
   var status=svg.querySelector('[data-circuit-status]');if(status)status.textContent='Topologia e referências de corrente/tensão';
-  svg.querySelectorAll('[data-flow]').forEach(function(el){el.style.visibility='visible';});svg.querySelectorAll('[data-arrow]').forEach(function(el){el.style.visibility='visible';el.setAttribute('marker-end','url(#'+el.dataset.marker+')');});
+  svg.querySelectorAll('[data-flow]').forEach(function(el){el.style.visibility='visible';});svg.querySelectorAll('[data-arrow]').forEach(function(el){el.style.visibility='visible';el.removeAttribute('marker-start');el.removeAttribute('marker-end');var reverse=def.topology==='buckboost'&&(el.dataset.arrow==='iCDown'||el.dataset.arrow==='iOutDown');el.setAttribute(reverse?'marker-start':'marker-end','url(#'+el.dataset.marker+')');});
   return wrap.innerHTML;
+}
+
+
+function examAlternativeSvg(alt) {
+  var W=300,H=190,left=38,right=14,top=22,panelH=62,gap=25,h=[];
+  function x(t){return left+(W-left-right)*t;}
+  function txt(xp,yp,t,cls,anchor){h.push('<text x="'+xp+'" y="'+yp+'" class="'+(cls||'exam-svg-text')+'" text-anchor="'+(anchor||'start')+'">'+t+'</text>');}
+  function line(x1,y1,x2,y2,cls){h.push('<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" class="'+(cls||'exam-grid')+'"/>');}
+  function plot(points,yTop,label){
+    var vals=points.map(function(p){return p[1];}),lo=Math.min.apply(null,vals.concat([0])),hi=Math.max.apply(null,vals.concat([0]));
+    if(Math.abs(hi-lo)<1e-9){hi+=1;lo-=1;}var pad=(hi-lo)*.12||1;hi+=pad;lo-=pad;
+    function y(v){return yTop+(hi-v)/(hi-lo)*panelH;}
+    line(left,yTop+panelH,W-right,yTop+panelH,'exam-grid');line(left,yTop,left,yTop+panelH,'exam-grid');
+    if(lo<=0&&hi>=0)line(left,y(0),W-right,y(0),'exam-zero-line');
+    txt(5,yTop+16,label,'exam-svg-title');
+    var d='';points.forEach(function(p,i){d+=(i?' L':'M')+x(p[0])+' '+y(p[1]);});
+    h.push('<path d="'+d+'" class="exam-trace" fill="none"/>');
+  }
+  h.push('<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+alt.label+'">');
+  plot(alt.vo,top,'vₒ');plot(alt.ic,top+panelH+gap,'iC');
+  (alt.markers||[]).forEach(function(m){line(x(m),top,x(m),H-18,'exam-marker-line');});
+  txt(left,H-5,'0','exam-svg-subtle','middle');txt(W-right,H-5,'Tₛ','exam-svg-subtle','end');
+  h.push('</svg>');return h.join('');
+}
+
+function examAlternativesMarkup(def) {
+  if(!def.alternatives||!def.alternatives.length)return '';
+  return '<div class="exam-alternatives"><div class="exam-alternatives-head"><strong>Alternativas gráficas da prova</strong><span>Reconstruídas da fotografia original</span></div><div class="exam-alternatives-grid">'+
+    def.alternatives.map(function(alt){
+      return '<figure class="exam-alt-card '+(alt.correct?'is-correct':'')+'"><div class="exam-alt-label">'+alt.label+(alt.correct?' • correta':'')+'</div>'+examAlternativeSvg(alt)+'<figcaption>'+alt.note+'</figcaption></figure>';
+    }).join('')+'</div></div>';
 }
 
 function getExamFigureDefinitions() {
@@ -1153,7 +1184,7 @@ function getExamFigureDefinitions() {
       {label:"vL",unit:"V",points:[[0,100],[.4,100],[.4,-66.67],[1,-66.67]],annotations:[{t:.18,v:100,text:"+100 V"},{t:.72,v:-66.67,text:"−66,7 V"}]},
       {label:"iL",unit:"A",points:[[0,0],[.4,2.667],[1,0]],annotations:[{t:.4,v:2.667,text:"Ipk=2,667 A"}]}
     ]},
-    "solHist2024Q2":{title:"2024 Q2 — Boost: iD, iC e vC",topology:"boost",Vin:1,Vo:1.667,D:.4,audit:"O gráfico impresso é iD. Preservados 6 A → 2 A de 4 a 10 µs; iC e vC são derivados de iC=iD−Io e dvC/dt=iC/C.",markers:[{t:.4,label:"4 µs"},{t:1,label:"10 µs"}],signals:[
+    "solHist2024Q2":{title:"2024 Q2 — Boost: iD, iC e vC",topology:"boost",Vin:1,Vo:1.667,D:.4,audit:"O gráfico impresso é iD. Preservados 6 A → 2 A de 4 a 10 µs; iC e vC são derivados de iC=iD−Io e dvC/dt=iC/C.",alternatives:[{label:"Alternativa 1 — esquerda",correct:false,markers:[.4,.9],vo:[[0,.55],[.4,.72],[.58,.68],[.82,.34],[1,.52]],ic:[[0,-2.4],[.4,-2.4],[.4,3.6],[1,-.4]],note:"Não respeita dvₒ/dt=iC/C no primeiro intervalo: com iC<0, vₒ não pode subir."},{label:"Alternativa 2 — centro",correct:false,markers:[.4,.9],vo:[[0,.5],[.4,.5],[.7,.82],[.86,.5],[1,.5]],ic:[[0,-2.4],[.4,-2.4],[.4,3.6],[1,-.4]],note:"Não representa corretamente a integração da rampa de iC no OFF; vₒ não deve virar uma onda triangular."},{label:"Alternativa 3 — direita",correct:true,markers:[.4,.9],vo:[[0,.72],[.4,.48],[.58,.58],[.78,.78],[.9,.82],[1,.80]],ic:[[0,-2.4],[.4,-2.4],[.4,3.6],[1,-.4]],note:"Compatível: vₒ cai com iC<0, sobe com iC>0 e atinge máximo quando iC cruza zero, em aproximadamente 9,4 µs."}],markers:[{t:.4,label:"4 µs"},{t:1,label:"10 µs"}],signals:[
       {label:"iD",unit:"A",points:[[0,0],[.4,0],[.4,6],[1,2]],annotations:[{t:.4,v:6,text:"6 A"},{t:1,v:2,text:"2 A",dx:-7,anchor:"end"}]},
       {label:"iC",unit:"A",points:[[0,-2.4],[.4,-2.4],[.4,3.6],[1,-.4]],annotations:[{t:.18,v:-2.4,text:"−2,4 A"},{t:.4,v:3.6,text:"+3,6 A"}]},
       {label:"vC",unit:"qual.",points:[[0,1.04],[.4,.88],[.55,.94],[.9,1.10],[1,1.09]],min:.8,max:1.14,annotations:[{t:.4,v:.88,text:"mín."},{t:.9,v:1.10,text:"máx."}]}
@@ -1195,7 +1226,7 @@ function getExamFigureDefinitions() {
       {label:"vL",unit:"V",points:[[0,100],[.3,100],[.3,-150],[.5,-150],[.5,0],[1,0]]},
       {label:"iL",unit:"A",points:[[0,0],[.3,4],[.5,0],[1,0]]},{label:"iD",unit:"A",points:[[0,0],[.3,0],[.3,4],[.5,0],[1,0]]},{label:"iC",unit:"A",points:[[0,-.4],[.3,-.4],[.3,3.6],[.5,-.4],[1,-.4]]}
     ]},
-    "solHistApr26Q3":{title:"2026 Q3 — Buck: iS, iC e vC",topology:"buck",Vin:100,Vo:60,D:.6,audit:"Imin=2 A é dado no texto; 2 A no gráfico é ΔIL. Logo Imax=4 A e Io=3 A. A forma de vC vem do sinal de iC.",markers:[{t:.6,label:"60 µs"},{t:1,label:"100 µs"}],signals:[
+    "solHistApr26Q3":{title:"2026 Q3 — Buck: iS, iC e vC",topology:"buck",Vin:100,Vo:60,D:.6,audit:"Imin=2 A é dado no texto; 2 A no gráfico é ΔIL. Logo Imax=4 A e Io=3 A. A forma de vC vem do sinal de iC.",alternatives:[{label:"Alternativa 1 — esquerda",correct:false,markers:[.3,.6,.8],vo:[[0,.55],[.3,.68],[.55,.76],[.62,.50],[1,.63]],ic:[[0,-1],[.6,1],[1,-1]],note:"Os extremos de vₒ não coincidem com os cruzamentos iC=0."},{label:"Alternativa 2 — centro",correct:true,markers:[.3,.6,.8],vo:[[0,.66],[.3,.52],[.6,.62],[.8,.74],[1,.66]],ic:[[0,-1],[.6,1],[1,-1]],note:"Compatível com iC=iL−Io: mínimo em 30 µs, máximo em 80 µs e trechos curvos por integração da corrente triangular."},{label:"Alternativa 3 — direita",correct:false,markers:[.3,.6,.8],vo:[[0,.55],[.3,.68],[.6,.55],[.8,.67],[1,.58]],ic:[[0,-1],[.6,1],[1,-1]],note:"Introduz extremos incompatíveis com dvₒ/dt=iC/C."}],markers:[{t:.6,label:"60 µs"},{t:1,label:"100 µs"}],signals:[
       {label:"iS",unit:"A",points:[[0,2],[.6,4],[.6,0],[1,0]],brackets:[{t:.55,v1:2,v2:4,label:"ΔI=2 A"}]},
       {label:"vL",unit:"V",points:[[0,40],[.6,40],[.6,-60],[1,-60]]},
       {label:"iC",unit:"A",points:[[0,-1],[.6,1],[1,-1]],annotations:[{t:.3,v:0,text:"vC mín."},{t:.8,v:0,text:"vC máx."}]},
@@ -1234,7 +1265,7 @@ function initExamFigures() {
     if(!button)return;
     var body=button.closest('.exercise-body');
     if(!body||body.querySelector('[data-exam-visual="'+targetId+'"]'))return;
-    var host=document.createElement('div');host.setAttribute('data-exam-visual',targetId);host.innerHTML=examFigureMarkup(defs[targetId]);button.parentNode.insertBefore(host,button);
+    var host=document.createElement('div');host.setAttribute('data-exam-visual',targetId);host.innerHTML=examFigureMarkup(defs[targetId])+examAlternativesMarkup(defs[targetId]);button.parentNode.insertBefore(host,button);
   });
   var formula=document.getElementById('examFormulaSource');
   if(formula&&!formula.querySelector('.formula-visual-overview')){

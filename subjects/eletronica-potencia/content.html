@@ -1874,7 +1874,7 @@
                   <li>Use \(\int v_Ldt=0\) para tensões e \(v_L=L\,\Delta I/\Delta t\) para \(L\).</li>
                   <li>Use área/T para correntes médias. Para Boost/Buck-Boost, \(\overline I_D=I_o\).</li>
                   <li>Calcule \(R=V_o/I_o\) e só então \(L_{crit}\), se pedido.</li>
-                  <li>Faça teste de sanidade: Buck \(V_o<E\); Boost \(V_o>E\); \(D,D_2,D_3\in[0,1]\); balanços de L/C devem fechar.</li>
+                  <li>Confira a coerência dos resultados: no Buck, a saída é menor que a entrada (\(V_o\lt E\)); no Boost, é maior (\(V_o\gt E\)), com \(E=V_{in}\). As frações do período devem estar entre 0 e 1 e somar 1: \(D+D_2+D_3=1\) (em CCM, \(D_3=0\)). Em regime permanente periódico, a tensão média em L e a corrente média em C devem ser nulas: \(\langle v_L\rangle=0\) e \(\langle i_C\rangle=0\).</li>
                 </ol>
               </section>
             </div>

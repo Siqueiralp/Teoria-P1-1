@@ -74,6 +74,11 @@
       "title": "Simulador Interativo"
     },
     {
+      "anchor": "examSection",
+      "code": "P1",
+      "title": "Provas anteriores & Simulados"
+    },
+    {
       "anchor": "cheatSheetSection",
       "code": "TAB",
       "title": "Cheat Sheet de Prova"

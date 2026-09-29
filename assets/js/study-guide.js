@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return loadScript(base + manifest.script).then(function () {
           if (typeof window.initSubjectTools === "function") window.initSubjectTools();
           rewriteTopicLinks();
+          initPreloadedReview();
           scrollToInitialSection();
         });
       }
@@ -64,12 +65,32 @@ document.addEventListener("DOMContentLoaded", function () {
     if (target) target.scrollIntoView();
   }
 
-  function rewriteTopicLinks() {
+  function rewriteTopicLinks(root) {
     if (!currentPage) return;
-    document.querySelectorAll('#subjectContent a[href^="#"]').forEach(function (link) {
+    (root || document.getElementById("subjectContent")).querySelectorAll('a[href^="#"]').forEach(function (link) {
       var anchor = decodeURIComponent(link.getAttribute("href").slice(1));
       var page = window.TopicPages.owner(manifest, anchor);
-      if (page && page.id !== currentPage.id) link.href = window.TopicPages.href(manifest, page, anchor);
+      if (page && (currentPage.preloadGroup || page.id !== currentPage.id)) link.href = window.TopicPages.href(manifest, page, anchor);
+    });
+  }
+
+  function initPreloadedReview() {
+    if (!currentPage || !currentPage.preloadGroup || !window.ReviewTabs) return;
+    window.ReviewTabs.mount({ manifest: manifest, base: base, page: currentPage,
+      host: document.getElementById("subjectContent"),
+      initPanel: function (panel) {
+        if (typeof window.initSubjectPanel === "function") window.initSubjectPanel(panel);
+        if (window.UiIcons) window.UiIcons.hydrate(panel);
+        renderKaTeXIfAvailable(panel);
+        rewriteTopicLinks(panel);
+      },
+      onActivate: function (page) {
+        currentPage = page;
+        window.StudyGuide.page = page;
+        document.title = page.title + " | " + manifest.name;
+        var trail = document.querySelector(".topic-breadcrumb");
+        trail.lastChild.textContent = " / " + page.title;
+      }
     });
   }
 
@@ -77,7 +98,8 @@ document.addEventListener("DOMContentLoaded", function () {
     rewriteTopicLinks();
     var printDetails = [];
     window.addEventListener("beforeprint", function () {
-      printDetails = Array.from(document.querySelectorAll(".topic-details:not([open]), .converter-description:not([open])"));
+      printDetails = Array.from(document.querySelectorAll(".topic-details:not([open]), .converter-description:not([open]), [data-print-expand]:not([open])"))
+        .filter(function (detail) { return !detail.closest('[hidden]'); });
       printDetails.forEach(function (detail) { detail.open = true; });
     });
     window.addEventListener("afterprint", function () {
@@ -109,9 +131,10 @@ document.addEventListener("DOMContentLoaded", function () {
       var footer = host.querySelector("footer");
       host.insertBefore(pager, footer || null);
     }
-    document.querySelectorAll('[role="tablist"]').forEach(function (list) {
-      var tabs = Array.from(list.querySelectorAll('[role="tab"]'));
-      list.addEventListener("keydown", function (event) {
+    host.addEventListener("keydown", function (event) {
+        var list = event.target.closest('[role="tablist"]');
+        if (!list) return;
+        var tabs = Array.from(list.querySelectorAll('[role="tab"]'));
         var index = tabs.indexOf(document.activeElement);
         if (index < 0) return;
         if (event.key === " ") {
@@ -125,7 +148,6 @@ document.addEventListener("DOMContentLoaded", function () {
           (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
         tabs.forEach(function (tab, i) { tab.tabIndex = i === next ? 0 : -1; });
         tabs[next].focus();
-      });
     });
   }
 
@@ -390,10 +412,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function renderKaTeXIfAvailable() {
+  function renderKaTeXIfAvailable(root) {
     if (typeof window.renderMathInElement !== "function") return;
     try {
-      window.renderMathInElement(document.getElementById("subjectContent"), {
+      window.renderMathInElement(root || document.getElementById("subjectContent"), {
         delimiters: [
           { left: "$$", right: "$$", display: true },
           { left: "\\[", right: "\\]", display: true },

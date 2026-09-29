@@ -99,7 +99,7 @@
       "group": "Provas e prática"
     }
   ],
-  "script": "subject.js?v=20260929-paginas",
+  "script": "subject.js?v=20260929-preload",
   "pages": [
     {
       "id": "inicio",
@@ -198,7 +198,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "waveformReviewSection"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "revisao-buck-dcm",
@@ -207,7 +208,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "review-buck-dcm"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "revisao-boost-ccm",
@@ -216,7 +218,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "review-boost-ccm"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "revisao-boost-dcm",
@@ -225,7 +228,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "review-boost-dcm"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "revisao-buckboost-ccm",
@@ -234,7 +238,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "review-buckboost-ccm"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "revisao-buckboost-dcm",
@@ -243,7 +248,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "review-buckboost-dcm"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "revisao-roteiro",
@@ -252,7 +258,8 @@
       "navAnchor": "waveformReviewSection",
       "anchors": [
         "reviewWorkflowSection"
-      ]
+      ],
+      "preloadGroup": "review"
     },
     {
       "id": "formulas",

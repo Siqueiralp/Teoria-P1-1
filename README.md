@@ -43,6 +43,8 @@ guide.html?subject=eletronica-potencia&page=revisao-boost-dcm
 
 A revisão tem abas Buck, Boost e Buck-Boost, com subabas CCM/DCM. Provas, simulados e projetos também são separados. Links antigos com `#mod4`, `#historySection` e outras âncoras continuam funcionando.
 
+As subabas da revisão são pré-carregadas e retêm suas instâncias: alternar preserva play/pause, instante do ciclo, velocidade e canal do gráfico. A animação de uma aba oculta fica congelada até o retorno. Circuito, formas de onda e controles usam uma vista compacta no desktop.
+
 Após editar `subjects/eletronica-potencia/content.html`, atualize e confira as páginas:
 
 ```sh

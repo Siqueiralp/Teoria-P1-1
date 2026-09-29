@@ -28,6 +28,10 @@ O progresso usa todos os módulos e os IDs de `checklistIds` do manifesto, indep
 
 São 30 páginas: início, nove módulos, seis combinações de topologia/regime, roteiro de balanços, fórmulas, calculadora, análise histórica, quatro provas, dois simulados, três projetos e fundamentos. A revisão mantém o regime escolhido ao trocar de topologia. O formulário modal busca a página de fórmulas sob demanda e reutiliza o conteúdo nas próximas aberturas.
 
+As páginas com `preloadGroup: "review"` são pré-carregadas ao entrar na revisão. `review-tabs.js` retém os sete painéis e inicializa cada simulador uma vez. A troca oculta/mostra o mesmo DOM e atualiza a URL com `pushState`; voltar/avançar também usa o cache. Play/pause, instante, velocidade e canal permanecem em cada instância durante a navegação entre abas. Painéis ocultos interrompem os frames de animação e retomam do instante salvo quando visíveis. As demais páginas mantêm o carregamento individual.
+
+O layout compacto se aplica à revisão: circuito e osciloscópio lado a lado no desktop, controles acima dos diagramas e referências recolhíveis. Em telas estreitas, os diagramas ficam empilhados com rolagem horizontal local para manter os rótulos legíveis. Na impressão, somente o painel visível é expandido.
+
 ## Extensibilidade
 
 A home não possui disciplinas hardcoded em JavaScript. Para incluir uma matéria nova, basta criar sua pasta e registrar seu caminho em `subjects/registry.json`.

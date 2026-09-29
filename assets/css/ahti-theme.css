@@ -283,13 +283,82 @@ button { font-family: inherit; }
 .topology-review .module-desc { margin-top: 6px; font-size: .88rem; }
 .topology-review .module-body { padding: 16px 24px; }
 .topology-review .converter-dashboard-head { padding: 16px; }
+/* Review only: keep the circuit and waveforms together at a smaller, readable scale. */
+.content-area:has(.review-panels) { padding-top: 16px; }
+.content-area:has(.review-panels) .topic-breadcrumb { margin-bottom: 8px; }
+.content-area:has(.review-panels) .topic-tabs { display: inline-flex; vertical-align: top; margin-bottom: 8px; padding-bottom: 0; border-bottom: 0; }
+.content-area:has(.review-panels) .topic-subtabs { padding-left: 12px; margin-left: 12px; border-left: 1px solid var(--ahti-border); }
+.review-tab-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.content-area .review-tab-toolbar .topic-tabs { margin-bottom: 0; }
+.content-area .review-tab-toolbar .exam-formula-fab { position: static; margin-left: auto; font-size: .75rem; padding: 8px 12px; box-shadow: none; min-height: 44px; }
+.topology-review { margin-bottom: 16px; }
+.topology-review .module-header { padding: 10px 16px; }
+.topology-review .module-desc { display: none; }
+.topology-review .module-body { padding: 10px; }
+.topology-review .converter-dashboard { margin: 0; }
+.topology-review .converter-dashboard-head { padding: 10px 12px; gap: 8px; }
+.topology-review .converter-dashboard-head > div:first-child { min-width: 0; }
+.topology-review .converter-dashboard-head p { font-size: .8rem; }
+.topology-review .converter-description { margin-top: 4px; }
+.topology-review .converter-description summary { min-height: 32px; font-size: .8rem; }
+.topology-review .converter-dashboard-layout { grid-template-columns: minmax(0, 1fr); padding: 10px; gap: 10px; }
+.topology-review .converter-animator-visual { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 10px; align-items: start; }
+.topology-review .converter-circuit-box, .topology-review .converter-scope-box { padding: 8px; }
+.topology-review .converter-box-title { margin-bottom: 4px; font-size: .7rem; letter-spacing: normal; }
+.topology-review .converter-box-title .active-indicator { font-size: .65rem; }
+.topology-review .converter-dashboard-svg { height: 165px; aspect-ratio: auto; }
+.topology-review .converter-scope-svg { height: 190px; aspect-ratio: auto; }
+.topology-review .converter-dashboard-svg svg text { font-size: 18px; }
+.topology-review .converter-references summary { min-height: 32px; cursor: pointer; color: var(--ahti-info); font-size: .73rem; }
+.topology-review .converter-channel-tabs { gap: 4px; }
+.topology-review .converter-channel-tabs button { font-size: .75rem; padding: 5px 8px; min-height: 36px; }
+.topology-review .converter-dashboard-legend, .topology-review .converter-scope-legend { gap: 6px; font-size: .65rem; }
+.topology-review .converter-conventions { font-size: .73rem; line-height: 1.4; margin-top: 6px; }
+.topology-review .converter-dashboard-panel { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.topology-review .dashboard-controls-bar { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 6px 10px; gap: 12px; }
+.topology-review .dashboard-controls-main { flex: 0 0 auto; gap: 6px; }
+.topology-review .dashboard-scrubber-row { flex: 1 1 240px; }
+.topology-review .timeline-scrubber { min-height: 36px; }
+.topology-review .btn-ctrl-play { width: auto; min-width: 96px; }
+.topology-review .btn-ctrl-play, .topology-review .btn-ctrl-speed,
+.topology-review .converter-stage-buttons button, .topology-review .converter-events button { min-height: 36px; font-size: .78rem; }
+.topology-review .converter-stage-card, .topology-review .converter-events { padding: 8px 10px; }
+.topology-review .converter-stage-card { min-height: var(--converter-stage-card-height, 9rem); height: var(--converter-stage-card-height, 9rem); }
+.topology-review .converter-stage-card h5 { font-size: .9rem; margin-block: 4px; }
+.topology-review .stage-note, .topology-review .converter-events, .topology-review .converter-cap-status { font-size: .75rem; line-height: 1.4; }
+.topology-review .stage-telemetry-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.topology-review .telemetry-cell { min-height: 48px; padding: 6px 8px; }
+.topology-review .telemetry-cell-val { font-size: .92rem; }
+.topology-review .converter-dashboard-formula { padding: 8px; }
+@media (min-width: 1500px) {
+  .topology-review .converter-dashboard-svg { height: 190px; }
+  .topology-review .converter-scope-svg { height: 220px; }
+}
+@media (max-width: 1100px) {
+  .content-area:has(.review-panels) .topic-tabs { display: flex; }
+  .content-area:has(.review-panels) .topic-subtabs { padding-left: 0; margin-left: 0; border-left: 0; }
+  .review-tab-toolbar > .topic-tabs:first-child { width: 100%; }
+  .topology-review .converter-animator-visual { grid-template-columns: minmax(0, 1fr); }
+  .topology-review .converter-dashboard-svg { height: 180px; }
+  .topology-review .converter-scope-svg { height: 220px; }
+}
+@media (max-width: 600px) {
+  .topology-review .converter-dashboard-svg { min-width: 440px; }
+  .topology-review .converter-scope-svg { min-width: 480px; }
+  .topology-review .converter-dashboard-panel { grid-template-columns: minmax(0, 1fr); }
+  .topology-review .stage-telemetry-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .topology-review .converter-stage-card { height: auto; min-height: 0; max-height: none; }
+  .topology-review .converter-channel-tabs button, .topology-review .btn-ctrl-play,
+  .topology-review .btn-ctrl-speed, .topology-review .converter-stage-buttons button,
+  .topology-review .converter-events button { min-height: 44px; }
+}
 @media (max-width: 600px) {
   .topic-card-grid { grid-template-columns: 1fr; }
   .topic-tabs a { flex: 1 1 auto; padding-inline: 12px; }
   .topic-breadcrumb { overflow-wrap: anywhere; }
 }
 @media print {
-  .topic-tabs, .topic-breadcrumb, .topic-pager, .topic-link { display: none !important; }
+  .topic-tabs, .topic-breadcrumb, .topic-pager, .topic-link, .review-tab-toolbar { display: none !important; }
 }
 
 .topology-description {

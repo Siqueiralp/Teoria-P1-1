@@ -106,3 +106,11 @@ As contas específicas, a classificação e os gráficos históricos foram deriv
 - Progresso global preservado: 37 itens e nove módulos. Âncoras antigas, atualização e voltar/avançar continuam disponíveis.
 - `python scripts/build-topic-pages.py --check` confere o material gerado a partir de `content.html`. O workflow do deploy gera as páginas e executa os testes.
 - Verificação: 22 testes de física, cobertura do conteúdo, destinos de links/abas, progresso e busca apenas da página selecionada. Navegador local: troca de topologia/regime, teclado, gráficos de capacitor, resoluções, projetos, modal, link antigo, progresso entre páginas e largura de 390 px; Controle 1 também carrega corretamente.
+
+## Subabas pré-carregadas e vista compacta — 29/09/2026
+
+- As seis combinações de topologia/regime e o roteiro permanecem em memória na revisão. Cada simulador é inicializado uma vez; trocar a aba preserva play/pause, instante, velocidade e canal.
+- Abas ocultas congelam o tempo, mantendo a intenção de reproduzir ou pausar. O retorno retoma do instante retido. URL, favoritos, teclado e voltar/avançar continuam disponíveis.
+- Circuito e osciloscópio lado a lado no desktop, com alturas de 165/190 px na largura testada de 1271 px. O toolbar de reprodução aparece acima dos diagramas; fórmulas ficam junto às abas. Descrições e referências são expansíveis.
+- Rótulos dos diagramas foram ajustados para a escala compacta. A integração parabólica de corrente do capacitor e os pontos de máximo/mínimo permanecem visíveis. Em celulares, os diagramas empilham e mantêm rolagem horizontal local.
+- Verificação: 26 testes passaram, incluindo reutilização do cache, pedidos simultâneos e recuperação de falha no pré-carregamento. No navegador, Buck CCM preservou pausa, tempo em 50%, velocidade 2× e canal do capacitor; em play, ficou congelado em 60,2% enquanto oculto e retomou ao voltar. Modal sem erros KaTeX, sete painéis/seis simuladores/um painel visível, sem IDs duplicados; telas de desktop e 390 px conferidas.

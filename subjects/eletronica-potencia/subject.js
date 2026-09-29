@@ -380,11 +380,13 @@ var CONVERTER_CONFIGS = {};
   };
 });
 
-function initConverterDashboards() {
+function initConverterDashboards(root) {
+  root = root || document;
   Object.keys(CONVERTER_CONFIGS).forEach(function (moduleId) {
-    var host = document.getElementById('dashboard-host-' + moduleId);
+    var host = root.querySelector('#dashboard-host-' + moduleId);
+    if (host && host.querySelector('.converter-dashboard')) return;
     if (!host) {
-      var section = document.getElementById(moduleId);
+      var section = root.querySelector('#' + moduleId);
       if (!section || section.querySelector('.converter-dashboard')) return;
       var body = section.querySelector('.module-body');
       if (!body) return;
@@ -608,6 +610,7 @@ function createAnimatedConverterSimulator(host, config) {
   var lastTimestamp = null;
   var animId = null;
   var isVisible = false;
+  var isPanelActive = !host.closest('[hidden]');
   var flowPhase = 0;
   var renderedStage = -1;
   var renderedChannel = null;
@@ -651,7 +654,9 @@ function createAnimatedConverterSimulator(host, config) {
             '<span><i class="legend-vl"></i> Tensão (vL)</span>' +
             '<span><i class="legend-idle"></i> Corrente de C</span>' +
           '</div>' +
+          (reviewPage ? '<details class="converter-references" data-print-expand><summary>Referências de tensão e corrente</summary>' : '') +
           '<p class="converter-conventions">Setas: corrente convencional. vL usa os sinais fixos junto a L; vD = vA − vK. iC é positiva entrando no terminal positivo de C, que fica embaixo no inversor. vS é medida da entrada ao nó comutado (no Boost, do nó ao terra).</p>' +
+          (reviewPage ? '</details>' : '') +
         '</div>' +
         '<div class="converter-scope-box">' +
           '<div class="converter-box-title">' +
@@ -663,6 +668,7 @@ function createAnimatedConverterSimulator(host, config) {
             '</div>' +
           '</div>' +
           '<div class="converter-scope-svg" data-role="simScopeSvg"></div>' +
+          (reviewPage ? '<p class="converter-conventions" data-role="simScopeNote"></p>' : '') +
           '<div class="converter-scope-legend">' +
             '<span><i class="legend-vl"></i> vL(t) Tensão</span>' +
             '<span><i class="legend-current"></i> iL(t) Corrente</span>' +
@@ -714,6 +720,10 @@ function createAnimatedConverterSimulator(host, config) {
       '</div>' +
     '</div>';
 
+  if (reviewPage) {
+    var layout = container.querySelector('.converter-dashboard-layout');
+    layout.insertBefore(container.querySelector('.dashboard-controls-bar'), layout.firstChild);
+  }
   host.innerHTML = '';
   host.appendChild(container);
 
@@ -866,7 +876,11 @@ function createAnimatedConverterSimulator(host, config) {
     if (!circuitSvgBox.firstElementChild) circuitSvgBox.innerHTML = generateCircuitSvgContent(config);
     updateCircuitSvg(circuitSvgBox, state, flowPhase);
     if (renderedChannel !== activeChannel) {
-      scopeSvgBox.innerHTML = generateOscilloscopeSvgContent(config, state, activeChannel);
+      scopeSvgBox.innerHTML = generateOscilloscopeSvgContent(config, state, activeChannel, reviewPage);
+      var scopeNote = container.querySelector('[data-role="simScopeNote"]');
+      if (scopeNote) scopeNote.textContent = activeChannel === 'filtro'
+        ? 'Corrente em rampa → tensão parabólica. iC = 0 com troca de sinal marca um extremo de vC.'
+        : 'iL é contínua na comutação; vL determina a inclinação. Círculos marcam os extremos.';
       renderedChannel = activeChannel;
     }
     updateOscilloscopeSvg(scopeSvgBox, state);
@@ -874,7 +888,7 @@ function createAnimatedConverterSimulator(host, config) {
 
   function animLoop(timestamp) {
     animId = null;
-    if (!isPlaying || !isVisible || document.hidden || !container.isConnected) return;
+    if (!isPlaying || !isPanelActive || !isVisible || document.hidden || !container.isConnected) return;
     if (lastTimestamp === null) lastTimestamp = timestamp;
     var dt = Math.min(0.08, (timestamp - lastTimestamp) / 1000);
     lastTimestamp = timestamp;
@@ -892,7 +906,7 @@ function createAnimatedConverterSimulator(host, config) {
     if (animId !== null) cancelAnimationFrame(animId);
     animId = null;
     lastTimestamp = null;
-    if (isPlaying && isVisible && !document.hidden && container.isConnected) animId = requestAnimationFrame(animLoop);
+    if (isPlaying && isPanelActive && isVisible && !document.hidden && container.isConnected) animId = requestAnimationFrame(animLoop);
   }
 
   var observer = new IntersectionObserver(function (entries) {
@@ -901,6 +915,10 @@ function createAnimatedConverterSimulator(host, config) {
   }, { threshold: 0 });
 
   observer.observe(container);
+  container.addEventListener('study-panel-visibility', function (event) {
+    isPanelActive = event.detail.active;
+    syncAnimation();
+  });
   document.addEventListener('visibilitychange', syncAnimation);
   render();
   updatePlayBtnUI();
@@ -1034,7 +1052,7 @@ function waveformSegments(config) {
   });
 }
 
-function generateOscilloscopeSvgContent(config, state, channel) {
+function generateOscilloscopeSvgContent(config, state, channel, compact) {
   var x = function (t) { return 62 + 588 * t; };
   var segments = waveformSegments(config);
   var voltages = channel === 'semicondutores' ? ['vS', 'vD'] : channel === 'filtro' ? ['vC'] : ['vL'];
@@ -1046,7 +1064,7 @@ function generateOscilloscopeSvgContent(config, state, channel) {
   };
   var html = '<svg viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Formas de onda sincronizadas: ' + voltages.concat(currents).join(', ') + '">';
   function text(xp, yp, label, color, anchor) {
-    return '<text x="' + xp + '" y="' + yp + '" fill="' + (color || 'var(--ahti-subtle)') + '" font-size="11" font-family="sans-serif" text-anchor="' + (anchor || 'start') + '">' + label + '</text>';
+    return '<text x="' + xp + '" y="' + yp + '" fill="' + (color || 'var(--ahti-subtle)') + '" font-size="' + (compact ? 16 : 11) + '" font-family="sans-serif" text-anchor="' + (anchor || 'start') + '">' + label + '</text>';
   }
   function line(x1, y1, x2, y2, color, extra) {
     return '<line x1="' + x1 + '" y1="' + y1 + '" x2="' + x2 + '" y2="' + y2 + '" stroke="' + color + '" ' + (extra || '') + '/>';
@@ -1103,14 +1121,15 @@ function generateOscilloscopeSvgContent(config, state, channel) {
       var extrema=waveformKeyPoints(candidates.map(function(p){return [p.t,p.v];}),false);
       extrema.forEach(function(p){
         html+='<circle data-key-point="'+key+'-'+p.label+'" cx="'+x(p.t)+'" cy="'+y(p.v)+'" r="4" fill="none" stroke="'+colors[key]+'"/>';
-        html+=text(x(p.t)+(p.t>.8?-6:6),y(p.v)+12+index*10,key+' '+p.label,colors[key],p.t>.8?'end':'start');
+        var labelY = compact && y(p.v) > bottom - 22 ? y(p.v) - 8 - index * 18 : y(p.v) + 12 + index * (compact ? 18 : 10);
+        html+=text(x(p.t)+(p.t>.8?-6:6),labelY,key+' '+p.label,colors[key],p.t>.8?'end':'start');
       });
       html += '<circle data-scope-dot="' + key + '" data-zero="' + zero + '" data-scale="' + scale + '" r="4" fill="' + colors[key] + '" stroke="#fff"/>';
     });
   }
   panel(voltages, 30, 119, 'V');
   panel(currents, 167, 263, 'A');
-  html += text(62, 143, channel === 'filtro'
+  if (!compact) html += text(62, 143, channel === 'filtro'
     ? 'dvC/dt = iC/C • iC > 0: vC sobe • iC < 0: vC desce • iC = 0: extremo de vC'
     : 'iL é contínua na comutação; vL muda de sinal e altera a inclinação de iL.', 'var(--ahti-muted)');
   if (channel === 'filtro') {
@@ -1408,7 +1427,6 @@ function initExamMode() {
 
   modal.dataset.initialized = 'true';
   var lastFocus = null;
-  var originalTitle = document.title;
   var sourceRequest = null;
 
   function ensureFormulaSource() {
@@ -1487,6 +1505,7 @@ function initExamMode() {
       return;
     }
     document.body.classList.add('print-formula-only');
+    var originalTitle = document.title;
     document.title = asPdf ? 'Formulario-P1-Eletronica-de-Potencia' : originalTitle;
 
     var cleanup = function () {
@@ -1624,3 +1643,5 @@ window.initSubjectTools = function () {
   initExamMode();
   initHistoryPlots();
 };
+
+window.initSubjectPanel = function (panel) { initConverterDashboards(panel); };

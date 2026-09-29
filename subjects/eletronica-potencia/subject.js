@@ -622,7 +622,7 @@ function createAnimatedConverterSimulator(host, config) {
       '<div>' +
         '<span class="converter-dashboard-kicker">Simulador Interativo • Circuito & Osciloscópio</span>' +
         '<h4>' + config.title + '</h4>' +
-        '<p>Acompanhe o caminho físico da corrente, as polaridades de tensão e as formas de onda simultâneas.</p>' +
+        '<p>' + topologyDescription(config.topology, config.mode) + '</p>' +
       '</div>' +
       '<div class="converter-dashboard-tags">' +
         '<span class="tag-mode">' + config.mode + '</span>' +
@@ -1293,8 +1293,20 @@ function getExamFigureDefinitions() {
   };
 }
 
+function topologyDescription(topology, mode) {
+  var descriptions = {
+    buck: 'O Buck reduz a tensão contínua sem inverter a polaridade, sendo usado em fontes e reguladores para cargas de menor tensão. A chave dosa a energia da entrada; o indutor em série com a saída suaviza a corrente, o diodo mantém seu caminho quando a chave abre e o capacitor reduz a ondulação da tensão. Em ON, a corrente de L cresce; no OFF com diodo, ela diminui.',
+    boost: 'O Boost eleva a tensão contínua sem inverter a polaridade, sendo usado quando a carga precisa de uma tensão maior que a fonte. O indutor fica em série com a entrada. Em ON, a chave armazena energia em L, o diodo bloqueia e C alimenta a carga; no OFF com diodo, a fonte e o indutor fornecem energia à saída. O capacitor suaviza a tensão entre essas transferências.',
+    buckboost: 'O Buck-Boost inversor gera uma saída negativa em relação ao terra, com magnitude menor ou maior que a entrada, sendo útil para obter uma alimentação de polaridade oposta. Em ON, a chave carrega o indutor e o capacitor alimenta a carga; no OFF, L transfere energia pelo diodo para C e a carga. A polaridade invertida exige atenção às referências: o terminal positivo de C fica ligado ao terra.',
+    capacitor: 'O capacitor armazena energia no campo elétrico e suaviza a tensão aplicada à carga. A corrente que entra no terminal positivo altera sua carga: iC positiva aumenta vC e iC negativa a reduz. Corrente constante produz uma reta em q e vC; corrente em rampa produz uma parábola, pois a tensão é a integral da corrente dividida por C.'
+  };
+  return (descriptions[topology] || '') + (topology==='capacitor' ? '' : mode==='DCM'
+    ? ' Em DCM, a corrente de L chega a zero antes do próximo ON: existe um terceiro intervalo com chave e diodo bloqueados, durante o qual C sustenta a carga. O ganho também depende da carga, da indutância e da frequência.'
+    : ' Em CCM, a corrente de L permanece positiva durante todo o período; em condução crítica, apenas toca zero ao final do OFF.');
+}
+
 function examFigureMarkup(def) {
-  return '<div class="exam-visual-block"><div class="exam-visual-title"><strong>'+def.title+'</strong><span>SVG vetorial • reconstrução auditada</span></div><div class="exam-visual-grid"><div class="exam-circuit-pane">'+examStaticCircuit(def)+'</div><div class="exam-wave-pane">'+examWaveSvg(def)+'</div></div><div class="exam-audit-note"><strong>Revisão crítica:</strong> '+def.audit+'</div></div>';
+  return '<div class="exam-visual-block"><div class="exam-visual-title"><strong>'+def.title+'</strong><span>SVG vetorial • reconstrução auditada</span></div><div class="exam-visual-grid"><div class="exam-circuit-pane">'+examStaticCircuit(def)+'</div><div class="exam-wave-pane">'+examWaveSvg(def)+'</div></div><p class="topology-description">'+topologyDescription(def.topology,def.mode)+'</p><div class="exam-audit-note"><strong>Revisão crítica:</strong> '+def.audit+'</div></div>';
 }
 
 function formulaOverviewMarkup() {

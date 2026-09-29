@@ -253,3 +253,63 @@ button { font-family: inherit; }
     overflow: visible;
   }
 }
+
+
+.topology-description {
+  margin: 0;
+  padding: 12px 16px;
+  color: var(--ahti-text);
+  font-size: .88rem;
+  line-height: 1.6;
+}
+
+/* Paleta própria de impressão: texto e referências legíveis sobre papel branco. */
+@media print {
+  body {
+    color-scheme: light;
+    --ahti-bg: #fff;
+    --ahti-panel: #fff;
+    --ahti-text: #111;
+    --ahti-muted: #333;
+    --ahti-subtle: #444;
+    --ahti-border: #888;
+    --ahti-info: #123c66;
+    --ahti-success: #17502d;
+    --ahti-warning: #683c00;
+    --ahti-capacitor: #51266e;
+    --ahti-control: #555;
+    --bg-primary: #fff;
+    --bg-secondary: #fff;
+    --bg-card: #fff;
+    --text-primary: #111;
+    --text-secondary: #333;
+    --text-muted: #444;
+    --accent-blue: #123c66;
+    --accent-yellow: #683c00;
+    background: #fff !important;
+    color: #111 !important;
+  }
+  #subjectContent, #subjectContent * {
+    color: #111 !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+  }
+  #subjectContent section, #subjectContent article,
+  #subjectContent .exam-visual-block, #subjectContent .exam-circuit-pane,
+  #subjectContent .exam-wave-pane, #subjectContent .converter-dashboard,
+  #subjectContent .formula-sheet-grid > section, #subjectContent th,
+  #subjectContent td, #subjectContent .exam-formula-panel {
+    background: #fff !important;
+    background-image: none !important;
+  }
+  #subjectContent svg text { fill: #111 !important; }
+  #subjectContent svg [stroke]:not([stroke="none"]),
+  #subjectContent .exam-trace, #subjectContent .exam-bracket,
+  #subjectContent .exam-zero-line { stroke: #222 !important; }
+  #subjectContent .exam-grid, #subjectContent .exam-marker-line { stroke: #888 !important; }
+  #subjectContent svg marker path { fill: #222 !important; }
+  #subjectContent .topology-description { font-size: 9pt; line-height: 1.4; }
+}

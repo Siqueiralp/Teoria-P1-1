@@ -1137,13 +1137,13 @@ function examWaveSvg(def) {
 
 function examStaticCircuit(def) {
   if(def.topology==='capacitor') return '<div class="exam-cap-symbol"><div class="exam-cap-symbol-plates"></div><strong>C</strong><span>iC = C·dvC/dt</span><span>vC = vC(t₀) + (1/C)∫iC dt</span></div>';
-  var cfg={id:'exam-'+def.topology,title:def.topology==='buck'?'Buck':def.topology==='boost'?'Boost':'Buck-Boost',topology:def.topology,mode:def.mode||'CCM',params:{Vin:def.Vin||100,Vo:def.Vo||60,D:def.D==null?.6:def.D,D2:def.D2==null?.4:def.D2}};
+  var uniqueId='exam-'+def.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48);var cfg={id:uniqueId,title:def.topology==='buck'?'Buck':def.topology==='boost'?'Boost':'Buck-Boost',topology:def.topology,mode:def.mode||'CCM',params:{Vin:def.Vin||100,Vo:def.Vo||60,D:def.D==null?.6:def.D,D2:def.D2==null?.4:def.D2}};
   var wrap=document.createElement('div');wrap.innerHTML=generateCircuitSvgContent(cfg);
   var svg=wrap.firstElementChild;
   var closed=svg.querySelector('[data-switch="closed"]'),open=svg.querySelector('[data-switch="open"]');
   if(closed)closed.style.display='';if(open)open.style.display='none';
   var status=svg.querySelector('[data-circuit-status]');if(status)status.textContent='Topologia e referências de corrente/tensão';
-  svg.querySelectorAll('[data-flow],[data-arrow]').forEach(function(el){el.style.visibility='visible';});
+  svg.querySelectorAll('[data-flow]').forEach(function(el){el.style.visibility='visible';});svg.querySelectorAll('[data-arrow]').forEach(function(el){el.style.visibility='visible';el.setAttribute('marker-end','url(#'+el.dataset.marker+')');});
   return wrap.innerHTML;
 }
 

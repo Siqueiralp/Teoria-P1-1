@@ -119,6 +119,20 @@ O conteúdo canônico permanece em `content.html`; `scripts/build-topic-pages.py
 gera as quatro páginas e suas âncoras. O estilo claro de `exam-paper.css` fica
 restrito às folhas, mantendo a navegação e os outros tópicos no tema do app.
 
+### Raciocínio e nomenclatura
+
+As 12 resoluções incluem um roteiro de solução e uma legenda local com nomes,
+significados e unidades das variáveis. Os 47 passos de resposta explicam a
+escolha da relação física antes da fórmula, com desenvolvimento intermediário
+e interpretação do resultado. A legenda diferencia valores instantâneos,
+médias, picos, ondulações, módulos de tensão e referências de polaridade.
+
+As deduções mostram a origem das médias por área, o balanço volt-segundo,
+o balanço de carga do capacitor, os cruzamentos de corrente por zero e a
+condição crítica. Foram explicitadas a conversão mH/µH, a diferença entre
+OFF e condução do diodo em DCM, e a diferença entre corrente média da carga,
+do indutor e dos pulsos da chave ou do diodo.
+
 ## Navegação por páginas — 29/09/2026
 
 - Conteúdo dividido em 30 páginas carregadas sob demanda. Teoria, provas, simulados e projetos abrem um tópico ou conjunto por vez.

@@ -30,13 +30,69 @@
             <div class="exam-solution-intro"><strong>Resolução passo a passo</strong>
             <p>Componentes ideais, regime periódico e pequena ondulação. Primeiro a fórmula; depois os valores e o resultado.</p>
             </div>
+            <div class="exam-solution-route"><strong>Como resolver esta questão</strong>
+            <ol>
+            <li>Separe a descrição conceitual de DCM do gráfico numérico, que representa CCM.</li>
+            <li>Leia o patamar OFF e a polaridade da carga para interpretar a tensão de saída.</li>
+            <li>Use o pico e a ondulação para encontrar o mínimo e a média da corrente no indutor.</li>
+            </ol>
+            </div><details class="exam-symbols" open><summary>Variáveis usadas: nomes, significado e unidades</summary><dl class="exam-symbol-list">
+            <div class="exam-symbol-entry"><dt>\(t\)</dt><dd>Instante de tempo medido ao longo do ciclo; não confundir com a duração ton ou tD.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(E\)</dt><dd>Tensão contínua de entrada, fornecida pela fonte.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(V\)</dt><dd>Módulo da tensão média de saída: valor positivo usado nas contas.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(v_o,\ v_{out}\)</dt><dd>Tensão de saída nas referências indicadas. vo, na polaridade da carga com “+” embaixo, tem média +V; vout, referido ao terra, tem média −V.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(T_s\)</dt><dd>Período de comutação: duração de um ciclo completo.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{on}\)</dt><dd>Tempo em que a chave S fica ligada durante um ciclo.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{off}\)</dt><dd>Tempo em que a chave S fica desligada. Em CCM, coincide com a condução do diodo no Buck, Boost e inversor.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D\)</dt><dd>Razão cíclica: fração do período em que a chave está ligada. D = ton/Ts.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D_2\)</dt><dd>Fração do período em que somente o diodo conduz em DCM. D₂ = tD/Ts.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D_3\)</dt><dd>Fração do período com corrente nula no indutor em DCM. D₃ = 1 − D − D₂.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(L\)</dt><dd>Indutância do indutor: relaciona a tensão aplicada à velocidade de variação da corrente.<small>Unidade: H, mH ou µH</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(v_L\)</dt><dd>Tensão instantânea no indutor, na referência de polaridade desenhada.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(v_{L,off}\)</dt><dd>Patamar de tensão no indutor enquanto o diodo conduz; use o sinal da topologia.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_L\)</dt><dd>Corrente instantânea no indutor: varia ao longo do ciclo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_D\)</dt><dd>Corrente instantânea no diodo; é nula quando ele está bloqueado.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_{D,min},\ I_{D,max}\)</dt><dd>Extremos da corrente durante a condução do diodo; não incluem o intervalo em que o diodo está bloqueado.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_{pk}\)</dt><dd>Corrente de pico no indutor para a rampa que parte de zero em DCM ou na crítica.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_{min},\ I_{max}\)</dt><dd>Valores mínimo e máximo da corrente no indutor em um ciclo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\Delta I_L\)</dt><dd>Ondulação pico a pico da corrente do indutor: Imax − Imin.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\overline I_L\)</dt><dd>Corrente média no indutor, calculada sobre o período inteiro.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_o\)</dt><dd>Corrente média na carga. No Buck é a média de iL; no Boost e no inversor é a média de iD.<small>Unidade: A</small></dd>
+            </div></dl>
+            <p class="exam-symbol-note">ON = chave ligada; OFF = chave desligada. Letras minúsculas indicam valores instantâneos; a barra superior indica média no período. “crit” significa crítico, “pk” significa pico e “pp” significa pico a pico. O símbolo C pode representar o capacitor; como unidade, C significa coulomb.</p></details>
             <section class="exam-answer-item">
             <h4>a) Etapas de operação em DCM</h4>
-            <p>A chave carrega o indutor; o diodo descarrega o indutor; depois ambos ficam bloqueados até o próximo ciclo. Em DCM, \(D_3&gt;0\). Na fronteira crítica, \(D_3=0\).</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>Parta da lei do indutor: a inclinação da corrente é a tensão no indutor dividida pela indutância. Por isso, uma tensão positiva faz a corrente subir, uma tensão negativa a faz descer e tensão nula mantém a corrente constante.</p>
+            <p>No ON, o diodo está bloqueado e a corrente começa em zero. Integre a inclinação constante durante \(DT_s\) para obter o pico. No segundo intervalo, a chave abre e a energia armazenada alimenta a saída pelo diodo. Quando a corrente chega a zero, o diodo bloqueia: esta condição inicia a terceira etapa.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[v_L=L\frac{di_L}{dt}\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[I_{pk}=\frac{EDT_s}{L},\qquad D+D_2+D_3=1\]</div>
+            </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>A chave carrega o indutor; o diodo descarrega o indutor; depois ambos ficam bloqueados até o próximo ciclo. Em DCM, \(D_3&gt;0\). Na fronteira crítica, \(D_3=0\).</p>
             </div>
             </section>
             <div class="exam-table-scroll">
@@ -61,7 +117,10 @@
             <p class="exam-reading-note">O item (a) pede uma descrição de DCM. O gráfico fornecido para os itens (b) e (c) representa CCM: a corrente do indutor permanece positiva.</p>
             <section class="exam-answer-item">
             <h4>b) Tensão de saída</h4>
-            <p>V é positivo na polaridade impressa, com “+” embaixo. Em relação ao terra, \(v_{out}=-150\,V\).</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>No inversor, durante a condução do diodo a tensão no indutor é −V, em que V é o módulo da tensão de saída. O patamar de −150 V fornece esse módulo diretamente.</p>
+            <p>Leia a polaridade desenhada na carga antes de atribuir um sinal à resposta. A folha marca o terminal inferior como positivo; em relação ao terra, o terminal superior está a −150 V. São referências diferentes para o mesmo ponto de operação.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[v_{L,off}=-V\]</div>
             <div class="exam-step-label">Substituição</div>
@@ -69,16 +128,28 @@
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[V=150\,V\]</div>
             </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>V é positivo na polaridade impressa, com “+” embaixo. Em relação ao terra, \(v_{out}=-150\,V\).</p>
+            </div>
             </section>
             <section class="exam-answer-item">
             <h4>c) Corrente média no indutor</h4>
-            <p>A seta de 5 A marca a <strong>ondulação</strong>; não marca o mínimo. Conferência: \(I_o=0{,}35\cdot8{,}5=2{,}975\,A\) e \(E=150\cdot35/65=80{,}769\,V\).</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>A marca de 5 A indica uma diferença vertical entre níveis, isto é, a ondulação. Não a interprete como o valor final da corrente. O pico é 11 A, então o mínimo é obtido por subtração.</p>
+            <p>Como a corrente mínima é 6 A, o gráfico numérico está em CCM. A média da corrente do indutor é a semissoma dos extremos, mas a corrente do diodo só existe no OFF. Para conferir Io, multiplique a média do indutor pela fração OFF de 35/100.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[I_{min}=I_{max}-\Delta I_L,\qquad \overline I_L=\frac{I_{max}+I_{min}}{2}\]</div>
-            <div class="exam-step-label">Substituição</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[D=\frac{65}{65+35}=0{,}65,\qquad 1-D=0{,}35\]</div>
+            <div class="exam-equation">\[I_o=(1-D)\overline I_L,\qquad E=\frac{Vt_{off}}{t_{on}\]</div>
+            <div class="exam-step-label">Substituição das expressões</div>
             <div class="exam-equation">\[I_{min}=11-5=6\,A,\qquad \overline I_L=\frac{11+6}{2}\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[\overline I_L=8{,}5\,A\]</div>
+            </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>A seta de 5 A marca a <strong>ondulação</strong>; não marca o mínimo. Conferência: \(I_o=0{,}35\cdot8{,}5=2{,}975\,A\) e \(E=150\cdot35/65=80{,}769\,V\).</p>
             </div>
             </section>
             </div>
@@ -102,58 +173,157 @@
             <div class="exam-solution-intro"><strong>Resolução passo a passo</strong>
             <p>Componentes ideais, regime periódico e pequena ondulação. Primeiro a fórmula; depois os valores e o resultado.</p>
             </div>
+            <div class="exam-solution-route"><strong>Como resolver esta questão</strong>
+            <ol>
+            <li>Separe ON, condução do diodo e corrente nula; a existência da terceira etapa identifica DCM.</li>
+            <li>Obtenha Io pela área de iD e a carga do capacitor pela área positiva de iC.</li>
+            <li>Use somente os intervalos com vL diferente de zero para calcular a saída e depois determine R.</li>
+            </ol>
+            </div><details class="exam-symbols" open><summary>Variáveis usadas: nomes, significado e unidades</summary><dl class="exam-symbol-list">
+            <div class="exam-symbol-entry"><dt>\(t\)</dt><dd>Instante de tempo medido ao longo do ciclo; não confundir com a duração ton ou tD.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(E\)</dt><dd>Tensão contínua de entrada, fornecida pela fonte.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(V\)</dt><dd>Módulo da tensão média de saída: valor positivo usado nas contas.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(T_s\)</dt><dd>Período de comutação: duração de um ciclo completo.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{on}\)</dt><dd>Tempo em que a chave S fica ligada durante um ciclo.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{off}\)</dt><dd>Tempo em que a chave S fica desligada. Em CCM, coincide com a condução do diodo no Buck, Boost e inversor.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_D\)</dt><dd>Duração da condução do diodo. Em DCM, é menor que o OFF total da chave.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D\)</dt><dd>Razão cíclica: fração do período em que a chave está ligada. D = ton/Ts.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D_2\)</dt><dd>Fração do período em que somente o diodo conduz em DCM. D₂ = tD/Ts.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D_3\)</dt><dd>Fração do período com corrente nula no indutor em DCM. D₃ = 1 − D − D₂.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(v_L\)</dt><dd>Tensão instantânea no indutor, na referência de polaridade desenhada.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_D\)</dt><dd>Corrente instantânea no diodo; é nula quando ele está bloqueado.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_{D,pk}\)</dt><dd>Pico da corrente triangular no diodo em DCM.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_o\)</dt><dd>Corrente média na carga. No Buck é a média de iL; no Boost e no inversor é a média de iD.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_C\)</dt><dd>Corrente instantânea do capacitor, positiva entrando no seu terminal positivo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_{C,inicial},\ i_{C,final}\)</dt><dd>Correntes do capacitor no início e no fim da condução do diodo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\Delta t_+\)</dt><dd>Duração do trecho em que a corrente do capacitor é positiva.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\Delta Q\)</dt><dd>Variação de carga entre o mínimo e o máximo da tensão: área positiva de iC, igual ao módulo da área negativa no ciclo periódico.<small>Unidade: C (coulomb) ou µC</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\Delta V_{pp}\)</dt><dd>Ondulação pico a pico da tensão de saída: Vmax − Vmin.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(C\)</dt><dd>Capacitância do capacitor de saída.<small>Unidade: F ou µF</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(R\)</dt><dd>Resistência da carga conectada à saída.<small>Unidade: Ω</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(L\)</dt><dd>Indutância do indutor: relaciona a tensão aplicada à velocidade de variação da corrente.<small>Unidade: H, mH ou µH</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\overline I_L\)</dt><dd>Corrente média no indutor, calculada sobre o período inteiro.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{\mathrm{nulo}}\)</dt><dd>Duração da terceira etapa DCM, com corrente nula no indutor; vale D₃Ts.<small>Unidade: s ou µs</small></dd>
+            </div></dl>
+            <p class="exam-symbol-note">ON = chave ligada; OFF = chave desligada. Letras minúsculas indicam valores instantâneos; a barra superior indica média no período. “crit” significa crítico, “pk” significa pico e “pp” significa pico a pico. O símbolo C pode representar o capacitor; como unidade, C significa coulomb.</p></details>
             <section class="exam-answer-item">
             <h4>Leitura inicial — identifique as três etapas</h4>
-            <p>O diodo conduz apenas 20 µs do OFF total de 70 µs. Há 50 µs com \(i_L=0\): o regime é DCM.</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>Não confunda o OFF total da chave com a duração da condução do diodo. A chave fica desligada de 30 a 100 µs, mas o diodo conduz somente de 30 a 50 µs.</p>
+            <p>Entre 50 e 100 µs, iD = 0 e vL = 0; o indutor já descarregou. Essa terceira etapa caracteriza DCM. Separe as três durações antes de escolher qualquer fórmula.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[D=\frac{t_{on}}{T_s},\quad D_2=\frac{t_D}{T_s},\quad D_3=1-D-D_2\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[t_{off}=100-30=70\,\mu s,\quad t_D=50-30=20\,\mu s,\quad t_{\mathrm{nulo}}=100-50=50\,\mu s\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[D=\frac{30}{100},\quad D_2=\frac{20}{100},\quad D_3=\frac{50}{100}\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[D=0{,}3,\quad D_2=0{,}2,\quad D_3=0{,}5\]</div>
             </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>O diodo conduz apenas 20 µs do OFF total de 70 µs. Há 50 µs com \(i_L=0\): o regime é DCM.</p>
+            </div>
             </section>
             <section class="exam-answer-item">
             <h4>a) Corrente do capacitor</h4>
-            <p>Nos intervalos sem corrente de diodo, \(i_C=-0{,}4\,A\). Durante a condução, cai de 3,6 a −0,4 A.</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>O gráfico inferior é de iD, não de iC. Primeiro calcule a corrente média da carga pela área triangular de iD dividida pelo período completo.</p>
+            <p>Depois aplique iC = iD − Io. Sem condução do diodo, o capacitor entrega 0,4 A à carga. Ao começar a condução, o diodo fornece 4 A: 0,4 A vão para a carga e os 3,6 A restantes entram no capacitor.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[I_o=\frac{I_{D,pk}D_2}{2},\quad i_C=i_D-I_o\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[I_o=\frac{\frac12 I_{D,pk}t_D}{T_s}=\frac{\frac12\cdot4\cdot20}{100}=0{,}4\,A\]</div>
+            <div class="exam-equation">\[i_{C,final}=0-0{,}4=-0{,}4\,A\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[I_o=\frac{4\cdot0{,}2}{2}=0{,}4\,A,\quad i_{C,inicial}=4-0{,}4=3{,}6\,A\]</div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>Nos intervalos sem corrente de diodo, \(i_C=-0{,}4\,A\). Durante a condução, cai de 3,6 a −0,4 A.</p>
+            </div>
             </section>
             <section class="exam-answer-item">
             <h4>a) Capacitância pela área positiva</h4>
-            <p>O cruzamento de \(i_C\) ocorre em \(30+18=48\,\mu s\). A tensão é mínima em 30 µs e máxima em 48 µs. Sem \(\Delta V_{pp}\), C permanece simbólico.</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>Integre iC somente entre o mínimo e o máximo da tensão. O mínimo ocorre em 30 µs, quando iC passa a positiva; o máximo ocorre quando iD cai até Io, pois nesse instante iC = 0.</p>
+            <p>A corrente do diodo cai linearmente 4 A em 20 µs. Portanto, para iC cair de 3,6 A até zero, são necessários 18 µs. A área positiva é um triângulo com essa base e altura de 3,6 A.</p>
+            <p>O OFF total não é uma única rampa de corrente do capacitor: há um trecho com diodo e outro sem corrente no indutor. Usar 70 µs como base do triângulo produz uma capacitância incorreta.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[\Delta t_+=t_D\frac{I_{D,pk}-I_o}{I_{D,pk}},\quad \Delta Q=\frac{(I_{D,pk}-I_o)\Delta t_+}{2},\quad C=\frac{\Delta Q}{\Delta V_{pp}}\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[i_D(t)=4\,A\left(1-\frac{t-30\,\mu s}{20\,\mu s}\right),\qquad 30\,\mu s\leq t\leq50\,\mu s\]</div>
+            <div class="exam-equation">\[i_C=0\Rightarrow i_D=I_o=0{,}4\,A\Rightarrow t=48\,\mu s\]</div>
+            <div class="exam-equation">\[\Delta Q=\int_{30\,\mu s}^{48\,\mu s}i_C(t)\,dt\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[\Delta t_+=20\,\mu s\frac{3{,}6}{4}=18\,\mu s,\quad \Delta Q=\frac{3{,}6\cdot18}{2}=32{,}4\,\mu C\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[C=\frac{32{,}4\,\mu C}{\Delta V_{pp}}\]</div>
+            </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>O cruzamento de \(i_C\) ocorre em \(30+18=48\,\mu s\). A tensão é mínima em 30 µs e máxima em 48 µs. Sem \(\Delta V_{pp}\), C permanece simbólico.</p>
             </div>
             </section>
             <figure class="waveform-canvas-box" data-history-capacitor="2026-q2"><figcaption>Conferência: tensão obtida pela integral da corrente do capacitor.</figcaption>
             </figure>
             <section class="exam-answer-item">
             <h4>b) Tensão de saída em DCM</h4>
-            <p>Use somente os 20 µs em que o diodo conduz no balanço. No intervalo nulo, \(v_L=0\).</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>Em regime periódico, o balanço volt-segundo continua válido em DCM. O que muda são os intervalos: vL = E no ON, E − V durante a condução do diodo e zero na etapa de corrente nula.</p>
+            <p>Use os 30 µs de ON e os 20 µs do diodo. Os 50 µs restantes contribuem com área zero. Ao isolar V, a razão correta é ton/tD, e não ton/toff.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[Et_{on}+(E-V)t_D=0,\qquad V=E\left(1+\frac{t_{on}}{t_D}\right)\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[100\cdot30+(100-V)\cdot20+0\cdot50=0\]</div>
+            <div class="exam-equation">\[3000+2000-20V=0\quad\Rightarrow\quad 20V=5000\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[V=100\left(1+\frac{30}{20}\right)\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[V=250\,V\]</div>
             </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>Use somente os 20 µs em que o diodo conduz no balanço. No intervalo nulo, \(v_L=0\).</p>
+            </div>
             </section>
             <section class="exam-answer-item">
             <h4>c) Resistência da carga</h4>
-            <p>Conferência: \(L=100\cdot30\,\mu s/4=750\,\mu H\), e \(\overline I_L=\frac12\cdot4(0{,}3+0{,}2)=1\,A\).</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>A corrente média da carga já foi calculada pela área de iD: 0,4 A. Agora aplique a lei de Ohm usando a tensão de 250 V do item (b).</p>
+            <p>Não use o pico de 4 A nem a média de 1 A do indutor como corrente da resistência. No Boost, a carga recebe energia pelo diodo, e a média no indutor também inclui o tempo ON em que o diodo não conduz.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[R=\frac{V}{I_o}\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[R=\frac{250}{0{,}4}\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[R=625\,\Omega\]</div>
+            </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>Conferência: \(L=100\cdot30\,\mu s/4=750\,\mu H\), e \(\overline I_L=\frac12\cdot4(0{,}3+0{,}2)=1\,A\).</p>
             </div>
             </section>
             </div>
@@ -180,13 +350,71 @@
             <div class="exam-solution-intro"><strong>Resolução passo a passo</strong>
             <p>Componentes ideais, regime periódico e pequena ondulação. Primeiro a fórmula; depois os valores e o resultado.</p>
             </div>
+            <div class="exam-solution-route"><strong>Como resolver esta questão</strong>
+            <ol>
+            <li>Use os extremos de iL e sua média para determinar o sinal e os zeros de iC.</li>
+            <li>Compare a inclinação da tensão com o sinal de iC; mantenha explícita a inconsistência das alternativas.</li>
+            <li>Calcule D e a tensão no indutor para obter L; mantenha a mesma carga ao calcular Lcrit.</li>
+            </ol>
+            </div><details class="exam-symbols" open><summary>Variáveis usadas: nomes, significado e unidades</summary><dl class="exam-symbol-list">
+            <div class="exam-symbol-entry"><dt>\(t\)</dt><dd>Instante de tempo medido ao longo do ciclo; não confundir com a duração ton ou tD.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(E\)</dt><dd>Tensão contínua de entrada, fornecida pela fonte.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(V\)</dt><dd>Módulo da tensão média de saída: valor positivo usado nas contas.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(T_s\)</dt><dd>Período de comutação: duração de um ciclo completo.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{on}\)</dt><dd>Tempo em que a chave S fica ligada durante um ciclo.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{off}\)</dt><dd>Tempo em que a chave S fica desligada. Em CCM, coincide com a condução do diodo no Buck, Boost e inversor.<small>Unidade: s ou µs</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(D\)</dt><dd>Razão cíclica: fração do período em que a chave está ligada. D = ton/Ts.<small>Unidade: sem unidade</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_{min},\ I_{max}\)</dt><dd>Valores mínimo e máximo da corrente no indutor em um ciclo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\Delta I_L\)</dt><dd>Ondulação pico a pico da corrente do indutor: Imax − Imin.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(\overline I_L\)</dt><dd>Corrente média no indutor, calculada sobre o período inteiro.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(I_o\)</dt><dd>Corrente média na carga. No Buck é a média de iL; no Boost e no inversor é a média de iD.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(L\)</dt><dd>Indutância do indutor: relaciona a tensão aplicada à velocidade de variação da corrente.<small>Unidade: H, mH ou µH</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(L_{crit}\)</dt><dd>Indutância crítica, na fronteira entre CCM e DCM para a mesma entrada, carga, razão cíclica e frequência.<small>Unidade: H ou µH</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(R\)</dt><dd>Resistência da carga conectada à saída.<small>Unidade: Ω</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(v_o\)</dt><dd>Tensão instantânea de saída no terminal positivo do capacitor; sua média é V, com pequena ondulação.<small>Unidade: V</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_S\)</dt><dd>Corrente instantânea na chave; o trecho não nulo identifica sua condução.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_L\)</dt><dd>Corrente instantânea no indutor: varia ao longo do ciclo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(i_C\)</dt><dd>Corrente instantânea do capacitor, positiva entrando no seu terminal positivo.<small>Unidade: A</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(C\)</dt><dd>Capacitância do capacitor de saída.<small>Unidade: F ou µF</small></dd>
+            </div>
+            <div class="exam-symbol-entry"><dt>\(t_{\mathrm{min}\,v_o},\ t_{\mathrm{max}\,v_o}\)</dt><dd>Instantes em que a tensão de saída atinge seu mínimo e seu máximo. São determinados pelas trocas de sinal de iC.<small>Unidade: s ou µs</small></dd>
+            </div></dl>
+            <p class="exam-symbol-note">ON = chave ligada; OFF = chave desligada. Letras minúsculas indicam valores instantâneos; a barra superior indica média no período. “crit” significa crítico, “pk” significa pico e “pp” significa pico a pico. O símbolo C pode representar o capacitor; como unidade, C significa coulomb.</p></details>
             <section class="exam-answer-item">
             <h4>a) Relacione a corrente à inclinação da tensão</h4>
-            <p>\(i_C\) sobe de −1 a +1 A no ON e desce no OFF. A tensão tem trechos parabólicos contínuos e extremos nas trocas de sinal da corrente: 30 e 80 µs.</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>A forma de tensão depende do sinal da corrente do capacitor, na referência de corrente da folha. Primeiro obtenha iC pela diferença entre iL e a corrente da carga.</p>
+            <p>Com mínimo 2 A e ondulação 2 A, iL varia de 2 a 4 A e sua média é 3 A. No Buck, essa é também Io; por isso, iC varia entre −1 e +1 A.</p>
+            <p>No ON, a rampa de iC cresce durante 60 µs e cruza zero na metade, em 30 µs. No OFF, decresce durante 40 µs e cruza zero na metade desse trecho, em 80 µs. A tensão cai, depois sobe e volta a cair; os extremos estão nesses cruzamentos.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[i_C=i_L-I_o,\qquad \frac{dv_o}{dt}=\frac{i_C}{C}\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[i_{C,min}=2-3=-1\,A,\qquad i_{C,max}=4-3=1\,A\]</div>
+            <div class="exam-equation">\[t_{\mathrm{min}\,v_o}=\frac{60}{2}=30\,\mu s,\qquad t_{\mathrm{max}\,v_o}=60+\frac{40}{2}=80\,\mu s\]</div>
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[i_C<0:\ v_o\text{ cai};\qquad i_C>0:\ v_o\text{ sobe}\]</div>
+            </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>\(i_C\) sobe de −1 a +1 A no ON e desce no OFF. A tensão tem trechos parabólicos contínuos e extremos nas trocas de sinal da corrente: 30 e 80 µs.</p>
             </div>
             </section>
             <aside class="exam-caution"><strong>Atenção à folha original</strong>
@@ -196,7 +424,10 @@
             </figure>
             <section class="exam-answer-item">
             <h4>b) Corrente média no indutor</h4>
-            <p>A seta “2 A” no gráfico representa a ondulação, não o máximo.</p>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>Use dois dados diferentes: o texto informa o mínimo de 2 A, e a seta vertical do gráfico informa uma ondulação de 2 A. Some os dois para obter o máximo.</p>
+            <p>A corrente do indutor é triangular sobre um nível positivo: ela sobe e desce entre os mesmos extremos. Sua média é a semissoma dos extremos. O trecho em que a chave não conduz não torna a corrente do indutor igual a zero.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[I_{max}=I_{min}+\Delta I_L,\quad \overline I_L=\frac{I_{max}+I_{min}}{2}\]</div>
             <div class="exam-step-label">Substituição</div>
@@ -204,11 +435,21 @@
             <div class="exam-result"><strong>Resultado</strong>
             <div class="exam-equation">\[\overline I_L=3\,A\]</div>
             </div>
+            <div class="exam-step-check"><strong>Conferência e interpretação</strong>
+            <p>A seta “2 A” no gráfico representa a ondulação, não o máximo.</p>
+            </div>
             </section>
             <section class="exam-answer-item">
             <h4>c) Indutância</h4>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>A largura não nula de iS identifica o ON de 60 µs, e o período é 100 µs. Determine D, obtenha a tensão de saída pelo ganho do Buck em CCM e aplique a lei do indutor na subida de corrente.</p>
+            <p>No ON, o indutor recebe somente a diferença entre a fonte e a saída: 100 − 60 = 40 V. Usar os 100 V completos na rampa confundiria a tensão de entrada com a tensão no indutor.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[D=\frac{t_{on}}{T_s},\quad V=DE,\quad L=\frac{(E-V)t_{on}}{\Delta I_L}\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[v_{L,on}=E-V=100-60=40\,V,\qquad \Delta I_L=2\,A\]</div>
+            <div class="exam-equation">\[L=\frac{40\,V\cdot60\,\mu s}{2\,A}=1200\,\mu H\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[D=\frac{60}{100}=0{,}6,\quad V=0{,}6\cdot100=60\,V,\quad L=\frac{(100-60)\cdot60\,\mu s}{2}\]</div>
             <div class="exam-result"><strong>Resultado</strong>
@@ -217,8 +458,15 @@
             </section>
             <section class="exam-answer-item">
             <h4>d) Indutância crítica</h4>
+            <div class="exam-reasoning"><strong>Raciocínio</strong>
+            <p>Mantenha a carga do ponto de operação encontrado: R = V/Io = 20 Ω. A fronteira crítica ocorre quando o mínimo da corrente do indutor chega a zero.</p>
+            <p>Na fronteira, a ondulação passa a ser 2Io = 6 A. Use a rampa OFF, que recebe tensão −V durante 40 µs. O valor crítico de L deve ser menor que o calculado no item (c), pois diminuir L aumenta a ondulação.</p>
+            </div>
             <div class="exam-step-label">Fórmula</div>
             <div class="exam-equation">\[R=\frac{V}{I_o},\qquad L_{crit}=\frac{(1-D)RT_s}{2}\]</div>
+            <div class="exam-step-label">Desenvolvimento da conta</div>
+            <div class="exam-equation">\[\Delta I_{L,crit}=2I_o=2\cdot3=6\,A\]</div>
+            <div class="exam-equation">\[L_{crit}=\frac{Vt_{off}}{2I_o}=\frac{60\cdot40\,\mu s}{6}=400\,\mu H\]</div>
             <div class="exam-step-label">Substituição</div>
             <div class="exam-equation">\[R=\frac{60}{3}=20\,\Omega,\quad L_{crit}=\frac{0{,}4\cdot20\cdot100\,\mu s}{2}\]</div>
             <div class="exam-result"><strong>Resultado</strong>

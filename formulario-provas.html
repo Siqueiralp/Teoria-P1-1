@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Formulário compacto das quatro provas P1, com fórmulas e gráficos de Buck, Boost e Buck-Boost em CCM/DCM. PNG escuro para baixar.">
+  <title>Formulário das 4 provas — Eletrônica de Potência</title>
+  <style>
+    :root { color-scheme: dark; font-family: system-ui,sans-serif; background:#12171d; color:#f3f5f7; }
+    body { margin:0; }
+    header { padding:16px 20px; border-bottom:1px solid #3b4957; display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+    h1 { font-size:18px; margin:0 12px 0 0; }
+    p { margin:0; color:#becbd7; font-size:13px; }
+    nav { display:flex; gap:8px; flex-wrap:wrap; }
+    a,button { border:1px solid #657585; border-radius:6px; padding:9px 12px; font:inherit; font-size:14px; color:#f3f5f7; background:#1c242d; text-decoration:none; cursor:pointer; }
+    a:hover,button:hover { background:#314051; }
+    :focus-visible { outline:2px solid #f5d987; outline-offset:3px; }
+    main { overflow:auto; padding:12px; }
+    img { display:block; width:100%; max-width:1800px; margin:auto; height:auto; }
+    main.detailed img { width:1800px; max-width:none; margin:0; }
+    @media print { header{display:none} main{padding:0;overflow:visible} img,main.detailed img{width:100%;max-width:100%} body{print-color-adjust:exact;-webkit-print-color-adjust:exact} }
+  </style>
+</head>
+<body>
+  <header>
+    <div><h1>Formulário das quatro provas P1</h1><p>Folha única · fundo escuro · PNG 3600 × 3120 · SVG vetorial</p></div>
+    <nav aria-label="Exportar e consultar formulário">
+      <a href="subjects/eletronica-potencia/exports/formulario-p1-4-provas-escuro.png" download>Baixar PNG escuro</a>
+      <a href="subjects/eletronica-potencia/exports/formulario-p1-4-provas-escuro.svg" download>Baixar SVG</a>
+      <button id="zoom" type="button" aria-pressed="false" aria-controls="preview">Ampliar para ler</button>
+      <a href="guide.html?subject=eletronica-potencia&amp;page=formulas">Voltar ao guia</a>
+    </nav>
+  </header>
+  <main id="preview">
+    <img src="subjects/eletronica-potencia/exports/formulario-p1-4-provas-escuro.svg" alt="Formulário das provas de novembro de 2024, maio e setembro de 2025 e abril de 2026: tempos, balanços, médias, fórmulas de Buck, Boost e Buck-Boost; gráficos de tensão e corrente no indutor, semicondutores, capacitor e carga em CCM e DCM; intervalos D, D2, D3, picos e extremos de tensão; cálculo de capacitância e legenda de unidades.">
+  </main>
+  <script>
+    const zoom = document.getElementById('zoom');
+    zoom.addEventListener('click', () => {
+      const detailed = document.getElementById('preview').classList.toggle('detailed');
+      zoom.setAttribute('aria-pressed', String(detailed));
+      zoom.textContent = detailed ? 'Ajustar à tela' : 'Ampliar para ler';
+    });
+  </script>
+</body>
+</html>

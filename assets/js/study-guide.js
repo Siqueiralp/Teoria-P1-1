@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (manifest.id !== safeId) throw new Error("O identificador da matéria não corresponde à pasta.");
       currentPage = window.TopicPages.resolve(manifest, params.get("page"), decodeURIComponent(window.location.hash.slice(1)));
       window.StudyGuide = { manifest: manifest, base: base, page: currentPage };
+      document.dispatchEvent(new CustomEvent('study:page-view'));
       return fetch(base + (currentPage ? currentPage.file : "content.html")).then(requireOk).then(function (r) { return r.text(); });
     })
     .then(function (content) {
@@ -87,6 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
       onActivate: function (page) {
         currentPage = page;
         window.StudyGuide.page = page;
+        document.dispatchEvent(new CustomEvent('study:page-view'));
         document.title = page.title + " | " + manifest.name;
         var trail = document.querySelector(".topic-breadcrumb");
         trail.lastChild.textContent = " / " + page.title;

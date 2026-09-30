@@ -1,0 +1,11 @@
+{
+  "platform": { "apiRuntime": "node:20" },
+  "routes": [
+    { "route": "/api/host.json", "allowedRoles": ["administrator"] },
+    { "route": "/api/package*", "allowedRoles": ["administrator"] },
+    { "route": "/api/local.settings.json", "allowedRoles": ["administrator"] },
+    { "route": "/api/analytics/*", "allowedRoles": ["administrator"] },
+    { "route": "/api/tools/*", "allowedRoles": ["administrator"] },
+    { "route": "/api/*", "headers": { "Cache-Control": "no-store" } }
+  ]
+}

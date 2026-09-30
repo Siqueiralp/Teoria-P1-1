@@ -1,0 +1,10 @@
+api/node_modules/
+api/local.settings.json
+.analytics/
+*.sqlite
+.env
+.env.*
+!.env.example
+*.sqlite-wal
+*.sqlite-shm
+__pycache__/

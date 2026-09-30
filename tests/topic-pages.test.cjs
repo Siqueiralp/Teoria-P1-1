@@ -95,10 +95,11 @@ test('Carregamento busca apenas o manifesto e a página pedida; preserva fallbac
   ]) {
     const requests = [];
     let start;
-    const context = vm.createContext({ URLSearchParams, console: { error() {} }, window: {
+    const context = vm.createContext({ URLSearchParams, CustomEvent: class { constructor(type) { this.type = type; } }, console: { error() {} }, window: {
       location: { search: query, hash }, TopicPages: routing
     }, document: {
       addEventListener(event, callback) { start = callback; },
+      dispatchEvent() {},
       getElementById(id) {
         // Stop before UI mounting: this test inspects the network contract of the loader.
         if (id === 'subjectTitle') throw new Error('Conteúdo carregado');

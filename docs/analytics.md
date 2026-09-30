@@ -34,6 +34,20 @@ O relatorio agrega visitas, sessoes de abas, tempo ativo, uso dos graficos e res
 
 ## Limites
 
+## Coleta diária no GitHub
+
+Workflow `.github/workflows/analytics-daily.yml`: diariamente às 03:17 de São Paulo (06:17 UTC) e por acionamento manual. O horário do GitHub pode sofrer atrasos.
+
+Configure os secrets `HIVEMQ_ANALYTICS_USERNAME` e `HIVEMQ_ANALYTICS_PASSWORD` com a credencial **Subscribe Only**. `ANALYTICS_DB_KEY` guarda a chave Fernet do banco; mantenha também uma cópia privada local dessa chave. Não troque nem apague a chave sem recriptografar todos os snapshots necessários.
+
+A branch exclusiva `codex/analytics-data` guarda `engagement.sqlite.enc` e um checksum. O runner recupera e valida o banco anterior; erro na chave, integridade ou arquivos ausentes interrompe a coleta, sem substituir por um banco vazio. Em uma inicialização sem branch, um SQLite local existente é preservado como base. Commits mantêm snapshots anteriores; não é usado force push.
+
+Cada lote recebido passa por commit SQLite, backup consistente (incluindo WAL), criptografia, commit e push confirmado da branch **antes** do PUBACK. Falha de push preserva a mensagem no broker; retransmissões são deduplicadas por ID. Execuções da Action usam um grupo de concorrência sem cancelar a coleta em curso. A atualização do README usa uma cópia atual de main e altera somente o bloco de métricas; falha no README não apaga o banco já salvo.
+
+O README mostra totais e páginas dos últimos 30 dias, sem IPs/IDs individuais. O banco é criptografado porque o repositório é público. O limite de fila e a expiração MQTT ainda se aplicam. Não execute o coletor local ao mesmo tempo que a Action com o mesmo client ID. Agendamentos de repositórios públicos podem ser desativados após 60 dias sem atividade; confira o painel Actions.
+
+Para recuperar localmente: obtenha `engagement.sqlite.enc` da branch e use a cópia privada de `ANALYTICS_DB_KEY` para descriptografar em um novo arquivo. Preserve o banco existente até verificar o arquivo recuperado. Nunca publique o SQLite em texto claro nem a chave no README.
+
 A fila MQTT e temporaria e limitada. Expiracao da sessao, limite de mensagens, regras do plano ou exclusao do cliente podem fazer perder eventos ainda nao baixados. Mensagens nao sao guardadas para um consumidor que nunca assinou o topico. Nao use mensagens retidas como arquivo de eventos: um topico retido guarda apenas o ultimo valor. Rode o coletor regularmente. Os limites reais do seu cluster e a entrega offline ainda precisam ser verificados com as credenciais configuradas.
 
 ## Configuracao do backend Azure

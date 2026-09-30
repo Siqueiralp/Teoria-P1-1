@@ -1,0 +1,41 @@
+name: Daily engagement fetch
+
+on:
+  schedule:
+    # 06:17 UTC = 03:17 in America/Sao_Paulo; GitHub may delay scheduled runs.
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: study-guide-analytics-data
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      - name: Install collector
+        run: python -m pip install -r scripts/requirements-analytics.txt
+      - name: Verify history preservation
+        run: python -m unittest discover -s tests -p 'test_analytics_*.py'
+      - name: Fetch, preserve database and update README
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANALYTICS_DB_KEY: ${{ secrets.ANALYTICS_DB_KEY }}
+          HIVEMQ_HOST: 20679a5c225144c6a085bb5e03830559.s1.eu.hivemq.cloud
+          HIVEMQ_USERNAME: ${{ secrets.HIVEMQ_ANALYTICS_USERNAME }}
+          HIVEMQ_PASSWORD: ${{ secrets.HIVEMQ_ANALYTICS_PASSWORD }}
+          HIVEMQ_SESSION_EXPIRY: '604800'
+        run: python scripts/analytics-daily.py

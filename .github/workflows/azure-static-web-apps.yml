@@ -20,11 +20,11 @@ jobs:
       - name: Generate topic pages
         run: python3 scripts/build-topic-pages.py
 
-        - name: Validate navigation and converters
-          run: node --test tests/*.test.cjs
+      - name: Validate navigation and converters
+        run: node --test tests/*.test.cjs
 
-        - name: Validate local analytics collector
-          run: python3 -m unittest discover -s tests -p test_analytics_fetcher.py
+      - name: Validate local analytics collector
+        run: python3 -m unittest discover -s tests -p test_analytics_fetcher.py
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
@@ -32,7 +32,7 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: upload
-            app_location: /
-            api_location: api
+          app_location: /
+          api_location: api
           output_location: ""
           skip_app_build: true

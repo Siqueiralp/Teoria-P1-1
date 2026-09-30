@@ -45,11 +45,17 @@ class FetcherTests(unittest.TestCase):
 
             try:
                 with patch.object(mqtt, 'Client', Client):
-                    fetcher.collect(db, {'HIVEMQ_HOST': 'test', 'HIVEMQ_USERNAME': 'test', 'HIVEMQ_PASSWORD': 'test'})
+                    fetcher.collect(db, {'HIVEMQ_HOST': 'test', 'HIVEMQ_USERNAME': 'test', 'HIVEMQ_PASSWORD': 'test'}, durable_save=lambda db: calls.append(('durable_push', True)))
                 self.assertTrue(dict(calls)['init']['manual_ack'])
                 self.assertFalse(dict(calls)['connect']['clean_start'])
                 self.assertEqual(dict(calls)['connect']['properties'].SessionExpiryInterval, 604800)
                 self.assertEqual(dict(calls)['ack_after_commit'], 1)
+                self.assertLess([name for name, _ in calls].index('durable_push'), [name for name, _ in calls].index('ack_after_commit'))
+                calls.clear()
+                def fail_push(db): raise OSError('Push failed')
+                with patch.object(mqtt, 'Client', Client), self.assertRaises(ValueError):
+                    fetcher.collect(db, {'HIVEMQ_HOST': 'test', 'HIVEMQ_USERNAME': 'test', 'HIVEMQ_PASSWORD': 'test'}, durable_save=fail_push)
+                self.assertNotIn('ack_after_commit', dict(calls))
             finally:
                 db.close()
 

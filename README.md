@@ -1,5 +1,13 @@
 # Central de Estudos
 
+<!-- analytics:start -->
+## Uso do guia
+
+Aguardando a primeira coleta diária. O histórico SQLite fica criptografado na branch `codex/analytics-data`; somente métricas agregadas são publicadas aqui.
+
+Rotina diária prevista para **03:17 (America/Sao_Paulo)**, com execução manual em **Actions → Daily engagement fetch**. A coleta depende dos secrets MQTT configurados.
+<!-- analytics:end -->
+
 Este repositório deixou de ser uma página monolítica de Eletrônica de Potência e passou a ser uma base reutilizável para múltiplas matérias.
 
 ## Estrutura

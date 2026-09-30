@@ -74,7 +74,7 @@ def report(db, days):
     return result
 
 
-def collect(db, env, drain=False, idle_seconds=5):
+def collect(db, env, drain=False, idle_seconds=5, durable_save=None):
     import paho.mqtt.client as mqtt
     host, username, password = (env.get(name) for name in ["HIVEMQ_HOST", "HIVEMQ_USERNAME", "HIVEMQ_PASSWORD"])
     if not all([host, username, password]):
@@ -120,6 +120,8 @@ def collect(db, env, drain=False, idle_seconds=5):
     def message(client, userdata, message):
         try:
             count = ingest(db, message.payload)
+            if durable_save is not None:
+                durable_save(db)
             # Acknowledge only after SQLite committed. QoS 1 redeliveries are deduplicated.
             if client.ack(message.mid, message.qos) != mqtt.MQTT_ERR_SUCCESS:
                 raise OSError("Unable to confirm message")

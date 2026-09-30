@@ -19,22 +19,33 @@ test('IP exige header explicitamente confiável; não usa XFF fornecido pelo vis
   assert.equal(clientIp({ 'client-ip': 'garbage' }, 'client-ip'), null);
   assert.equal(device('Mozilla Windows Edg/1').browser, 'Edge');
 });
-function browser(consent, privacy) {
-  const handlers = {}, sent = [], memory = new Map(consent ? [['study-analytics-consent-v1', consent]] : []);
+function browser(consent, privacy, options = {}) {
+  const handlers = {}, sent = [], memory = options.memory || new Map(consent ? [['study-analytics-consent-v1', consent]] : []);
   const nodes = {};
-  const doc = { hidden: false, hasFocus: () => true,
+  const doc = { hidden: false, cookie: options.cookie || '', hasFocus: () => true, querySelector: () => null,
     addEventListener: (name, fn) => { (handlers[name] ||= []).push(fn); },
-    createElement: () => ({ addEventListener() {}, setAttribute() {}, querySelector: () => ({ textContent: '', hidden: false }) }),
+    createElement: () => ({ listeners: {}, addEventListener(name, fn) { this.listeners[name] = fn; }, setAttribute() {}, querySelector: () => ({ textContent: '', hidden: false }) }),
     getElementById: id => nodes[id], body: { append: (...items) => items.forEach(item => { if (item.id) nodes[item.id] = item; }) } };
   const win = { addEventListener: doc.addEventListener };
   const storage = { getItem: key => memory.get(key), setItem: (key, value) => memory.set(key, value), removeItem: key => memory.delete(key) };
-  const context = { window: win, document: doc, navigator: { globalPrivacyControl: privacy, language: 'pt-BR' }, localStorage: storage, sessionStorage: storage,
+  const blocked = { getItem() { throw Error('Blocked'); }, setItem() { throw Error('Blocked'); } };
+  const context = { window: win, document: doc, navigator: { globalPrivacyControl: privacy, language: 'pt-BR' }, localStorage: options.blockLocal ? blocked : storage, sessionStorage: storage,
     location: { pathname: '/index.html', search: '?subject=eletronica-potencia&page=revisao' }, performance: { now: () => 0 }, URLSearchParams, crypto: { randomUUID: () => id },
     fetch: (url, options) => { sent.push(JSON.parse(options.body)); return Promise.resolve({ ok: true }); }, setInterval() {}, innerWidth: 1200 };
   vm.runInNewContext(fs.readFileSync('assets/js/analytics.js', 'utf8'), context);
   handlers.DOMContentLoaded.forEach(fn => fn());
-  return { sent, win, handlers, nodes };
+  return { sent, win, handlers, nodes, memory, doc };
 }
+test('Recusa fica salva entre carregamentos, incluindo fallback quando localStorage é bloqueado', () => {
+  for (const blockLocal of [false, true]) {
+    const first = browser(null, false, { blockLocal });
+    first.nodes['analytics-consent'].listeners.click({ target: { closest: () => ({ dataset: { choice: 'declined' } }) } });
+    assert.equal(first.nodes['analytics-consent'].hidden, true);
+    const next = browser(null, false, blockLocal ? { blockLocal, cookie: first.doc.cookie } : { memory: first.memory });
+    assert.equal(next.nodes['analytics-consent'].hidden, true);
+    assert.equal(next.sent.length, 0);
+  }
+});
 test('Ausência de consentimento, recusa e GPC não enviam eventos', () => {
   for (const [consent, privacy] of [[null, false], ['declined', false], ['accepted', true]]) assert.equal(browser(consent, privacy).sent.length, 0);
 });

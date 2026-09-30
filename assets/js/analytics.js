@@ -4,7 +4,19 @@
   let accepted = false, session = null, queue = [], lastTick = performance.now(), seconds = 0;
   let page = route(), lastInteraction = performance.now();
   const privateSignal = navigator.globalPrivacyControl === true || navigator.doNotTrack === '1';
-  function saved() { try { return localStorage.getItem(consentKey); } catch (_) { return null; } }
+  function saved() {
+    try { const value = localStorage.getItem(consentKey); if (value) return value; } catch (_) {}
+    try {
+      const cookie = document.cookie.split('; ').find(value => value.startsWith(consentKey + '='));
+      if (cookie) return cookie.slice(consentKey.length + 1);
+    } catch (_) {}
+    try { return sessionStorage.getItem(consentKey); } catch (_) { return null; }
+  }
+  function remember(value) {
+    try { localStorage.setItem(consentKey, value); } catch (_) {}
+    try { sessionStorage.setItem(consentKey, value); } catch (_) {}
+    try { document.cookie = consentKey + '=' + value + '; Max-Age=31536000; Path=/; SameSite=Lax' + (location.protocol === 'https:' ? '; Secure' : ''); } catch (_) {}
+  }
   function route() {
     const study = window.StudyGuide;
     if (location.pathname.endsWith('/guide.html') && !study) return null;
@@ -39,7 +51,7 @@
   function choose(value) {
     accepted = value === 'accepted' && !privateSignal;
     queue = []; seconds = 0; lastTick = lastInteraction = performance.now();
-    try { localStorage.setItem(consentKey, accepted ? 'accepted' : 'declined'); } catch (_) {}
+    remember(accepted ? 'accepted' : 'declined');
     document.getElementById('analytics-consent').hidden = true;
     if (accepted) {
       try { session = sessionStorage.getItem('study-analytics-session'); } catch (_) {}
@@ -59,14 +71,19 @@
     const preferences = document.createElement('button');
     preferences.type = 'button'; preferences.className = 'analytics-preferences'; preferences.textContent = 'Privacidade';
     preferences.addEventListener('click', function () {
-      if (accepted) choose('declined');
       box.hidden = false;
+      box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     });
     box.addEventListener('click', function (event) {
       const button = event.target.closest('[data-choice]');
       if (button) choose(button.dataset.choice);
     });
-    document.body.append(box, preferences);
+    const content = document.querySelector('.main-layout, .home-main');
+    if (content) content.before(box);
+    else document.body.append(box);
+    const actions = document.querySelector('.header-actions, .home-header');
+    if (actions) actions.append(preferences);
+    else document.body.append(preferences);
     if (privateSignal) {
       box.querySelector('p').textContent = 'Seu navegador pediu para não ser rastreado. As métricas de uso estão desativadas.';
       box.querySelector('[data-choice="accepted"]').hidden = true;

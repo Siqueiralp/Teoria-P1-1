@@ -19,9 +19,11 @@ OUT = ROOT / 'subjects/eletronica-potencia/exports'
 OUT.mkdir(exist_ok=True)
 models = json.loads(subprocess.check_output(['node', str(ROOT / 'scripts/export-formula-waveforms.cjs')], encoding='utf8'))
 W, H = 1800, 1560
-BG, SURFACE, FG, MUTED = '#12171d', '#1c242d', '#f3f5f7', '#becbd7'
-BLUE, GREEN, GOLD, ORANGE, PURPLE = '#8dc9ff', '#8fe0b2', '#f5d987', '#ffb68a', '#cfb4ff'
-plt.rcParams.update({'font.family': 'DejaVu Sans', 'mathtext.fontset': 'dejavusans', 'svg.fonttype': 'path'})
+BG = SURFACE = '#000000'
+FG = MUTED = '#ffffff'
+BLUE = GREEN = GOLD = ORANGE = PURPLE = '#ffffff'
+plt.rcParams.update({'font.family': 'DejaVu Sans', 'mathtext.fontset': 'dejavusans',
+                     'svg.fonttype': 'path', 'svg.hashsalt': 'p1-four-papers'})
 fig = plt.figure(figsize=(W / 100, H / 100), dpi=200, facecolor=BG)
 canvas = fig.add_axes([0, 0, 1, 1]); canvas.set_xlim(0, W); canvas.set_ylim(H, 0); canvas.axis('off')
 
@@ -65,7 +67,7 @@ def math(x, y, s, size=17, color=FG):
 
 def box(x, y, w, h, title, color=GOLD):
     canvas.add_patch(FancyBboxPatch((x, y), w, h, boxstyle='round,pad=0,rounding_size=8',
-                                  facecolor=SURFACE, edgecolor='#3b4957', linewidth=.7))
+                                  facecolor=SURFACE, edgecolor='#404040', linewidth=.6))
     text(x + 12, y + 10, title, 17, color, 'bold')
 
 
@@ -162,26 +164,20 @@ def wave_panel(model, x, y):
     for row, (key, color, title) in enumerate(signals):
         yy, hh = y + 56 + row*40, 35
         ax = fig.add_axes([px/W, 1-(yy+hh)/H, pw/W, hh/H], facecolor='none')
-        for a,b,cc in [(0,D,BLUE),(D,D+d2,GREEN),(D+d2,1,ORANGE)]:
-            if b>a+1e-8: ax.axvspan(a,b,color=cc,alpha=.035)
-        for boundary in [0,D,D+d2,1]: ax.axvline(boundary,color='#607182',lw=.6,ls=(0,(2,3)))
-        for boundary, _ in crossing:
-            if key in ['iC','vC','load']: ax.axvline(boundary,color=GOLD,lw=.55,ls=(0,(1,3)),alpha=.7)
+        for boundary in [D,D+d2] if mode == 'DCM' else [D]:
+            ax.axvline(boundary,color='#333333',lw=.5,ls=(0,(3,4)))
         vals = np.array([s['iS'] if key=='switches' else s['vC']/p['R'] if key=='load' else s[key] for s in samples])
         all_vals = np.concatenate((vals,[0])) if key not in ['vC','load'] else vals
         lo,hi = min(all_vals),max(all_vals); span=max(hi-lo,1e-8)
         ax.set_xlim(0,1.01);ax.set_ylim(lo-.18*span,hi+.3*span)
-        ax.plot(t,vals,color=color,lw=1.25)
-        if key=='switches': ax.plot(t,[s['iD'] for s in samples],color=PURPLE,lw=1.25)
-        if key not in ['vC','load']: ax.axhline(0,color='#607182',lw=.5)
-        else: ax.axhline(p['Vo'] if key=='vC' else p['Io'],color='#607182',lw=.6,ls=(0,(3,3)))
-        if key=='iL': ax.axhline(p['Io'],color=GOLD,lw=.6,ls=(0,(3,3)))
+        ax.plot(t,vals,color=color,lw=1.1)
+        if key=='switches': ax.plot(t,[s['iD'] for s in samples],color=PURPLE,lw=1.1,ls=(0,(3,2)))
+        if key in ['vL','iC']: ax.axhline(0,color='#505050',lw=.45)
         if key=='iC':
-            ax.fill_between(t,0,vals,where=vals>=0,color=PURPLE,alpha=.2)
             for boundary,_ in crossing:
                 # A zero crossing is a dot only if the current is continuous there.
                 if top=='buck' or boundary>D+1e-8: ax.plot(boundary,0,'o',ms=2.3,color=GOLD)
-        if key in ['vC','load']:
+        if key == 'vC':
             voltage_events = crossing + ([(1, 'max')] if top != 'buck' and ratio <= 0 else [])
             for boundary,label in voltage_events:
                 ind=np.argmin(abs(t-boundary)); val=vals[ind]
@@ -195,18 +191,14 @@ def wave_panel(model, x, y):
             ax.text(D+d2/2,off+span*.08,labels[1] if top!='buck' else '−V',color=BLUE,fontsize=6.8,ha='center')
             if d3>0: ax.text(D+d2+d3/2,span*.06,'0',color=BLUE,fontsize=6.8,ha='center')
         if key=='iL':
-            ax.annotate('Imax / Ipk' if mode=='DCM' else 'Imax',(D,p['Imax']),xytext=(3,1),textcoords='offset points',color=GREEN,fontsize=6.8)
+            ax.annotate('Ipk' if mode=='DCM' else 'Imax',(D,p['Imax']),xytext=(3,1),textcoords='offset points',color=GREEN,fontsize=6.8)
             ax.text(.99,p['Imin']+span*.05,'0' if mode=='DCM' else 'Imin',ha='right',color=GREEN,fontsize=6.8)
-            ax.text(.02,p['Io']+span*.03,'Io',color=GOLD,fontsize=6.5)
         if key=='switches':
             ax.text(D/2,p['Imax']*.82,'iS',color=ORANGE,fontsize=7)
             ax.text(D+d2/2,p['Imax']*.8,'iD',color=PURPLE,fontsize=7)
         if key=='iC':
             ax.text(.02,lo+span*.06,'−Io' if top!='buck' else 'Imin − Io',color=PURPLE,fontsize=6.5)
-            ax.text(D+.02,hi+span*.04,('Ipk' if mode=='DCM' else 'Imax')+' − Io',color=PURPLE,fontsize=6.5)
             ax.text(.97,0+span*.08,'0',ha='right',color=MUTED,fontsize=6.5)
-        if key=='vC': text(x+12,yy+25,'ripple ampliado',9.5,MUTED)
-        if key=='load': text(x+12,yy+25,'média Io = V/R',9.5,MUTED)
     ty=y+299
     text(px,ty,'0',11,MUTED,ha='center')
     text(px+D*pw,ty,'D',11,BLUE,ha='center')
@@ -242,13 +234,16 @@ text(912,1368,'V·µs/A → µH   |   A·µs → µC   |   µC/V → µF   |   m
 text(912,1395,'Inversor: gráficos mostram vC = |vo| e a corrente no terminal positivo de C.',13)
 text(912,1417,'A tensão vo referida ao terra tem sinal oposto; sua corrente em R também.',13)
 text(912,1439,'Colchete de ΔI ≠ Imin. Se faltar ΔVpp, deixe C simbólico. D₂ ≠ OFF em DCM.',13,ORANGE)
-text(20,1480,'GRÁFICOS: um ciclo, escalas próprias por sinal; ripple da tensão e da corrente na carga ampliado. Tracejado dourado: Io / cruzamentos de iC.',13,MUTED)
+text(20,1480,'GRÁFICOS: um ciclo; escalas próprias; ripple ampliado. iS: linha contínua; iD: tracejada. Pontos: cruzamentos de iC / extremos de vC.',13,MUTED)
 text(20,1502,'Boost CCM acima inclui iC < 0 no fim do OFF (caso Nov/2024 Q2). No inversor CCM, Imin ≥ Io: vC atinge máximo no fim do OFF.',13,MUTED)
 math(20,1526,r'E={|v_{L,off}|t_D\over t_{on}}\quad\mathrm{(Boost/inversor)}',15,GOLD)
 math(630,1526,r'V={v_{L,on}t_{on}\over t_D}\quad\mathrm{(Buck)}',15,GOLD)
 math(1200,1526,r'i_D(t)=I_{max}-{\Delta I_L(t-t_{on})\over t_D}\quad\mathrm{(OFF)}',15,GOLD)
 
 for suffix in ['png','svg']:
-    fig.savefig(OUT / ('formulario-p1-4-provas-escuro.'+suffix),facecolor=BG,dpi=200)
+    output = OUT / ('formulario-p1-4-provas-escuro.'+suffix)
+    fig.savefig(output,facecolor=BG,dpi=200,metadata={'Date': None} if suffix == 'svg' else None)
+    if suffix == 'svg':
+        output.write_text('\n'.join(line.rstrip() for line in output.read_text(encoding='utf8').splitlines())+'\n', encoding='utf8')
 plt.close(fig)
 print('Exportado: PNG 3600×3120 e SVG vetorial; seis topologias/regimes com balanços validados.')

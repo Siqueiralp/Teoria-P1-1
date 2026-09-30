@@ -1,6 +1,6 @@
 # Formulário das quatro provas
 
-Folha única escura, PNG 3600 × 3120 e SVG vetorial. Fonte: as doze resoluções em `../content.html`; gráficos calculados pelo modelo físico de `../subject.js`. Abre em `/formulario-provas.html`, com download e ampliação; acessível na página de fórmulas e no pop-up das provas.
+Folha única com fundo preto puro (#000000), texto branco e gráficos monocromáticos simplificados; PNG 3600 × 3120 e SVG vetorial. Fonte: as doze resoluções em `../content.html`; gráficos calculados pelo modelo físico de `../subject.js`. Abre em `/formulario-provas.html`, com download e ampliação; acessível na página de fórmulas e no pop-up das provas.
 
 As relações repetidas e suas formas algébricas equivalentes foram agrupadas. Os valores numéricos dos enunciados não ocupam espaço na folha.
 
@@ -14,7 +14,7 @@ As relações repetidas e suas formas algébricas equivalentes foram agrupadas. 
 | 2026 Q1 | Inversor: estados DCM teóricos; vL,OFF = −V, gráfico numérico CCM e média de iL |
 | 2026 Q2 | Boost DCM: D/D2/D3; pico, média de diodo, iC, rampa do diodo, Δt+, ΔQ, C, balanço para V, R |
 
-Cada um dos seis conjuntos traz vL, iL, iS/iD, iC, vC = |vo| e io = vC/R. Ripple ampliado e escalas próprias por sinal. Para o inversor, os sinais desenhados usam o terminal positivo do capacitor: vo referida ao terra tem sinal oposto.
+Cada um dos seis conjuntos traz vL, iL, iS/iD, iC, vC = |vo| e io = vC/R. Ripple ampliado e escalas próprias por sinal. Sem áreas preenchidas ou grades; guias discretas nas comutações e pontos nos cruzamentos/extremos. iS usa linha contínua e iD tracejada. Para o inversor, os sinais desenhados usam o terminal positivo do capacitor: vo referida ao terra tem sinal oposto.
 
 O Boost CCM foi configurado para mostrar o cruzamento de iC dentro do OFF presente na prova de 2024: a fórmula C = Io·D·Ts/ΔVpp não cobre esse caso. O formulário explicita a condição Imin ≥ Io e a integração da área triangular quando ela não é atendida.
 

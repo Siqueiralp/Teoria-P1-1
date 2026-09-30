@@ -2178,9 +2178,9 @@ body {
   outline: none;
 }
 
-.formula-export-preview { margin-bottom: 24px; padding: 18px; background: #12171d; color: #f3f5f7; border: 1px solid #3b4957; border-radius: 12px; }
+.formula-export-preview { margin-bottom: 24px; padding: 18px; background: #000; color: #fff; border: 1px solid #404040; border-radius: 12px; }
 .formula-export-preview h3 { margin: 0 0 8px; }
-.formula-export-preview p { color: #becbd7; }
+.formula-export-preview p { color: #fff; }
 .formula-export-preview .exam-formula-actions { justify-content: flex-start; margin: 14px 0; }
 .formula-export-image { display: block; }
 .formula-export-image img { display: block; width: 100%; height: auto; }

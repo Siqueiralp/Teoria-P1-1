@@ -32,8 +32,6 @@ O banco fica em `.analytics/engagement.sqlite`. A confirmacao MQTT (PUBACK) so o
 
 O relatorio agrega visitas, sessoes de abas, tempo ativo, uso dos graficos e resolucoes abertas, navegador/OS/idioma. IPs ficam no banco privado e nao aparecem no resumo. Faca backup do SQLite regularmente, preferindo copiar o banco com o coletor parado.
 
-## Limites
-
 ## Coleta diária no GitHub
 
 Workflow `.github/workflows/analytics-daily.yml`: diariamente às 03:17 de São Paulo (06:17 UTC) e por acionamento manual. O horário do GitHub pode sofrer atrasos.
@@ -49,6 +47,8 @@ O README mostra totais e páginas dos últimos 30 dias, sem IPs/IDs individuais.
 Para recuperar localmente: obtenha `engagement.sqlite.enc` da branch e use a cópia privada de `ANALYTICS_DB_KEY` para descriptografar em um novo arquivo. Preserve o banco existente até verificar o arquivo recuperado. Nunca publique o SQLite em texto claro nem a chave no README.
 
 Com a chave no `.env` local: `python scripts/analytics-daily.py --decrypt caminho/engagement.sqlite.enc --output .analytics/restored.sqlite`. O comando recusa sobrescrever um arquivo existente e confere a integridade do SQLite.
+
+## Limites
 
 A fila MQTT e temporaria e limitada. Expiracao da sessao, limite de mensagens, regras do plano ou exclusao do cliente podem fazer perder eventos ainda nao baixados. Mensagens nao sao guardadas para um consumidor que nunca assinou o topico. Nao use mensagens retidas como arquivo de eventos: um topico retido guarda apenas o ultimo valor. Rode o coletor regularmente. Os limites reais do seu cluster e a entrega offline ainda precisam ser verificados com as credenciais configuradas.
 

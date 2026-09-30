@@ -196,7 +196,7 @@ def main():
             status = 'Aguardando configuração das credenciais MQTT; coleta ainda não ativada.'
         update_readme(db, status, remote)
         if not ready and not args.initialize_only:
-            raise ValueError('MQTT secrets missing; persistent subscription not initialized')
+            print('::warning::MQTT secrets missing. Encrypted history and README preserved; collection not active.')
     finally:
         db.close()
 

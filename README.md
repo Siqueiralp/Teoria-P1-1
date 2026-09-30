@@ -3,7 +3,7 @@
 <!-- analytics:start -->
 ## Uso do guia
 
-Aguardando configuração das credenciais MQTT; coleta ainda não ativada.
+Coleta diária concluída; lotes confirmados após preservar o banco no GitHub.
 
 Último evento coletado (UTC): Nenhum evento coletado.
 

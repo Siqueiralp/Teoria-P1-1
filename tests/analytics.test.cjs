@@ -57,7 +57,6 @@ function backend(env, failPublish = false) {
   const sandbox = { module: { exports: {} }, process: { env }, setTimeout, clearTimeout,
     require(name) {
       if (name === './validate') return require('../api/analytics/validate');
-      if (name === '@azure/data-tables') return { TableClient: { fromConnectionString: () => ({ upsertEntity: async entity => stored.push(entity) }) } };
       if (name === 'mqtt') return { connectAsync: async () => ({ publishAsync: async (topic, payload, options) => {
         if (failPublish) throw new Error('Offline');
         published.push({ topic, payload: JSON.parse(payload), options });
@@ -75,19 +74,21 @@ test('Backend desativado ou origem errada não persiste nem publica', async () =
     assert.ok([403, 503].includes(context.res.status));
   }
 });
-test('Backend grava histórico antes de publicar e o conserva se MQTT falhar', async () => {
-  const env = { ANALYTICS_ENABLED: 'true', HIVEMQ_HOST: 'host', HIVEMQ_USERNAME: 'user', HIVEMQ_PASSWORD: 'test', ANALYTICS_STORAGE_CONNECTION: 'test', ANALYTICS_ALLOWED_ORIGIN: 'https://allowed.test' };
+test('Backend publica sem banco remoto e informa falha do MQTT sem afirmar gravação', async () => {
+  const env = { ANALYTICS_ENABLED: 'true', HIVEMQ_HOST: 'host', HIVEMQ_USERNAME: 'user', HIVEMQ_PASSWORD: 'test', ANALYTICS_ALLOWED_ORIGIN: 'https://allowed.test' };
   for (const failure of [false, true]) {
     const api = backend(env, failure), context = { log: { warn() {} } };
     await api.call(context, { headers: { origin: env.ANALYTICS_ALLOWED_ORIGIN, 'content-type': 'application/json', 'user-agent': 'Windows Firefox/1', 'x-forwarded-for': 'forged' },
       body: { consent: 'accepted-v1', session: id, events: [{ id, type: 'page_view', subject: 'eletronica-potencia', page: 'revisao' }] } });
-    assert.equal(api.stored.length, 1);
-    assert.equal(api.stored[0].ip, undefined);
+    assert.equal(api.stored.length, 0);
     assert.equal(context.res.status, failure ? 503 : 202);
     if (!failure) {
       assert.equal(api.published[0].topic, 'study-guide/engagement/v1');
       assert.equal(api.published[0].options.retain, false);
       assert.equal(api.published[0].payload.HIVEMQ_PASSWORD, undefined);
+      assert.equal(api.published[0].payload.ip, undefined);
+      assert.equal(api.published[0].options.properties, undefined);
+      assert.equal(context.res.body.stored, undefined);
     }
   }
 });

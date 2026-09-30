@@ -55,7 +55,7 @@
     const box = document.createElement('section');
     box.id = 'analytics-consent'; box.className = 'analytics-consent';
     box.setAttribute('aria-label', 'Preferências de métricas de uso');
-    box.innerHTML = '<p>Podemos registrar IP, navegador, sistema, páginas, ações nos gráficos e tempo ativo para melhorar o guia? Os eventos vão ao HiveMQ e ao histórico privado do site. Sem nomes, buscas ou respostas digitadas.</p><div><button type="button" data-choice="accepted">Permitir métricas</button><button type="button" data-choice="declined">Recusar</button></div>';
+    box.innerHTML = '<p>Podemos registrar IP, navegador, sistema, páginas, ações nos gráficos e tempo ativo para melhorar o guia? Os eventos passam pelo HiveMQ e são guardados no computador do responsável pelo site. Sem nomes, buscas ou respostas digitadas.</p><div><button type="button" data-choice="accepted">Permitir métricas</button><button type="button" data-choice="declined">Recusar</button></div>';
     const preferences = document.createElement('button');
     preferences.type = 'button'; preferences.className = 'analytics-preferences'; preferences.textContent = 'Privacidade';
     preferences.addEventListener('click', function () {

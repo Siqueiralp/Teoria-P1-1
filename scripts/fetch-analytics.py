@@ -5,6 +5,7 @@ import os
 import sqlite3
 import ssl
 import sys
+import time
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -16,6 +17,7 @@ def database(path):
     path.parent.mkdir(parents=True, exist_ok=True)
     db = sqlite3.connect(path)
     db.execute("PRAGMA journal_mode=WAL")
+    db.execute("PRAGMA synchronous=FULL")
     db.execute("""CREATE TABLE IF NOT EXISTS events (
         id TEXT PRIMARY KEY, session TEXT, received_at TEXT, collected_at TEXT,
         subject TEXT, page TEXT, type TEXT, seconds INTEGER, value TEXT,
@@ -72,7 +74,7 @@ def report(db, days):
     return result
 
 
-def collect(db, env):
+def collect(db, env, drain=False, idle_seconds=5):
     import paho.mqtt.client as mqtt
     host, username, password = (env.get(name) for name in ["HIVEMQ_HOST", "HIVEMQ_USERNAME", "HIVEMQ_PASSWORD"])
     if not all([host, username, password]):
@@ -80,35 +82,65 @@ def collect(db, env):
     topic = env.get("HIVEMQ_TOPIC", "study-guide/engagement/v1")
     if topic != "study-guide/engagement/v1":
         raise ValueError("Use the dedicated engagement topic")
-    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="study-guide-fetcher", clean_session=False)
+    client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="study-guide-fetcher", protocol=mqtt.MQTTv5, manual_ack=True)
+    expiry = int(env.get("HIVEMQ_SESSION_EXPIRY", "604800"))
+    if not 1 <= expiry <= 4294967295:
+        raise ValueError("Invalid session expiry")
+    properties = mqtt.Properties(mqtt.PacketTypes.CONNECT)
+    properties.SessionExpiryInterval = expiry
+    state = {"ready": False, "last_message": time.monotonic(), "fatal": False}
     client.username_pw_set(username, password)
     client.tls_set(cert_reqs=ssl.CERT_REQUIRED)
     client.reconnect_delay_set(min_delay=1, max_delay=60)
 
     def connected(client, userdata, flags, reason_code, properties):
         if reason_code.is_failure:
+            state["fatal"] = True
             print("MQTT connection rejected. Check private credentials/permissions.", file=sys.stderr)
             return
+        state["ready"] = False
+        print("Resuming existing session." if flags.session_present else "Creating persistent session; older publications cannot be recovered.", flush=True)
+        effective_expiry = getattr(properties, "SessionExpiryInterval", None)
+        if effective_expiry is not None:
+            print(f"Broker session lifetime: {effective_expiry} seconds (queue limits still apply).", flush=True)
+        else:
+            print(f"Requested offline session lifetime: {expiry} seconds; cluster limits still need verification.", flush=True)
         client.subscribe(topic, qos=1)
         print("Connected; listening for engagement events. Ctrl+C to stop.", flush=True)
 
     def subscribed(client, userdata, mid, reason_codes, properties):
         if any(code.is_failure for code in reason_codes):
+            state["fatal"] = True
             print("Subscription rejected: use a credential with Subscribe Only on the engagement topic.", file=sys.stderr)
         else:
+            state["ready"] = True
+            state["last_message"] = time.monotonic()
             print("Subscription confirmed.", flush=True)
 
     def message(client, userdata, message):
         try:
             count = ingest(db, message.payload)
+            # Acknowledge only after SQLite committed. QoS 1 redeliveries are deduplicated.
+            if client.ack(message.mid, message.qos) != mqtt.MQTT_ERR_SUCCESS:
+                raise OSError("Unable to confirm message")
+            state["last_message"] = time.monotonic()
             print(f"Stored {count} new events.", flush=True)
-        except (ValueError, KeyError, TypeError, sqlite3.Error):
-            print("Invalid message discarded; payload omitted.", file=sys.stderr)
+        except (ValueError, KeyError, TypeError, OSError, sqlite3.Error):
+            state["fatal"] = True
+            print("Message not acknowledged: storage or validation failed. Queue preserved; payload omitted.", file=sys.stderr)
 
     client.on_connect, client.on_message, client.on_subscribe = connected, message, subscribed
     try:
-        client.connect(host, int(env.get("HIVEMQ_PORT", "8883")), 60)
-        client.loop_forever()
+        client.connect(host, int(env.get("HIVEMQ_PORT", "8883")), 60, clean_start=False, properties=properties)
+        while not state["fatal"]:
+            result = client.loop(timeout=1.0)
+            if result != mqtt.MQTT_ERR_SUCCESS:
+                raise OSError("MQTT interrupted; rerun with the same client ID")
+            if drain and state["ready"] and time.monotonic() - state["last_message"] >= idle_seconds:
+                print(f"No messages received for {idle_seconds} seconds; saved messages acknowledged. Session retained.")
+                break
+        if state["fatal"]:
+            raise ValueError("Collection failed; unacknowledged messages retained")
     except KeyboardInterrupt:
         print("Collector stopped.")
     finally:
@@ -121,6 +153,8 @@ def main():
     parser.add_argument("--days", type=int, default=30)
     parser.add_argument("--db")
     parser.add_argument("--input", help="JSON event batch for offline import/test")
+    parser.add_argument("--drain", action="store_true", help="Save queued/new events, then exit after idle period; keep MQTT session")
+    parser.add_argument("--idle-seconds", type=int, default=5)
     args = parser.parse_args()
     try:
         from dotenv import load_dotenv
@@ -130,13 +164,15 @@ def main():
             raise ValueError("Install scripts/requirements-analytics.txt first")
     if not 1 <= args.days <= 365:
         raise ValueError("Choose 1 to 365 days")
+    if not 1 <= args.idle_seconds <= 300:
+        raise ValueError("Choose 1 to 300 idle seconds")
     path = Path(args.db or os.getenv("ANALYTICS_DB", ".analytics/engagement.sqlite"))
     if not path.is_absolute():
         path = ROOT / path
     db = database(path)
     try:
         if args.command == "collect":
-            collect(db, os.environ)
+            collect(db, os.environ, args.drain, args.idle_seconds)
         elif args.command == "import":
             if not args.input:
                 raise ValueError("Supply --input with a JSON batch")

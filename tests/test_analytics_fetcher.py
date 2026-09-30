@@ -4,6 +4,8 @@ import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('fetcher', Path(__file__).resolve().parents[1] / 'scripts/fetch-analytics.py')
 fetcher = importlib.util.module_from_spec(spec)
@@ -11,6 +13,46 @@ spec.loader.exec_module(fetcher)
 
 
 class FetcherTests(unittest.TestCase):
+    def test_mqtt_confirms_only_after_sqlite_commit_and_preserves_session(self):
+        import paho.mqtt.client as mqtt
+        with tempfile.TemporaryDirectory() as folder:
+            db = fetcher.database(Path(folder) / 'events.sqlite')
+            batch = {'schema': 1, 'session': 'test', 'receivedAt': datetime.now(timezone.utc).isoformat(),
+                     'events': [{'id': '00000000-0000-4000-8000-000000000001', 'type': 'page_view'}]}
+            calls = []
+
+            class Client:
+                def __init__(self, *args, **kwargs):
+                    calls.append(('init', kwargs))
+                    self.first = True
+                def username_pw_set(self, *args): pass
+                def tls_set(self, **kwargs): pass
+                def reconnect_delay_set(self, **kwargs): pass
+                def connect(self, *args, **kwargs): calls.append(('connect', kwargs))
+                def subscribe(self, topic, qos): calls.append(('subscribe', qos))
+                def ack(self, mid, qos):
+                    self_count = db.execute('SELECT COUNT(*) FROM events').fetchone()[0]
+                    calls.append(('ack_after_commit', self_count))
+                    return mqtt.MQTT_ERR_SUCCESS
+                def disconnect(self): calls.append(('disconnect', True))
+                def loop(self, **kwargs):
+                    if not self.first: raise KeyboardInterrupt
+                    self.first = False
+                    self.on_connect(self, None, SimpleNamespace(session_present=True), SimpleNamespace(is_failure=False), None)
+                    self.on_subscribe(self, None, 1, [SimpleNamespace(is_failure=False)], None)
+                    self.on_message(self, None, SimpleNamespace(payload=json.dumps(batch).encode(), mid=1, qos=1))
+                    return mqtt.MQTT_ERR_SUCCESS
+
+            try:
+                with patch.object(mqtt, 'Client', Client):
+                    fetcher.collect(db, {'HIVEMQ_HOST': 'test', 'HIVEMQ_USERNAME': 'test', 'HIVEMQ_PASSWORD': 'test'})
+                self.assertTrue(dict(calls)['init']['manual_ack'])
+                self.assertFalse(dict(calls)['connect']['clean_start'])
+                self.assertEqual(dict(calls)['connect']['properties'].SessionExpiryInterval, 604800)
+                self.assertEqual(dict(calls)['ack_after_commit'], 1)
+            finally:
+                db.close()
+
     def test_repeated_delivery_is_deduplicated_and_summary_omits_ips(self):
         with tempfile.TemporaryDirectory() as folder:
             db = fetcher.database(Path(folder) / 'events.sqlite')

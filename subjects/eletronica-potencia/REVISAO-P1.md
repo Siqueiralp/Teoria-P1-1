@@ -98,6 +98,27 @@ Modelos ideais, regime periódico e pequena ondulação. Não representam transi
 
 As contas específicas, a classificação e os gráficos históricos foram derivados das fotos e dos balanços físicos nesta revisão.
 
+## Apresentação das provas — 30/09/2026
+
+As quatro páginas de P1 agora usam uma folha clara, com cabeçalho acadêmico,
+questões numeradas e subitens na ordem das fotos. Os circuitos são reconstruídos
+em SVG monocromático, ao lado das formas de onda no desktop. As alternativas
+aparecem junto ao enunciado, antes de abrir a resolução.
+
+A referência de leitura foi `APS 1/resolucao_aps_buck_boost.html`: texto de
+16–17 px, separadores simples, rótulos “Fórmula” e “Substituição” e resultados
+destacados. As 12 resoluções foram desdobradas por item. Dados ausentes continuam
+simbólicos; os conflitos de 2024 Q3 e 2026 Q3 permanecem explicados.
+
+Os gráficos do enunciado indicam simbolicamente os níveis não impressos, e as
+contas mostram sua dedução. Os gráficos DCM conceituais distinguem chave,
+diodo e corrente nula. No celular, circuitos e gráficos ficam em sequência,
+com rolagem local para conservar o tamanho dos rótulos e das equações.
+
+O conteúdo canônico permanece em `content.html`; `scripts/build-topic-pages.py`
+gera as quatro páginas e suas âncoras. O estilo claro de `exam-paper.css` fica
+restrito às folhas, mantendo a navegação e os outros tópicos no tema do app.
+
 ## Navegação por páginas — 29/09/2026
 
 - Conteúdo dividido em 30 páginas carregadas sob demanda. Teoria, provas, simulados e projetos abrem um tópico ou conjunto por vez.

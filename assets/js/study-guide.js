@@ -400,14 +400,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function initExerciseAccordions() {
     document.querySelectorAll(".solution-toggle").forEach(function (button) {
+      var targetId = button.getAttribute("data-target");
+      button.setAttribute("aria-controls", targetId);
+      button.setAttribute("aria-expanded", "false");
       button.addEventListener("click", function () {
         var content = document.getElementById(button.getAttribute("data-target"));
         if (!content) return;
         content.classList.toggle("open");
+        button.setAttribute("aria-expanded", String(content.classList.contains("open")));
         button.innerHTML = "";
         if (window.UiIcons) button.appendChild(window.UiIcons.create(content.classList.contains("open") ? "chevronUp" : "chevronDown"));
         var label = document.createElement("span");
-        label.textContent = content.classList.contains("open") ? "Ocultar Resolução" : "Ver Resolução Completa Passo a Passo";
+        label.textContent = content.classList.contains("open") ? "Ocultar resolução" : "Ver resolução passo a passo";
         button.appendChild(label);
         renderKaTeXIfAvailable();
       });

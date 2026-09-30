@@ -99,7 +99,7 @@
       "group": "Provas e prática"
     }
   ],
-  "script": "subject.js?v=20260929-preload",
+  "script": "subject.js?v=20260930-provas",
   "pages": [
     {
       "id": "inicio",
@@ -316,8 +316,11 @@
       "anchors": [
         "p1-2024-page",
         "p1-2024",
+        "p1-2024-questao-1",
         "hist-2024-q1",
+        "p1-2024-questao-2",
         "hist-2024-q2",
+        "p1-2024-questao-3",
         "hist-2024-q3"
       ]
     },
@@ -329,8 +332,11 @@
       "anchors": [
         "p1-2025-maio-page",
         "p1-2025-maio",
+        "p1-2025-maio-questao-1",
         "hist-2025a-q1",
+        "p1-2025-maio-questao-2",
         "hist-2025a-q2",
+        "p1-2025-maio-questao-3",
         "hist-2025a-q3"
       ]
     },
@@ -342,8 +348,11 @@
       "anchors": [
         "p1-2025-setembro-page",
         "p1-2025-setembro",
+        "p1-2025-setembro-questao-1",
         "hist-2025b-q1",
+        "p1-2025-setembro-questao-2",
         "hist-2025b-q2",
+        "p1-2025-setembro-questao-3",
         "hist-2025b-q3"
       ]
     },
@@ -355,8 +364,11 @@
       "anchors": [
         "p1-2026-page",
         "p1-2026",
+        "p1-2026-questao-1",
         "hist-2026-q1",
+        "p1-2026-questao-2",
         "hist-2026-q2",
+        "p1-2026-questao-3",
         "hist-2026-q3"
       ]
     },

@@ -109,8 +109,10 @@ overview = overview.replace('Os gráficos abaixo reconstroem', 'Nas abas de cada
 add('historico', 'Provas anteriores • análise histórica', overview, 'historySection', tabs(history_tabs, 'historico', 'Provas anteriores'), 'historico')
 for paper in papers:
     title = re.search(r'<span>P1 • ([^<]+)</span>', paper[0])[1]
-    add(paper[1], 'P1 • ' + title, section(paper[1] + '-page', 'P1 • ' + title, paper[0],
-        'Três questões com resolução, circuito e gráficos.', 'Prova anterior'), 'historySection', tabs(history_tabs, paper[1], 'Provas anteriores'), paper[1])
+    # The paper carries its own heading, as on the photographed exam sheet.
+    add(paper[1], 'P1 • ' + title,
+        '<section id="' + paper[1] + '-page" class="exam-page">' + paper[0] + '</section>',
+        'historySection', tabs(history_tabs, paper[1], 'Provas anteriores'), paper[1])
 
 exam = SECTIONS['examSection']
 exercises = re.findall(r'^          <div class="exercise-box">.*?^          </div>', exam, re.M | re.S)
@@ -137,7 +139,7 @@ manifest['pages'] = PAGES
 manifest['checklistIds'] = re.findall(r'data-check-id="([^"]+)"', SOURCE)
 manifest['totalChecklistItems'] = len(manifest['checklistIds'])
 manifest['tools'][0]['title'] = 'Revisão por topologia'
-manifest['script'] = 'subject.js?v=20260929-preload'
+manifest['script'] = 'subject.js?v=20260930-provas'
 OUTPUTS['subject.json'] = json.dumps(manifest, ensure_ascii=False, indent=2) + '\n'
 
 if __name__ == '__main__':

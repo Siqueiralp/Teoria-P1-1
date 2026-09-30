@@ -1397,9 +1397,25 @@ function formulaOverviewMarkup() {
 
 function initExamFigures() {
   var defs=getExamFigureDefinitions();
+  document.querySelectorAll('[data-exam-circuit]').forEach(function(host) {
+    var key=host.dataset.examCircuit, def=defs[key];
+    if(def)host.insertAdjacentHTML('afterbegin', examPaperCircuitSvg(def, key));
+  });
+  document.querySelectorAll('[data-exam-alternatives]').forEach(function(host) {
+    var def=defs[host.dataset.examAlternatives];
+    if(!def||!def.alternatives)return;
+    host.innerHTML='<div class="exam-alternatives"><div class="exam-alternatives-head"><strong>Alternativas da folha original</strong><span>Escolha antes de consultar a resolução.</span></div><div class="exam-alternatives-grid">'+def.alternatives.map(function(alt, index) {
+      return '<figure class="exam-alt-card"><div class="exam-alt-label">Alternativa '+(index+1)+'</div>'+examAlternativeSvg(alt)+'<figcaption>( &nbsp; )</figcaption></figure>';
+    }).join('')+'</div></div>';
+  });
+  document.querySelectorAll('[data-exam-dcm]').forEach(function(host) {
+    host.innerHTML=examDcmDiagramSvg(host.dataset.examDcm);
+  });
   Object.keys(defs).forEach(function(targetId){
     var button=document.querySelector('.solution-toggle[data-target="'+targetId+'"]');
     if(!button)return;
+    // Historical sheets already place circuit and supplied waves at the question.
+    if(button.closest('.exam-paper'))return;
     var body=button.closest('.exercise-body');
     if(!body||body.querySelector('[data-exam-visual="'+targetId+'"]'))return;
     var host=document.createElement('div');
@@ -1413,6 +1429,90 @@ function initExamFigures() {
     var head=formula.querySelector('.formula-sheet-head'),tmp=document.createElement('div');tmp.innerHTML=formulaOverviewMarkup(),overview=tmp.firstElementChild;
     if(head&&head.nextSibling)formula.insertBefore(overview,head.nextSibling);else formula.appendChild(overview);
   }
+}
+
+// Plain circuit notation, aligned with the photographs rather than dashboard UI.
+function examPaperCircuitSvg(def, key) {
+  var inverted=def.topology==='buckboost', buck=def.topology==='buck';
+  var marker='paper-arrow-'+key, h=[];
+  function path(d) { h.push('<path d="'+d+'"/>'); }
+  function text(x,y,label,anchor) { h.push('<text x="'+x+'" y="'+y+'" fill="currentColor" stroke="none" font-family="Georgia,serif" font-style="italic" font-size="16" text-anchor="'+(anchor||'middle')+'">'+label+'</text>'); }
+  function arrow(x1,y1,x2,y2,label,lx,ly) {
+    h.push('<path d="M'+x1+' '+y1+'L'+x2+' '+y2+'" marker-end="url(#'+marker+')" stroke-width="1.2"/>');
+    text(lx,ly,label);
+  }
+  function source() {
+    path('M45 60V107 M45 143V200');
+    h.push('<circle cx="45" cy="125" r="18"/>');
+    text(45,124,'+');text(45,137,'−');text(20,130,'E');
+  }
+  function sw(x,y,vertical) {
+    if(vertical) {
+      path('M'+x+' '+y+'v20 m0 28v22 M'+x+' '+(y+20)+'l-13 25');
+      h.push('<circle cx="'+x+'" cy="'+(y+20)+'" r="2"/><circle cx="'+x+'" cy="'+(y+48)+'" r="2"/>');
+      text(x-24,y+42,'S');
+    } else {
+      path('M'+x+' '+y+'h22 m28 0h25 M'+(x+22)+' '+y+'l25 -10');
+      h.push('<circle cx="'+(x+22)+'" cy="'+y+'" r="2"/><circle cx="'+(x+50)+'" cy="'+y+'" r="2"/>');
+      text(x+35,y+25,'S');
+    }
+  }
+  function inductor(x,y,vertical) {
+    var d='M'+x+' '+y;
+    if(vertical) { d+='v20'; for(var i=0;i<4;i++)d+='a7 7 0 0 1 0 14'; d+='v24'; }
+    else { d+='h12'; for(var j=0;j<4;j++)d+='a7 7 0 0 1 14 0'; d+='h12'; }
+    path(d);text(x+(vertical?22:40),y+(vertical?54:24),'L');
+    text(x+(vertical?-12:8),y+(vertical?14:-14),'+');
+    text(x+(vertical?-12:74),y+(vertical?100:-14),'−');
+    text(x+(vertical?-28:40),y+(vertical?57:-14),'vL');
+  }
+  function diode(x,y,left) {
+    path('M'+x+' '+y+'h18 m25 0h22');
+    path(left?'M'+(x+43)+' '+(y-9)+'l-25 9 25 9Z M'+(x+18)+' '+(y-11)+'v22':
+      'M'+(x+18)+' '+(y-9)+'l25 9 -25 9Z M'+(x+43)+' '+(y-11)+'v22');
+    text(x+30,y-18,'D');
+  }
+  function output() {
+    path('M365 60V120 M353 120h24 M353 130h24 M365 130V200');
+    path('M430 60V105 l-7 7 14 12 -14 12 14 12 -7 7 V200');
+    text(340,134,'C');text(450,137,'R');text(476,135,'vo');
+    text(474,78,inverted?'−':'+');text(474,195,inverted?'+':'−');
+    arrow(386,inverted?105:83,386,inverted?83:105,'iC',402,95);
+    arrow(inverted?421:380,40,inverted?380:421,40,'Io',400,27);
+    [365,430].forEach(function(x) { h.push('<circle cx="'+x+'" cy="60" r="2.6" fill="currentColor"/><circle cx="'+x+'" cy="200" r="2.6" fill="currentColor"/>'); });
+  }
+  h.push('<svg viewBox="0 0 500 240" role="img" aria-label="Circuito '+(buck?'Buck':inverted?'Buck-Boost inversor':'Boost')+'; referências de corrente e polaridade da prova"><defs><marker id="'+marker+'" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L8 4L0 8Z" fill="currentColor"/></marker></defs><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round">');
+  source();path('M45 200H430');
+  if(buck) {
+    path('M45 60H82');sw(82,60,false);path('M157 60H210');inductor(210,60,false);path('M290 60H430');
+    path('M180 60V117 M180 146V200 M170 146l10 -25 10 25Z M168 117h24');
+    text(159,140,'D');arrow(198,174,198,150,'iD',214,168);
+    arrow(155,40,190,40,'iS',170,27);arrow(294,82,325,82,'iL',312,103);
+    h.push('<circle cx="180" cy="60" r="2.6" fill="currentColor"/>');
+  } else if(inverted) {
+    path('M45 60H82');sw(82,60,false);path('M157 60H248');diode(248,60,true);path('M313 60H430');
+    path('M205 60V80');inductor(205,80,true);path('M205 180V200');
+    arrow(159,40,190,40,'iS',172,27);arrow(225,91,225,113,'iL',245,105);
+    h.push('<circle cx="205" cy="60" r="2.6" fill="currentColor"/>');
+  } else {
+    path('M45 60H80');inductor(80,60,false);path('M160 60H248');diode(248,60,false);path('M313 60H430');
+    path('M205 60V88');sw(205,88,true);path('M205 158V200');
+    arrow(224,87,224,108,'iS',242,104);arrow(313,83,347,83,'iD',330,104);
+    h.push('<circle cx="205" cy="60" r="2.6" fill="currentColor"/>');
+  }
+  output();h.push('</g></svg>');return h.join('');
+}
+
+function examDcmDiagramSvg(topology) {
+  var off=topology==='boost'?'E − V':'−V';
+  return '<svg viewBox="0 0 680 260" role="img" aria-label="DCM: vL tem patamares E, '+off+' e zero; iL cresce, decresce e permanece nula">'+
+    '<g fill="none" stroke="currentColor" stroke-width="1.4"><path d="M60 18V112 M60 68H650 M60 142V230 M60 230H650"/>'+
+    '<path d="M250 18V230 M450 18V230" stroke="#aaa" stroke-dasharray="4 5"/>'+
+    '<path d="M60 35H250V103H450V68H650 M60 230L250 152L450 230H650" stroke-width="2.3"/></g>'+
+    '<g fill="currentColor" font-family="Arial,sans-serif" font-size="15"><text x="8" y="44">vL</text><text x="8" y="174">iL</text>'+
+    '<text x="44" y="38" text-anchor="end">E</text><text x="48" y="73" text-anchor="end">0</text><text x="110" y="105">'+off+'</text>'+
+    '<text x="260" y="153">Ipk = EDTs / L</text><text x="48" y="236" text-anchor="end">0</text>'+
+    '<text x="140" y="253">DTs</text><text x="335" y="253">D₂Ts</text><text x="520" y="253">D₃Ts</text><text x="654" y="235">t</text></g></svg>';
 }
 
 function initExamMode() {
@@ -1601,14 +1701,91 @@ function historyPlotSvg(plot) {
   return html + '</svg>';
 }
 
+// Unknown amplitudes stay symbolic on the question sheet. Geometry is schematic.
+function examGivenPlot(id) {
+  var supplied=HISTORY_PLOTS[id], plot={end:supplied.end,ticks:supplied.ticks,traces:[]};
+  var names={
+    '2024-q2':['iD [A]'], '2024-q3':['vL [V]'],
+    '2025a-q2':['vL [V]','iC [A]'], '2025a-q3':['iS [A]'],
+    '2025b-q2':['vL [V]','iC [A]'], '2025b-q3':['iD [A]'],
+    '2026-q1':['vL [V]','iD [A]'], '2026-q2':['vL [V]','iD [A]'],
+    '2026-q3':['iS [A]']
+  };
+  supplied.traces.forEach(function(trace, i) {
+    plot.traces.push({name:names[id][i],points:trace.points,labels:[],brackets:[]});
+  });
+  var first=plot.traces[0], second=plot.traces[1];
+  function level(trace,value,label) { trace.labels.push({value:value,label:label}); }
+  function bracket(trace,t,from,to,label) { trace.brackets.push({t:t,from:from,to:to,label:label}); }
+  if(id==='2024-q2') {
+    level(first,6,'6 A');level(first,2,'2 A');
+  } else if(id==='2024-q3') {
+    level(first,12,'12 V');level(first,-48,'−V');
+    plot.traces.push({name:'iL [A]',points:[[0,1],[80,3],[100,1]],labels:[{value:1,label:'1 A?'}],brackets:[]});
+  } else if(id==='2025a-q2'||id==='2025b-q2') {
+    level(first,first.points[0][1],'E');level(first,-100,'−100 V');level(second,-1,'−1 A');
+    bracket(second,supplied.end,second.points[2][1],second.points[3][1],'2 A');
+  } else if(id==='2025a-q3'||id==='2025b-q3') {
+    level(first,6,'6 A');level(first,8,'8 A');
+  } else if(id==='2026-q1') {
+    level(first,first.points[0][1],'E');level(first,-150,'−150 V');
+    level(second,11,'11 A');bracket(second,100,11,6,'5 A');
+  } else if(id==='2026-q2') {
+    level(first,100,'100 V');level(first,-150,'E − V');level(second,4,'4 A');
+  } else if(id==='2026-q3') {
+    level(first,2,'Imin');bracket(first,60,4,2,'2 A');
+  }
+  if(['2024-q3','2025a-q2','2025b-q2','2026-q1','2026-q2'].includes(id)) {
+    var end=supplied.end, on=id==='2024-q3'?80:id==='2025a-q2'?70:id==='2025b-q2'?50:id==='2026-q1'?65:30;
+    plot.traces.unshift({name:'S',points:[[0,1],[on,1],[on,0],[end,0]],labels:[{value:1,label:'1'}],brackets:[]});
+  }
+  return plot;
+}
+
+function examGivenWaveSvg(id) {
+  var plot=examGivenPlot(id), W=440, left=68, right=92, panel=98, gap=24, H=plot.traces.length*(panel+gap)+16, h=[];
+  function x(t) { return left+(W-left-right)*t/plot.end; }
+  function txt(xp,yp,label,anchor) {
+    h.push('<text x="'+xp+'" y="'+yp+'" fill="currentColor" font-family="Arial,sans-serif" font-size="13" text-anchor="'+(anchor||'start')+'">'+label+'</text>');
+  }
+  h.push('<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Formas de onda do enunciado: '+plot.traces.map(function(t){return t.name;}).join(', ')+'"><title>Dados fornecidos; níveis desconhecidos indicados simbolicamente</title>');
+  plot.traces.forEach(function(trace,i) {
+    var top=12+i*(panel+gap), vals=trace.points.map(function(p){return p[1];}).concat([0]);
+    var lo=Math.min.apply(null,vals),hi=Math.max.apply(null,vals),pad=(hi-lo)*.18;
+    lo-=pad;hi+=pad;
+    function y(v) { return top+panel*(hi-v)/(hi-lo||1); }
+    h.push('<path d="M'+left+' '+top+'V'+(top+panel)+' M'+left+' '+y(0)+'H'+(W-right+12)+'" fill="none" stroke="currentColor" stroke-width="1"/>');
+    txt(4,top-2,trace.name);txt(left-8,y(0)+5,'0','end');
+    plot.ticks.forEach(function(t) {
+      h.push('<path d="M'+x(t)+' '+top+'V'+(top+panel)+'" stroke="#aaa" stroke-width=".8" stroke-dasharray="3 4"/>');
+      txt(x(t),top+panel+17,String(t),'middle');
+    });
+    txt(W-6,top+panel+17,'t [µs]','end');
+    h.push('<path d="'+trace.points.map(function(p,j){return (j?'L':'M')+x(p[0])+' '+y(p[1]);}).join(' ')+'" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>');
+    trace.labels.forEach(function(l){txt(left-8,y(l.value)+5,l.label,'end');});
+    trace.brackets.forEach(function(b) {
+      var bx=x(b.t)+18, y1=y(b.from),y2=y(b.to);
+      h.push('<path d="M'+bx+' '+y1+'V'+y2+' M'+(bx-5)+' '+y1+'h10 M'+(bx-5)+' '+y2+'h10" fill="none" stroke="currentColor"/>');
+      txt(bx+9,(y1+y2)/2+4,b.label);
+    });
+  });
+  h.push('</svg>');return h.join('');
+}
+
 function initHistoryPlots() {
   document.querySelectorAll('[data-history-plot]').forEach(function (host) {
     var plot = HISTORY_PLOTS[host.dataset.historyPlot];
-    if (plot) host.innerHTML = historyPlotSvg(plot);
+    if (plot) {
+      var caption=host.querySelector('figcaption');
+      host.innerHTML = host.closest('.exam-paper') ? examGivenWaveSvg(host.dataset.historyPlot) : historyPlotSvg(plot);
+      if(caption)host.appendChild(caption);
+    }
   });
   document.querySelectorAll('[data-history-capacitor]').forEach(function (host) {
+    var caption=host.querySelector('figcaption');
     host.innerHTML = historyPlotSvg(historyCapacitorPlot(host.dataset.historyCapacitor)) +
       '<p>vC normalizada: 0 = mínimo e 1 = máximo, sobre o nível CC da saída. A ampliação destaca a curvatura: corrente em rampa gera parábola; corrente constante gera reta. q(t) = ∫iC dt tem a mesma forma de vC, pois vC = vC(0) + q/C. A amplitude depende de C; os tempos dos extremos vêm de iC.</p>';
+    if(caption)host.appendChild(caption);
   });
 }
 

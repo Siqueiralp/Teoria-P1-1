@@ -121,6 +121,10 @@ def summary(db, status):
             continue
         rows.append(f'| {label} | {row["views"]} | {row["active_seconds"] / 60:.1f} | {row["graph_actions"]} |')
     rows += ['', 'Sessões de abas não equivalem a pessoas únicas. IPs, IDs de sessões e eventos individuais ficam no banco criptografado da branch `codex/analytics-data`.', END]
+    for field, title in [('browser', 'Navegadores'), ('os', 'Sistemas')]:
+        values = [f'{name}: {count}' for name, count in data[field].items() if isinstance(name, str) and re.fullmatch(r'[a-zA-Z0-9]+', name)]
+        if values:
+            rows.insert(-2, f'{title} por visita: ' + ', '.join(values) + '.')
     return '\n'.join(rows)
 
 
@@ -156,7 +160,26 @@ def update_readme(db, status, remote):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--initialize-only', action='store_true')
+    parser.add_argument('--decrypt', type=Path, help='Restore an encrypted snapshot locally; does not contact GitHub')
+    parser.add_argument('--output', type=Path)
     args = parser.parse_args()
+    if args.decrypt:
+        from dotenv import load_dotenv
+        load_dotenv(ROOT / '.env', override=False)
+        if not args.output or args.output.exists():
+            raise ValueError('Choose a new output file; existing databases are never overwritten')
+        content = Fernet(os.environ['ANALYTICS_DB_KEY'].encode()).decrypt(args.decrypt.read_bytes())
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        with args.output.open('xb') as output:
+            output.write(content)
+        check = sqlite3.connect(f'file:{args.output.resolve().as_posix()}?mode=ro', uri=True)
+        try:
+            if check.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
+                raise ValueError('Restored snapshot invalid')
+        finally:
+            check.close()
+        print('Snapshot restored to a new local SQLite file; existing database preserved.')
+        return
     cipher = Fernet(os.environ['ANALYTICS_DB_KEY'].encode())
     auth(os.environ['GITHUB_TOKEN'])
     remote = 'https://github.com/' + os.environ['GITHUB_REPOSITORY'] + '.git'

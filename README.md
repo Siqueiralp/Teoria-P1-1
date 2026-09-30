@@ -3,9 +3,16 @@
 <!-- analytics:start -->
 ## Uso do guia
 
-Aguardando a primeira coleta diária. O histórico SQLite fica criptografado na branch `codex/analytics-data`; somente métricas agregadas são publicadas aqui.
+Aguardando configuração das credenciais MQTT; coleta ainda não ativada.
 
-Rotina diária prevista para **03:17 (America/Sao_Paulo)**, com execução manual em **Actions → Daily engagement fetch**. A coleta depende dos secrets MQTT configurados.
+Último evento coletado (UTC): Nenhum evento coletado.
+
+Histórico preservado: **0 eventos**. Nos últimos 30 dias: **0 visitas**, **0 sessões de abas**, **0.0 minutos ativos**.
+
+| Página | Visitas | Minutos ativos | Ações nos gráficos |
+| --- | ---: | ---: | ---: |
+
+Sessões de abas não equivalem a pessoas únicas. IPs, IDs de sessões e eventos individuais ficam no banco criptografado da branch `codex/analytics-data`.
 <!-- analytics:end -->
 
 Este repositório deixou de ser uma página monolítica de Eletrônica de Potência e passou a ser uma base reutilizável para múltiplas matérias.
